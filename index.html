@@ -281,7 +281,7 @@ body:not(.audio-playing) .track-row.is-active .track-num::before{content:'‖ ';
 .vol-slider::-moz-range-thumb{width:10px;height:18px;background:var(--mint);cursor:pointer;border:none;border-radius:0}
 .np-actions{display:flex;align-items:center;gap:8px}
 .np-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 14px;border:1px solid var(--line);background:transparent;color:var(--muted);font:13px var(--mono);letter-spacing:.12em;text-transform:uppercase;transition:border-color .1s,color .1s,background .1s;white-space:nowrap}
-.np-btn:hover,.np-btn[aria-expanded="true"]{border-color:var(--mint);color:var(--mint)}
+.np-btn:hover,.np-btn[aria-expanded="true"],.np-btn.is-active{border-color:var(--mint);color:var(--mint)}
 
 .np-panel{position:fixed;right:24px;bottom:calc(var(--bar-h) + 14px);z-index:401;width:min(460px,calc(100vw - 32px));max-height:min(62vh,600px);display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--mint);box-shadow:8px 8px 0 rgba(0,0,0,.6)}
 .np-panel-head{flex:0 0 auto;display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
@@ -297,7 +297,7 @@ body:not(.audio-playing) .track-row.is-active .track-num::before{content:'‖ ';
 /* ══════════════════════════════════════
    Overlay views — Saved / About
 ══════════════════════════════════════ */
-.saved-view,.about-view,.recent-view{position:fixed;inset:0;bottom:var(--np-offset);z-index:200;background:rgba(7,8,10,.96);overflow-y:auto;padding:56px 64px}
+.saved-view,.about-view,.recent-view,.app-view{position:fixed;inset:0;bottom:var(--np-offset);z-index:200;background:rgba(7,8,10,.96);overflow-y:auto;padding:56px 64px}
 .eyebrow{margin:0 0 12px;color:var(--mint);font:12px var(--mono);letter-spacing:.2em;text-transform:uppercase}
 .saved-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;padding-bottom:24px;border-bottom:1px solid var(--line);margin-bottom:28px}
 .saved-heading h1{margin:0;font:400 clamp(40px,6vw,72px)/.98 var(--mono);letter-spacing:-.01em}
@@ -339,6 +339,28 @@ button.saved-link:hover .saved-title{color:var(--mint)}
 .about-inner .about-note{color:var(--muted)}
 .about-back{margin-top:26px;border:1px solid var(--line);background:none;padding:11px 18px;color:var(--ink);font:13px var(--mono);letter-spacing:.12em;text-transform:uppercase;transition:border-color .1s,color .1s}
 .about-back:hover{border-color:var(--mint);color:var(--mint)}
+/* Get the app */
+.app-inner{max-width:1080px;margin:0 auto}
+.app-inner h1{margin:0 0 18px;font:400 clamp(44px,7vw,80px)/.98 var(--mono)}
+.app-lead{max-width:640px;margin:0 0 30px;color:#aaa6a0;font:16px/1.7 var(--mono);letter-spacing:.04em}
+.app-here{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;padding:22px 24px;border:1px solid var(--mint);margin-bottom:34px}
+.app-here-text{flex:1 1 280px;margin:0;color:var(--ink);font:15px/1.6 var(--mono);letter-spacing:.04em}
+.app-here-text strong{color:var(--mint);font-weight:400}
+.app-here-text kbd,.app-card kbd{padding:1px 6px;border:1px solid var(--line);color:var(--ink);font:inherit;font-size:13px}
+.app-install{border:1px solid var(--mint);background:var(--mint);color:var(--bg);padding:14px 22px;font:14px var(--mono);letter-spacing:.14em;text-transform:uppercase;transition:opacity .1s}
+.app-install:hover{opacity:.85}
+.app-install[hidden]{display:none}
+.app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.app-card{display:flex;flex-direction:column;gap:12px;padding:20px;border:1px solid var(--line)}
+.app-card.is-here{border-color:var(--mint)}
+.app-card h2{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0;font:400 20px var(--mono);letter-spacing:.06em}
+.app-card h2 span{display:none;color:var(--mint);font-size:11px;letter-spacing:.18em;white-space:nowrap}
+.app-card.is-here h2 span{display:inline}
+.app-card ol{margin:0;padding-left:20px;color:#aaa6a0;font:14px/1.65 var(--mono);letter-spacing:.03em}
+.app-card li+li{margin-top:6px}
+.app-card p{margin:0;color:var(--muted);font:13px/1.6 var(--mono);letter-spacing:.03em}
+.app-url{color:var(--mint);word-break:break-all}
+.np-cast[hidden]{display:none}
 
 /* ══ Tooltip ══ */
 .material-tip{position:fixed;z-index:500;width:min(380px,calc(100vw - 24px));padding:16px 18px;background:var(--panel);border:1px solid var(--line);box-shadow:5px 5px 0 rgba(0,0,0,.6);pointer-events:none;font:14px/1.5 var(--mono)}
@@ -383,7 +405,9 @@ button.saved-link:hover .saved-title{color:var(--mint)}
   .list-footer{flex-basis:100%}
   .status{text-align:left}
   .tracklist-body{grid-auto-columns:minmax(200px,80%)}
-  .saved-view,.about-view,.recent-view{padding:28px 18px}
+  .saved-view,.about-view,.recent-view,.app-view{padding:28px 18px}
+  .app-here{padding:18px}
+  .app-install{width:100%}
   .saved-row{grid-template-columns:56px minmax(0,1fr);gap:12px}
   .saved-row .row-actions{grid-column:1 / -1;justify-content:flex-start}
   .saved-cover{width:56px;height:56px}
@@ -398,6 +422,8 @@ button.saved-link:hover .saved-title{color:var(--mint)}
   .np-close{display:none}
   .np-panel{right:16px;left:16px;width:auto}
 }
+/* Four header buttons on a narrow phone */
+@media(max-width:480px){.header-actions{gap:4px}.hdr-btn{padding:7px 6px;font-size:11px;letter-spacing:0}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </head>
@@ -415,6 +441,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
       <span class="brand-copy"><strong>THE DEEP CUT</strong><span>Internet Archive · Music</span></span>
     </a>
     <nav class="header-actions" aria-label="Site navigation">
+      <button class="hdr-btn" id="appToggle" type="button" aria-label="Get the app" aria-pressed="false">[ APP ]</button>
       <button class="hdr-btn" id="aboutToggle" type="button" aria-pressed="false">[ ABOUT ]</button>
       <button class="hdr-btn" id="recentToggle" type="button" aria-label="Open recently played tracks" aria-pressed="false">[ RECENT ]</button>
       <button class="hdr-btn" id="savedToggle" type="button" aria-label="Open saved albums" aria-pressed="false">
@@ -532,6 +559,57 @@ button.saved-link:hover .saved-title{color:var(--mint)}
   </div>
 </div>
 
+<!-- Get the app: install on this device, or play on a TV -->
+<div class="app-view" id="appView" hidden>
+  <div class="app-inner">
+    <p class="eyebrow">// TAKE IT WITH YOU</p>
+    <h1>Get the app.</h1>
+    <p class="app-lead">Install The Deep Cut on your phone or computer. It opens full screen from its own icon and shows the track and cover on your lock screen and media keys. Free, no store, no account. Updates arrive on their own.</p>
+    <div class="app-here">
+      <p class="app-here-text" id="appHereText"></p>
+      <button class="app-install" id="appInstall" type="button" hidden>↓ INSTALL APP</button>
+    </div>
+    <div class="app-grid">
+      <section class="app-card" data-platform="ios">
+        <h2>iPhone · iPad <span>THIS DEVICE</span></h2>
+        <ol>
+          <li>Open <span class="app-url">thedeepcut.vercel.app</span> in Safari.</li>
+          <li>Tap Share <kbd>⬆</kbd> (bottom of the screen on iPhone, top on iPad).</li>
+          <li>Choose <kbd>Add to Home Screen</kbd>, then <kbd>Add</kbd>.</li>
+        </ol>
+        <p>Apple does not let websites install themselves, so these taps are needed once.</p>
+      </section>
+      <section class="app-card" data-platform="android">
+        <h2>Android <span>THIS DEVICE</span></h2>
+        <ol>
+          <li>Open the site in Chrome.</li>
+          <li>Tap <kbd>↓ INSTALL APP</kbd> above, or menu <kbd>⋮</kbd> → <kbd>Install app</kbd>.</li>
+        </ol>
+        <p>Samsung Internet and Edge work too: look for “Install” or “Add to home screen”.</p>
+      </section>
+      <section class="app-card" data-platform="desktop">
+        <h2>Computer <span>THIS DEVICE</span></h2>
+        <ol>
+          <li>Windows, Mac or Linux: open the site in Chrome or Edge.</li>
+          <li>Click <kbd>↓ INSTALL APP</kbd> above, or the install icon at the right of the address bar.</li>
+          <li>Mac with Safari: <kbd>File</kbd> → <kbd>Add to Dock</kbd>.</li>
+        </ol>
+        <p>Firefox cannot install sites as apps: use Chrome, Edge or Safari for this step.</p>
+      </section>
+      <section class="app-card" data-platform="tv">
+        <h2>TV <span>THIS DEVICE</span></h2>
+        <ol>
+          <li>Chromecast or Google TV: on Android, start an album and tap <kbd>▭ TV</kbd> in the player.</li>
+          <li>Apple TV or AirPlay speaker: on iPhone or Mac, tap <kbd>▭ TV</kbd> in the player, or pick AirPlay in Control Center.</li>
+          <li>From a computer: Chrome menu <kbd>⋮</kbd> → <kbd>Cast…</kbd> → choose your TV.</li>
+          <li>Smart TV with a browser: open <span class="app-url">thedeepcut.vercel.app</span> on the TV itself.</li>
+        </ol>
+      </section>
+    </div>
+    <button class="about-back" id="appBack" type="button">← BACK TO THE ARCHIVE</button>
+  </div>
+</div>
+
 <!-- Now playing: persists while browsing, refreshing the selection and reloading the page -->
 <div class="np-bar" id="npBar" role="region" aria-label="Now playing" hidden>
   <div class="np-seek" id="npSeek" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="np-seek-fill" id="npSeekFill"></span></div>
@@ -552,6 +630,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
     <input type="range" class="vol-slider" id="volSlider" min="0" max="100" step="5" value="100" aria-label="Volume">
   </div>
   <div class="np-actions">
+    <button class="np-btn np-cast" id="npCast" type="button" aria-label="Play on TV or speaker" title="Play on TV or speaker" hidden>▭<span class="np-btn-label"> TV</span></button>
     <button class="np-btn" id="npListToggle" type="button" aria-expanded="false" aria-controls="npPanel">≡<span class="np-btn-label"> TRACKLIST</span></button>
     <button class="np-btn np-close" id="npClose" type="button" aria-label="Stop and close player">✕</button>
   </div>
@@ -1375,16 +1454,71 @@ function syncLibraryRows(){
 }
 
 /* ── Views ── */
-const VIEWS={saved:['savedView','savedToggle'],recent:['recentView','recentToggle'],about:['aboutView','aboutToggle']};
+const VIEWS={saved:['savedView','savedToggle'],recent:['recentView','recentToggle'],about:['aboutView','aboutToggle'],app:['appView','appToggle']};
 function setView(name){
   Object.keys(VIEWS).forEach(key=>{const [view,toggle]=VIEWS[key];$(view).hidden=key!==name;$(toggle).setAttribute('aria-pressed',String(key===name));});
   if(name==='saved')renderSaved();
   if(name==='recent')renderRecent();
+  if(name==='app')renderAppView();
 }
 function setHomeView(){setView(null);}
 function setSavedView(show){setView(show?'saved':null);}
 function setRecentView(show){setView(show?'recent':null);}
 function setAboutView(show){setView(show?'about':null);}
+function setAppView(show){setView(show?'app':null);}
+
+/* ── Get the app ──
+   Chrome and Edge (Android, Windows, Mac, Linux) hand over an install prompt
+   that the button opens in one tap. Safari never does, so iPhone/iPad and
+   Mac Safari get the steps instead. */
+let installPrompt=null;
+const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+function devicePlatform(){
+  const ua=navigator.userAgent;
+  if(/iPad|iPhone|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1))return 'ios';
+  if(/SMART-TV|SmartTV|Tizen|Web0S|webOS|HbbTV|NetCast|Viera|AppleTV|GoogleTV|BRAVIA|\bAFT\w|Android TV/i.test(ua))return 'tv';
+  if(/Android/.test(ua))return 'android';
+  return 'desktop';
+}
+function renderAppView(){
+  const platform=devicePlatform(),ua=navigator.userAgent;
+  document.querySelectorAll('.app-card').forEach(card=>card.classList.toggle('is-here',card.dataset.platform===platform));
+  $('appInstall').hidden=!installPrompt||isStandalone();
+  let text;
+  if(isStandalone())text='<strong>Installed.</strong> You are already using the app on this device.';
+  else if(installPrompt)text='<strong>Ready to install.</strong> One tap adds The Deep Cut to this device.';
+  else if(platform==='ios')text=/CriOS|FxiOS|EdgiOS/.test(ua)?'<strong>On iPhone or iPad:</strong> tap Share, then “Add to Home Screen” (if it is missing, open the site in Safari).':'<strong>On iPhone or iPad:</strong> tap Share <kbd>⬆</kbd>, then “Add to Home Screen”.';
+  else if(platform==='tv')text='<strong>On a TV:</strong> keep this page open and press play. Bookmark it to come back.';
+  else if(/Firefox\//.test(ua))text='<strong>Firefox cannot install apps.</strong> Open this site in Chrome or Edge to install it.';
+  else if(/Safari\//.test(ua)&&!/Chrome|Chromium|Edg\//.test(ua))text='<strong>On Mac Safari:</strong> menu File → “Add to Dock”.';
+  else text='<strong>Install from the browser menu</strong> or the install icon in the address bar. If neither shows up, the app is probably installed already.';
+  $('appHereText').innerHTML=text;
+}
+async function installApp(){
+  if(!installPrompt)return;
+  const prompt=installPrompt;installPrompt=null;
+  try{await prompt.prompt();await prompt.userChoice;}catch(_){}
+  renderAppView();
+}
+addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;if(!$('appView').hidden)renderAppView();});
+addEventListener('appinstalled',()=>{installPrompt=null;showShareToast('[ APP INSTALLED ]');if(!$('appView').hidden)renderAppView();});
+
+/* ── Play on TV ──
+   Remote Playback (Chromecast / Google TV, mainly Chrome on Android) and
+   AirPlay (Safari). The button only shows while a device is reachable. */
+function bindCast(){
+  const btn=$('npCast'),remote=previewAudio.remote;
+  document.body.appendChild(previewAudio); // both APIs want the element in the page; with no controls attribute it stays invisible
+  if(remote&&remote.watchAvailability){
+    remote.watchAvailability(ok=>{btn.hidden=!ok;}).catch(()=>{/* no remote playback for this media here */});
+    btn.addEventListener('click',()=>remote.prompt().catch(()=>{}));
+    const sync=()=>btn.classList.toggle('is-active',remote.state!=='disconnected');
+    ['connecting','connect','disconnect'].forEach(t=>remote.addEventListener(t,sync));
+  }else if(window.WebKitPlaybackTargetAvailabilityEvent){
+    previewAudio.addEventListener('webkitplaybacktargetavailabilitychanged',event=>{btn.hidden=event.availability!=='available';});
+    btn.addEventListener('click',()=>previewAudio.webkitShowPlaybackTargetPicker());
+  }
+}
 function exportSaved(){
   const blob=new Blob([JSON.stringify(getSaved(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download='deep-cuts-saved-albums.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -1495,7 +1629,7 @@ async function refreshAll(onlyMissing){
 
 /* ── Bind ── */
 function bind(){
-  bindPreviewAudio();bindMediaSession();
+  bindPreviewAudio();bindMediaSession();bindCast();
   $('albumList').addEventListener('click',event=>{
     const row=event.target.closest('.album-card');if(!row||row.classList.contains('is-loading'))return;
     const index=Number(row.dataset.index);if(isNaN(index))return;
@@ -1559,6 +1693,9 @@ function bind(){
   $('refresh').addEventListener('click',()=>refreshAll(false));
   $('savedToggle').addEventListener('click',()=>setSavedView($('savedView').hidden));
   $('aboutToggle').addEventListener('click',()=>setAboutView($('aboutView').hidden));
+  $('appToggle').addEventListener('click',()=>setAppView($('appView').hidden));
+  $('appBack').addEventListener('click',setHomeView);
+  $('appInstall').addEventListener('click',installApp);
   $('recentToggle').addEventListener('click',()=>setRecentView($('recentView').hidden));
   $('brandHome').addEventListener('click',event=>{event.preventDefault();setHomeView();});
   $('backHome').addEventListener('click',setHomeView);

@@ -46,6 +46,8 @@ Arquivos:
 - assets/: logo, ícones e fonte Geist Pixel usada no site. Os arquivos Fraunces antigos permanecem disponíveis, mas já não são carregados pela página.
 
 Instalar como app:
+- O botão [ APP ] no topo abre a seção "Get the app". No Chrome e no Edge (Android, Windows, Mac, Linux) ela mostra o botão INSTALL APP, que instala com um clique. No iPhone/iPad e no Safari do Mac (que não permitem instalação automática) ela mostra os passos certos. O cartão do aparelho atual fica destacado.
+- TV: o botão ▭ TV aparece no player quando há um Chromecast/Google TV (Chrome no Android) ou um Apple TV/AirPlay (Safari) por perto, e manda a música para lá. A seção também explica como transmitir do Chrome no computador e como abrir o site no navegador da smart TV.
 - Android (Chrome): menu ⋮ → Instalar app (ou Adicionar à tela inicial).
 - iPhone/iPad (Safari): Compartilhar → Adicionar à Tela de Início.
 - Windows/Mac (Chrome ou Edge): ícone de instalar na barra de endereço, ou menu → Instalar The Deep Cut.
