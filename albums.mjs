@@ -3,6 +3,11 @@
    albums with exactly the same rules. No DOM access in here. */
 const API='https://archive.org/advancedsearch.php';
 const FIELDS=['identifier','title','description','creator','year','date','mediatype','subject','publisher','coverage','language','collection','format'];
+const REGIONAL_COLLECTIONS=['audio_music','hifidelity','opensource_audio','cratediggers','netlabels','jamendo-albums','unlockedrecordings','folksoundomy_music'];
+const BRAZILIAN_SUBJECTS='mpb OR samba OR "bossa nova" OR bossanova OR "musica brasileira" OR "música brasileira" OR "brazilian music" OR "brazilian jazz" OR "brazilian rock" OR "rock brasileiro" OR brazilian OR forro OR forró OR choro OR tropicalia OR tropicália OR baiao OR baião OR frevo OR "samba rock" OR "samba-jazz" OR "jovem guarda" OR axé OR brega OR sertanejo OR pagode';
+const LATIN_SUBJECTS='cumbia OR salsa OR bolero OR boleros OR merengue OR "son cubano" OR "afro-cuban" OR "latin jazz" OR "latin rock" OR "latin music" OR "música latina" OR "musica latina" OR "música tropical" OR "musica tropical" OR ranchera OR mariachi OR bachata OR "nueva canción" OR "nueva cancion" OR "rock en español" OR "rock nacional" OR vallenato OR huayno OR guaracha OR mambo OR tango OR reggaeton';
+// Chart rips ("Sertanejo Top 2020", "pagode2017 musicas novas") and radio shows are left out
+function regionalQuery(subjects){return 'mediatype:audio AND collection:('+REGIONAL_COLLECTIONS.join(' OR ')+') AND subject:('+subjects+') AND NOT title:(top OR "mais tocadas" OR "musicas novas" OR radio OR podcast)';}
 /* trusted: every item in the collection is an album, so the "album" wording
    check is skipped (the four-track, cover and spoken-word checks still apply) */
 const SOURCES=[
@@ -14,8 +19,14 @@ const SOURCES=[
   {name:'Hip-hop mixtapes',collection:'hiphopmixtapes',trusted:true,query:'mediatype:audio AND collection:hiphopmixtapes AND downloads:[1000 TO *] AND NOT title:(VA OR hosted OR presents OR chopped OR screwed OR "DJ")'},
   {name:'Digitized LPs',collection:'audio_music',query:'mediatype:audio AND collection:audio_music AND subject:LP'},
   {name:'Open source albums',collection:'opensource_audio',query:'mediatype:audio AND collection:opensource_audio AND subject:album'},
-  {name:'Open source album titles',collection:'opensource_audio',query:'mediatype:audio AND collection:opensource_audio AND title:album'}
+  {name:'Open source album titles',collection:'opensource_audio',query:'mediatype:audio AND collection:opensource_audio AND title:album'},
+  // Brazilian and Latin American records are scattered across the big collections, so these two read them by genre.
+  // Trusted: rips like "Tim Maia (1971)" or "Secos & Molhados" never say "album", and the genre tag already vouches for them
+  {name:'Brazilian albums',collection:REGIONAL_COLLECTIONS,trusted:true,query:regionalQuery(BRAZILIAN_SUBJECTS)},
+  {name:'Latin American albums',collection:REGIONAL_COLLECTIONS,trusted:true,query:regionalQuery(LATIN_SUBJECTS)},
+  {name:'Colombian música campesina',collection:'musica-campesina',trusted:true,query:'mediatype:audio AND collection:musica-campesina'}
 ];
+function sourceCollections(source){return [].concat(source.collection);}
 const QUERY_TTL=5*60*1000,TOTAL_TTL=60*60*1000,METADATA_TTL=30*60*1000;
 /* The search API stops at result 10,000, so a page drawn from the whole
    collection mostly failed and the big collections were almost never read.
@@ -201,7 +212,7 @@ export function resolveArtist(title,meta,doc){
 }
 function genericTitle(t){return t.length<5||/^(?:untitled|unknown|album|full album|music|audio|track)(?:\s*[-#]?\s*\d+)?$/i.test(t);}
 /* Discogs files speeches, lessons and readings under the "Non-Music" genre */
-const SPOKEN_RE=/\b(podcast|radio program|radio show|sermon|lecture|audiobook|audio book|talk show|news broadcast|non-music|spoken word)\b/i;
+const SPOKEN_RE=/\b(podcast|radio program|radio show|sermon|lecture|audiobook|audio book|talk show|news broadcast|non-music|spoken word|language course|foreign service institute)\b/i;
 export function isSpokenText(text){return SPOKEN_RE.test(text);}
 function isSpokenRecord(meta,doc,collections){
   const s=values(meta.subject||doc.subject).join(' '),words=[meta.title,meta.description,meta.genre,s].map(v=>clean(v,500)).join(' ');
@@ -244,7 +255,7 @@ export function aiSlopReason(info){
    composers and conductors, classical labels) are left out entirely. Only
    title, artist, subjects, genre and label are read: a description that
    mentions "classical influences" does not reject a rock record. */
-const CLASSICAL_WORK_RE=/\b(?:symphon(?:y|ies|ic poem)|sinfon(?:ia|ie|ía|ias|ietta)|symphonie|concert(?:o|os|i|ino)|concierto|sonat(?:a|as|e|ina)|string quartet|quatuor|streichquartett|cuarteto para cuerdas|quarteto de cordas|philharmoni[ac]|symphony orchestra|chamber (?:music|orchestra)|orchestre|orchestra sinfonica|requiem|réquiem|cantatas?|oratori(?:o|um)|overtures?|nocturnes?|preludes? and fugues?|fugues?|partitas?|etudes?|études?|mass in [a-g]|operas?|opéra|operetta|lieder|baroque|barroco|classical|klassik|clásica|cl[aá]ssica|early music|renaissance music|der renaissance|instrumentalmusik|medieval music|gregorian|plainchant|chants? gr[eé]goriens?|missa|messes?|mše|motets?|madrigals?|frottol[ae]|sacred vocal music|choruses, sacred|string orchestra music|harpsichord|clavecin|cembalo|carmina burana|abbaye|benedictine monks|moines|moniales|domspatzen|pro musica|collegium|consort|concertgebouw|gewandhaus|staatskapelle|(?:bwv|kv|hob)\.?\s?\d+|(?:opus|op\.)\s?\d+|in [a-g](?:[\s-](?:flat|sharp|dur|moll|bémol|dièse))?[\s,-]+(?:major|minor))\b/i;
+const CLASSICAL_WORK_RE=/\b(?:symphon(?:y|ies|ic poem)|sinfon(?:ia|ie|ía|ias|ietta)|symphonie|concert(?:o|os|i|ino)|concierto|sonat(?:a|as|e|ina)|string quartet|quatuor|streichquartett|cuarteto para cuerdas|quarteto de cordas|philharmoni[ac]|symphony orchestra|chamber (?:music|orchestra)|orchestre|orchestra sinfonica|requiem|réquiem|cantatas?|oratori(?:o|um)|overtures?|nocturnes?|preludes? and fugues?|fugues?|partitas?|etudes?|études?|mass in [a-g]|operas?|opéra|operetta|lieder|baroque|barroco|classical|klassik|clásica|cl[aá]ssica|early music|renaissance music|der renaissance|instrumentalmusik|medieval music|gregorian|plainchant|chants? gr[eé]goriens?|missa|messes?|mše|motets?|madrigals?|frottol[ae]|sacred vocal music|sacred music|choruses, sacred|musicology|magnificat|te deum|stabat mater|matinas|trezena|ladainha|string orchestra music|harpsichord|clavecin|cembalo|carmina burana|abbaye|benedictine monks|moines|moniales|domspatzen|pro musica|collegium|consort|concertgebouw|gewandhaus|staatskapelle|(?:bwv|kv|hob)\.?\s?\d+|(?:opus|op\.)\s?\d+|in [a-g](?:[\s-](?:flat|sharp|dur|moll|bémol|dièse))?[\s,-]+(?:major|minor))\b/i;
 /* Catalog credits of the digitized LPs: "Fournet Jean, cond.", "Stader Maria, sop.",
    "Ruf Hugo, clav.", "c.b. David Munrow", and orchestra abbreviations ("S.O. Prague", "Radio Ph.O.") */
 const CLASSICAL_CREDIT_RE=/,\s*(?:cond|sop|mezzo|alt|ten|clav|hpd|hpsd|rec)\.|(?:^|[\s;(])[cd]\.b\.\s|\b(?:s|ph|phil)\.\s?o\.|\b(?:supraphon|dgg|archiv|candide|l'oiseau-lyre|b[aä]e?renreiter|festival classique|melodiya|saga pan|red seal)\b/i;
@@ -259,6 +270,12 @@ export function isClassical(info){
    collection name: "industrial rock" and "rock" are different styles, while
    "rap", "hip-hop" and "hiphop" are the same. A pool holds one album per style. */
 const STYLES=[
+  // Brazilian and Latin styles come first, so "rock en español" or "latin jazz" is not read as plain rock or jazz
+  ['samba rock',/samba[\s-]rock/],['bossa nova',/bossa/],['mpb',/\bmpb\b/],['samba',/samba|pagode/],['tropicália',/tropic[aá]lia/],['jovem guarda',/jovem guarda/],['forró',/forr[oó]|bai[aã]o|xote/],['choro',/\bchoro\b/],
+  ['frevo',/\bfrevo\b/],['axé',/ax[eé] music|\baxé/],['brega',/\bbrega\b/],['sertanejo',/sertanej/],['rock en español',/rock en espa[nñ]ol|rock nacional|latin rock|rock brasileiro|brazilian rock/],
+  ['latin jazz',/latin jazz|samba[\s-]jazz|brazilian jazz|afro[\s-]cuban jazz/],['vallenato',/vallenato/],['música campesina',/parrander|guasca|campesin/],['bolero',/\bboleros?\b/],
+  ['merengue',/merengue/],['bachata',/bachata/],['reggaeton',/reggaet[oó]n/],['ranchera',/ranchera|mariachi|norte[nñ]o/],['nueva canción',/nueva canci[oó]n/],
+  ['son cubano',/son cubano|afro[\s-]cuban|guaracha|guaguanc[oó]/],['latin hip hop',/latin (?:rap|hip[\s-]?hop)|rap (?:latino|en espa[nñ]ol)|spanish (?:rap|hip[\s-]?hop)/],
   ['industrial metal',/industrial[\s-]metal/],['industrial rock',/industrial[\s-]rock/],['black metal',/black[\s-]metal/],['death metal',/death[\s-]metal/],
   ['doom metal',/doom|sludge/],['thrash metal',/thrash/],['metalcore',/metalcore|deathcore/],['grindcore',/grindcore|goregrind/],['metal',/\bmetal\b/],
   ['post-rock',/post[\s-]?rock/],['post-punk',/post[\s-]?punk|coldwave|darkwave/],['shoegaze',/shoegaze|dream[\s-]?pop/],['math rock',/math[\s-]?rock/],
@@ -276,13 +293,13 @@ const STYLES=[
   ['electronic',/electronic|electronica|\bedm\b|\bdance\b/],
   ['free jazz',/free jazz|free improvisation|\bimprov/],['jazz fusion',/jazz[\s-]?fusion|jazz[\s-]?rock/],['jazz',/jazz|bebop|\bswing\b/],['blues',/blues/],['soul',/\bsoul\b|motown/],
   ['funk',/\bfunk\b/],['r&b',/r&b|r'n'b|rhythm and blues|\brnb\b/],['disco',/disco/],['reggae',/reggae/],['dub',/\bdub\b/],['ska',/\bska\b|rocksteady/],
-  ['dancehall',/dancehall/],['afrobeat',/afro[\s-]?beat|\bafro\b/],['bossa nova',/bossa/],['samba',/samba|pagode/],['mpb',/\bmpb\b/],['salsa',/salsa|mambo/],
+  ['dancehall',/dancehall/],['afrobeat',/afro[\s-]?beat|\bafro\b/],['salsa',/salsa|mambo/],
   ['cumbia',/cumbia/],['tango',/tango/],['flamenco',/flamenco/],['latin',/\blatin/],['k-pop',/k-?pop/],['j-pop',/j-?pop|anime/],
   ['bluegrass',/bluegrass/],['country',/country|americana/],['folk',/\bfolk\b|acoustic|singer[\s-]?songwriter/],['world',/\bworld\b|traditional|ethnic/],
   ['soundtrack',/soundtrack|\bscore\b|motion picture|\bost\b/],['exotica',/exotica|lounge|easy listening/],['new age',/new age|meditation/],['children',/children|\bkids\b/],
   ['comedy',/comedy|humou?r/],['gospel',/gospel|worship|christian/],['polka',/polka/],['indie pop',/indie[\s-]?pop/],['pop',/\bpop\b/],['indie',/\bindie\b/]
 ];
-const COLLECTION_STYLE={hiphopmixtapes:'hip hop'};
+const COLLECTION_STYLE={hiphopmixtapes:'hip hop','musica-campesina':'música campesina'};
 export function styleOf(genre,subjects,collections){
   const tries=[genre,(subjects||[]).join(' ; ')].map(v=>String(v||'').toLowerCase());
   for(const text of tries){if(!text)continue;const hit=STYLES.find(([,re])=>re.test(text));if(hit)return hit[0];}
@@ -293,7 +310,7 @@ const DJ_COMPILATION_RE=/^\s*va\s*[-–]|\bhosted by\b|\bchopped (?:and|n|not) (
 function qualityCheck(candidate,details){
   const meta=details.metadata,doc=candidate.doc;
   const collections=Array.from(new Set(candidate.collections.concat(collectionList(meta.collection))));
-  const sources=candidate.sourceNames.filter(name=>{const s=SOURCES.find(x=>x.name===name);return s&&collections.includes(s.collection);});
+  const sources=candidate.sourceNames.filter(name=>{const s=SOURCES.find(x=>x.name===name);return s&&sourceCollections(s).some(c=>collections.includes(c));});
   if(!sources.length)return null;
   if(/^true$/i.test(clean(meta['access-restricted-item'],10)))return null; // borrow-only: nothing streams
   if(isSpokenRecord(meta,doc,collections))return null;
