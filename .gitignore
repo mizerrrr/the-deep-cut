@@ -1,0 +1,5 @@
+﻿.env
+
+# Old copies kept on disk only (the history now lives in git)
+index_backup_*.html
+index_v1.html
