@@ -21,6 +21,8 @@ const QUERY_TTL=5*60*1000,TOTAL_TTL=60*60*1000,METADATA_TTL=30*60*1000;
    Each search now picks one of these orderings and a page inside that window;
    big collections are first cut down by a random title prefix, so every part
    of them can come up. */
+/* Classical items tagged as such are dropped by the search itself; isClassical() catches the rest */
+const NO_CLASSICAL=' AND NOT subject:(classical OR symphony OR symphonies OR opera OR concerto OR concertos OR baroque)';
 const PAGE_ROWS=36,MAX_PAGE=Math.floor(10000/PAGE_ROWS);
 const SORTS=['titleSorter','creatorSorter','identifier','publicdate','downloads','item_size','avg_rating'];
 const PREFIXES='a b c d e f g h i j k l m n o p r s t u v w y'.split(' ');
@@ -73,7 +75,7 @@ async function search(query,page,sort){
   queryCache.set(key,entry);return entry;
 }
 async function searchPage(source,wave,decade){
-  const query=source.query+(decade?' AND year:'+decadeRange(decade):'');
+  const query=source.query+NO_CLASSICAL+(decade?' AND year:'+decadeRange(decade):'');
   const known=queryCache.get(query+'|total');
   if(known&&Date.now()-known.time<TOTAL_TTL&&!known.total)return []; // nothing from this collection in this era
   const sort=pick(SORTS)+(Math.random()<.5?' asc':' desc');
@@ -209,6 +211,18 @@ export function aiSlopReason(info){
   if(RELIGIOUS_RE.test(info.title+' '+info.creator+' '+subjects.join(' ')))weak++;
   return weak>=2?'generic metadata':'';
 }
+/* ── Classical filter ──
+   Western classical recordings (symphonies, concertos, operas, the canon's
+   composers and conductors, classical labels) are left out entirely. Only
+   title, artist, subjects, genre and label are read: a description that
+   mentions "classical influences" does not reject a rock record. */
+const CLASSICAL_WORK_RE=/\b(?:symphon(?:y|ies|ic poem)|sinfon(?:ia|ie|ía|ias|ietta)|symphonie|concert(?:o|os|i|ino)|concierto|sonat(?:a|as|e|ina)|string quartet|quatuor|streichquartett|cuarteto para cuerdas|quarteto de cordas|philharmoni[ac]|symphony orchestra|chamber (?:music|orchestra)|orchestre|orchestra sinfonica|requiem|réquiem|cantatas?|oratori(?:o|um)|overtures?|nocturnes?|preludes? and fugues?|fugues?|partitas?|etudes?|études?|mass in [a-g]|operas?|opéra|operetta|lieder|baroque|barroco|classical|klassik|clásica|cl[aá]ssica|(?:bwv|kv|hob)\.?\s?\d+|(?:opus|op\.)\s?\d+|in [a-g](?:[\s-](?:flat|sharp|dur|moll|bémol|dièse))?[\s,-]+(?:major|minor))\b/i;
+const NOT_CLASSICAL_RE=/\b(?:rock opera|space opera|soap opera|punk opera|hip[\s-]?hop opera|neo[\s-]?classical (?:metal|darkwave)|classic rock)\b/gi;
+const CLASSICAL_NAME_RE=/\b(?:beethoven|mozart|bach|brahms|mahler|haydn|handel|händel|haendel|vivaldi|chopin|liszt|wagner|verdi|puccini|debussy|ravel|stravinsk[yi]|dvo[rř][aá]k|mendelssohn|bruch|schumann|schubert|bruckner|sibelius|prokofiev|shostakovich|rachmaninoff?|tchaikovsk[yi]|tschaikowsk[iy]|grieg|elgar|holst|telemann|monteverdi|purcell|rossini|bizet|berlioz|saint-sa[eë]ns|faur[eé]|satie|bart[oó]k|mussorgsk[yi]|rimsky-korsakov|scarlatti|corelli|paganini|offenbach|donizetti|bellini|gounod|massenet|poulenc|britten|vaughan williams|rameau|couperin|lully|albinoni|pergolesi|boccherini|hummel|smetana|janáček|janacek|borodin|glazunov|scriabin|respighi|mascagni|leoncavallo|villa-lobos|ginastera|rodrigo|albéniz|albeniz|granados|de falla|karajan|toscanini|ormandy|solti|furtwängler|furtwangler|klemperer|bernstein|leonhardt|brüggen|bruggen|harnoncourt|menuhin|heifetz|rostropovich|horowitz|rubinstein|callas|pavarotti|deutsche grammophon|philips classics|naxos|hyperion records|harmonia mundi|archiv produktion|erato|nonesuch explorer|telarc|chandos|musical heritage society)\b/i;
+export function isClassical(info){
+  const text=[info.title,info.creator,info.genre,info.publisher,(info.subjects||[]).join(' ; ')].join(' \n ').replace(NOT_CLASSICAL_RE,' ');
+  return CLASSICAL_WORK_RE.test(text)||CLASSICAL_NAME_RE.test(text);
+}
 function qualityCheck(candidate,details){
   const meta=details.metadata,doc=candidate.doc;
   const collections=Array.from(new Set(candidate.collections.concat(collectionList(meta.collection))));
@@ -224,6 +238,7 @@ function qualityCheck(candidate,details){
   const subjects=values(meta.subject||doc.subject).filter(v=>!/^\d{4}$/.test(v)&&!/^(album|music|audio)$/i.test(v));
   const genre=clean(meta.genre||subjects.slice(0,3).join(' · '),100);
   const description=clean(meta.description||doc.description,900);
+  if(isClassical({title,creator,genre:clean(meta.genre,200),publisher:clean(meta.publisher||meta.label||doc.publisher,180),subjects:values(meta.subject||doc.subject)}))return null;
   const cover=chooseCover(details.files);
   const firstTrack=chooseFirstTrack(details.files);
   if(!cover||!firstTrack)return null;
