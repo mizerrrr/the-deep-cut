@@ -476,7 +476,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
       <div class="list-footer" id="listFooter">
         <p class="status" id="status" role="status" aria-live="polite" hidden></p>
         <button class="refresh-btn" id="refresh" type="button">
-          <span class="refresh-ico">↻</span> REFRESH
+          <span class="refresh-ico">↻</span> SEARCH MORE
         </button>
       </div>
       <div class="refresh-progress" id="refreshProgress" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden>
@@ -552,7 +552,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
   <div class="about-inner">
     <p class="eyebrow">// THE PROJECT</p>
     <h1>About the archive.</h1>
-    <p>The Deep Cut is a small window into the Internet Archive's music collection. Each refresh brings six albums at random, leaving room for unexpected discoveries beyond recommendation feeds.</p>
+    <p>The Deep Cut is a small window into the Internet Archive's music collection. Each Search More brings six albums at random, each in a different style, leaving room for unexpected discoveries beyond recommendation feeds.</p>
     <p>Albums come from three corners of the archive: Jamendo, Netlabels and Open Source Audio. Every pick is random. Nothing is ranked by plays, downloads or what you listened to before.</p>
     <p>Each album is checked before it reaches you: at least four tracks, an original cover, and no podcasts, radio or lectures. Artist, year and region appear only when the record states them.</p>
     <p class="about-note">Your saved albums and listening history are kept in this browser, with no account.</p>
@@ -656,7 +656,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
 <div class="material-tip" id="materialTip" role="tooltip" hidden></div>
 
 <script type="module">
-import {aiSlopReason,archiveUrl,chooseCover,clean,collectionList,deriveYear,distinctArtists,downloadUrl,findAlbums,getMetadata,rankAudioFiles,recentIds,resolveArtist,trackKey,uniqueTrackCount,values,wait} from './albums.mjs';
+import {aiSlopReason,archiveUrl,chooseCover,clean,collectionList,deriveYear,distinctArtists,downloadUrl,findAlbums,getMetadata,rankAudioFiles,recentIds,recentStyles,resolveArtist,trackKey,uniqueTrackCount,values,wait} from './albums.mjs';
 (function(){
 'use strict';
 const SAVED_KEY='internet-lottery-saved-v1';
@@ -1124,8 +1124,8 @@ function renderEmptyPool(key){
   const list=$('albumList');list.replaceChildren();list.classList.remove('has-active','is-scanning');
   const p=document.createElement('p');p.className='rail-empty';
   p.textContent=poolStatus[key]==='error'
-    ?'// Could not load '+decadeLabel(key)+' albums. Press REFRESH to try again.'
-    :'// No playable '+decadeLabel(key)+' albums turned up in this sample. Press REFRESH to draw again.';
+    ?'// Could not load '+decadeLabel(key)+' albums. Press SEARCH MORE to try again.'
+    :'// No playable '+decadeLabel(key)+' albums turned up in this sample. Press SEARCH MORE to draw again.';
   list.appendChild(p);
 }
 
@@ -1137,6 +1137,14 @@ const POOLS_KEY='deep-cuts-decade-pools-v1';
 /* Albums already shown, kept across visits so REFRESH keeps reaching new ones */
 const SEEN_KEY='deep-cuts-seen-ids-v1',SEEN_MAX=600;
 try{const seen=JSON.parse(localStorage.getItem(SEEN_KEY)||'[]');if(Array.isArray(seen))recentIds.push(...seen.filter(id=>typeof id==='string').slice(-SEEN_MAX));}catch(_){}
+/* Styles of the latest pools, so the next Search More leads with other styles */
+const STYLES_KEY='deep-cuts-recent-styles-v1',STYLES_MAX=16;
+try{const st=JSON.parse(localStorage.getItem(STYLES_KEY)||'[]');if(Array.isArray(st))recentStyles.push(...st.filter(s=>typeof s==='string').slice(-STYLES_MAX));}catch(_){}
+function noteStyles(items){
+  items.forEach(item=>{const st=item&&item.style;if(!st)return;const i=recentStyles.indexOf(st);if(i>=0)recentStyles.splice(i,1);recentStyles.push(st);});
+  while(recentStyles.length>STYLES_MAX)recentStyles.shift();
+  try{localStorage.setItem(STYLES_KEY,JSON.stringify(recentStyles));}catch(_){}
+}
 const DECADES=[{key:'all',decade:null,label:'all-era'},{key:'1960',decade:1960,label:'60s'},{key:'1970',decade:1970,label:'70s'},{key:'1980',decade:1980,label:'80s'},{key:'1990',decade:1990,label:'90s'},{key:'2000',decade:2000,label:'00s'},{key:'2010',decade:2010,label:'10s+'},{key:'2025',decade:2025,label:'2025–26'}];
 const pools={},poolStatus={};   // poolStatus: loading | ready | empty | error
 function activeKey(){return activeDecade?String(activeDecade):'all';}
@@ -1697,7 +1705,7 @@ async function refreshAll(onlyMissing){
       items.forEach(item=>exclude.add(item.identifier));
       if(items.length){pools[key]=items;succeeded++;preloadCovers(items);}
       poolStatus[key]=items.length||pools[key]?'ready':'empty';
-      if(items.length)items.forEach(item=>{if(!recentIds.includes(item.identifier))recentIds.push(item.identifier);});
+      if(items.length){items.forEach(item=>{if(!recentIds.includes(item.identifier))recentIds.push(item.identifier);});noteStyles(items);}
     }catch(_){poolStatus[key]=pools[key]&&pools[key].length?'ready':'error';}
     progress[key]=1;done++;
     savePools();syncDecadeButtons();report();

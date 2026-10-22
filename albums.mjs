@@ -29,6 +29,8 @@ const SORTS=['titleSorter','creatorSorter','identifier','publicdate','downloads'
 const PREFIXES='a b c d e f g h i j k l m n o p r s t u v w y'.split(' ');
 /* Albums handed out recently; picks avoid them while there are alternatives */
 export const recentIds=[];
+/* Styles of the latest pools; the next search puts other styles first so each Search More changes the mix */
+export const recentStyles=[];
 const queryCache=new Map(),metadataCache=new Map(),pendingMetadata=new Map();
 
 /* ── Utilities ── */
@@ -364,8 +366,9 @@ function pickDiverse(items,perStyle){
 }
 function chooseSix(eligible){
   const byId=new Map();eligible.forEach(item=>{if(!byId.has(item.identifier))byId.set(item.identifier,item);});
-  const all=Array.from(byId.values()),fresh=shuffle(all.filter(item=>!recentIds.includes(item.identifier)));
-  const ordered=fresh.concat(shuffle(all.filter(item=>recentIds.includes(item.identifier))));
+  // Unseen albums in styles not shown lately come first, then unseen albums in recent styles, then repeats
+  const rank=item=>(recentIds.includes(item.identifier)?2:0)+(item.style&&recentStyles.includes(item.style)?1:0);
+  const ordered=shuffle(Array.from(byId.values())).sort((a,b)=>rank(a)-rank(b));
   const strict=pickDiverse(ordered,1);
   return strict.length===6?strict:pickDiverse(ordered,2);
 }
