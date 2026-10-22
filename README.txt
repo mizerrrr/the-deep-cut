@@ -19,6 +19,7 @@ YouTube Music:
 
 Seleção de álbuns:
 - A API Advanced Search é consultada apenas para registros de áudio, em coleções musicais como Jamendo Albums, Netlabels e Open Source Audio.
+- Filtros de época: 60s a 00s cobrem uma década cada; 10s+ cobre 2010–2024; 25–26 (marcado NEW) traz os lançamentos mais recentes, de 2025 em diante, pelo campo year do Archive.
 - Cada busca amostra páginas diferentes. A seleção é embaralhada e não usa downloads, popularidade, favoritos ou personalização.
 - O site confere os metadados e a lista de arquivos do item. Um álbum ou EP precisa ter pelo menos quatro faixas distintas (MP3 e FLAC da mesma faixa contam uma vez) e evidência de lançamento em uma coleção musical ou no próprio registro. A falta de artista, data ou descrição não elimina sozinha um registro. Podcasts, rádio, sermões, palestras e audiolivros são descartados.
 - Cada item precisa ter um arquivo de imagem original de tamanho útil associado ao registro; espectrogramas, formas de onda, miniaturas geradas pelo Archive e imagens derivadas das faixas não valem como capa. Se o arquivo da capa estiver indisponível ao carregar, aparece um placeholder no lugar da imagem; uma miniatura genérica não é usada como substituta.

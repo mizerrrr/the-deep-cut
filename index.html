@@ -19,7 +19,7 @@
   --panel:#0d0e10;
   --ink:#ddd8cc;
   --dim:#1a1b1e;
-  --muted:#7a756b;
+  --muted:#868175;
   --line:#2a2c31;
   --hi:#232528;
   --mint:#7ec8a4;       /* phosphor green — primary accent */
@@ -77,6 +77,8 @@ body::after{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;b
 .decade-btn.is-pending::after{content:'█';margin-left:6px;font-size:.8em;color:var(--mint);animation:blink .9s step-end infinite}
 .decade-btn.is-active.is-pending::after{color:var(--bg)}
 .decade-btn.is-empty:not(.is-active){opacity:.4}
+.decade-new{margin-left:7px;padding:1px 4px;background:var(--mint);color:var(--bg);font-size:9px;letter-spacing:.1em;vertical-align:1px}
+.decade-btn.is-active .decade-new{background:var(--bg);color:var(--mint)}
 .rail-empty{margin:auto;max-width:520px;padding:0 16px;color:var(--muted);font:15px/1.6 var(--mono);letter-spacing:.04em;text-align:center}
 
 /* Featured band (shared link) */
@@ -144,6 +146,7 @@ body::after{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;b
 .card-ph{position:absolute;inset:0;display:grid;place-items:center;font:clamp(22px,3vw,40px) var(--mono);color:var(--line);user-select:none}
 .album-card:hover .card-cover{transform:translateY(-4px);border-color:var(--muted)}
 .album-card:focus-visible .card-cover{outline:2px solid var(--mint);outline-offset:4px}
+button:focus-visible,a:focus-visible,input:focus-visible,[role="slider"]:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
 
 /* Selected album: lifted, framed, the others dimmed */
 .album-list.has-active .album-card:not(.is-active) .card-cover{filter:saturate(.5) brightness(.6)}
@@ -427,7 +430,8 @@ button.saved-link:hover .saved-title{color:var(--mint)}
           <button class="decade-btn" type="button" data-decade="1980">80s</button>
           <button class="decade-btn" type="button" data-decade="1990">90s</button>
           <button class="decade-btn" type="button" data-decade="2000">00s</button>
-          <button class="decade-btn" type="button" data-decade="2010">10s+</button>
+          <button class="decade-btn" type="button" data-decade="2010" data-range="2010–2024">10s+</button>
+          <button class="decade-btn is-new" type="button" data-decade="2025" data-range="2025–2026">25–26<span class="decade-new">NEW</span></button>
         </div>
       </div>
       <div class="featured-band" id="featuredBand" hidden>
@@ -515,9 +519,9 @@ button.saved-link:hover .saved-title{color:var(--mint)}
   <div class="about-inner">
     <p class="eyebrow">// THE PROJECT</p>
     <h1>About the archive.</h1>
-    <p>Deep Cuts is a small window into the Internet Archive's music collection. Each refresh brings six albums at random, leaving room for unexpected discoveries beyond recommendation feeds.</p>
+    <p>The Deep Cut is a small window into the Internet Archive's music collection. Each refresh brings six albums at random, leaving room for unexpected discoveries beyond recommendation feeds.</p>
     <p class="about-note">This page is a draft. A fuller story about the project will be added here later.</p>
-    <button class="about-back" id="aboutBack" type="button">← BACK TO THE ALBUMS</button>
+    <button class="about-back" id="aboutBack" type="button">← BACK TO THE ARCHIVE</button>
   </div>
 </div>
 
@@ -620,8 +624,8 @@ async function fetchJson(url){
   throw lastErr||new Error('Fetch failed');
 }
 function searchUrl(query,page,rows){return API+'?'+new URLSearchParams({q:query,fl:FIELDS.join(','),rows:String(rows||36),page:String(page),output:'json'});}
-/* "10s+" covers everything from 2010 on */
-function decadeRange(decade){return decade>=2010?'[2010 TO 2099]':'['+decade+' TO '+(decade+9)+']';}
+/* "10s+" runs 2010–2024; "25–26" holds the newest releases (open-ended, so later years still land here) */
+function decadeRange(decade){return decade>=2025?'[2025 TO 2099]':decade>=2010?'[2010 TO 2024]':'['+decade+' TO '+(decade+9)+']';}
 async function searchPage(source,wave,decade){
   let firstPage=1,cacheTotal=0;
   const decadeSuffix=decade?' AND year:'+decadeRange(decade):'';
@@ -1115,7 +1119,7 @@ function renderEmptyPool(key){
    included), so switching decades is instant and never triggers a new search.
    Pools persist in localStorage and only change when REFRESH is pressed. */
 const POOLS_KEY='deep-cuts-decade-pools-v1';
-const DECADES=[{key:'all',decade:null,label:'all-era'},{key:'1960',decade:1960,label:'60s'},{key:'1970',decade:1970,label:'70s'},{key:'1980',decade:1980,label:'80s'},{key:'1990',decade:1990,label:'90s'},{key:'2000',decade:2000,label:'00s'},{key:'2010',decade:2010,label:'10s+'}];
+const DECADES=[{key:'all',decade:null,label:'all-era'},{key:'1960',decade:1960,label:'60s'},{key:'1970',decade:1970,label:'70s'},{key:'1980',decade:1980,label:'80s'},{key:'1990',decade:1990,label:'90s'},{key:'2000',decade:2000,label:'00s'},{key:'2010',decade:2010,label:'10s+'},{key:'2025',decade:2025,label:'2025–26'}];
 const pools={},poolStatus={};   // poolStatus: loading | ready | empty | error
 function activeKey(){return activeDecade?String(activeDecade):'all';}
 function decadeOf(key){return key==='all'?null:Number(key);}
@@ -1125,7 +1129,7 @@ function syncDecadeButtons(){
     const key=btn.dataset.decade||'all',st=poolStatus[key],n=pools[key]?pools[key].length:0;
     btn.classList.toggle('is-pending',st==='loading');
     btn.classList.toggle('is-empty',(st==='empty'||st==='error')&&!n);
-    btn.title=st==='loading'?'Loading…':n?n+' album'+(n!==1?'s':'')+' ready':st==='error'?'Could not load':'No albums found';
+    btn.title=(btn.dataset.range?btn.dataset.range+': ':'')+(st==='loading'?'Loading…':n?n+' album'+(n!==1?'s':'')+' ready':st==='error'?'Could not load':'No albums found');
   });
 }
 function showPool(key){
@@ -1149,7 +1153,7 @@ function restorePools(){
     if(!data||!data.pools)return;
     edition=Number(data.edition)||0;
     DECADES.forEach(({key})=>{
-      const items=Array.isArray(data.pools[key])?data.pools[key].filter(x=>x&&x.identifier&&x.title&&x.previewUrl):[];
+      const items=Array.isArray(data.pools[key])?data.pools[key].filter(x=>x&&x.identifier&&x.title&&x.previewUrl&&!(key==='2010'&&Number(x.year)>=2025)):[];
       if(items.length){pools[key]=items;poolStatus[key]='ready';}
       else if(Array.isArray(data.empty)&&data.empty.includes(key))poolStatus[key]='empty';
     });
@@ -1256,7 +1260,8 @@ function bindPreviewAudio(){
   previewAudio.addEventListener('ended',()=>{
     const item=previewItem;
     if(item&&item.tracks&&item.trackIndex<item.tracks.length-1)loadTrack(item.trackIndex+1,true);
-    else{previewPlaying=false;if(item)item.trackIndex=0;syncPlayerUI();persistNowPlaying();}
+    else if(item)loadTrack(0,false);
+    else{previewPlaying=false;syncPlayerUI();persistNowPlaying();}
   });
   previewAudio.addEventListener('error',()=>{if(!previewAudio.getAttribute('src'))return;previewPlaying=false;syncPlayerUI();});
   addEventListener('pagehide',persistNowPlaying);
@@ -1532,7 +1537,7 @@ function moveTip(x,y){
   tip.style.left=Math.max(margin,Math.min(left,innerWidth-w-margin))+'px';tip.style.top=Math.max(margin,Math.min(top,innerHeight-h-margin))+'px';
 }
 function showTip(item,event){
-  if(!item)return;const tip=$('materialTip');tip.replaceChildren();
+  if(!item)return;clearTimeout(tipTimer);const tip=$('materialTip');tip.replaceChildren();
   const eyebrow=document.createElement('p');eyebrow.className='tip-eyebrow';eyebrow.textContent='// INTERNET ARCHIVE';tip.appendChild(eyebrow);
   const title=document.createElement('h2');title.className='tip-title';title.textContent=item.title;tip.appendChild(title);
   if(item.creator){const a=document.createElement('p');a.className='tip-artist';a.textContent=item.creator;tip.appendChild(a);}
@@ -1556,11 +1561,11 @@ async function refreshAll(onlyMissing){
   const exclude=new Set(),progress={};let done=0,succeeded=0;
   keys.forEach(k=>{poolStatus[k]='loading';progress[k]=0;});
   syncDecadeButtons();
-  if(!(pools[first]&&pools[first].length))initLoadingRows();
+  if(keys.includes(first)&&!(pools[first]&&pools[first].length))initLoadingRows();
   const report=()=>{
     const pct=keys.reduce((sum,k)=>sum+progress[k],0)/keys.length*100;
     const loading=keys.filter(k=>poolStatus[k]==='loading').map(decadeLabel);
-    updateProgress(Math.max(3,pct),'Loading '+(loading.slice(0,2).join(' + ')||'covers')+'… '+done+'/'+keys.length+' decades ready');
+    updateProgress(Math.max(3,pct),'Loading '+(loading.slice(0,2).join(' + ')||'covers')+'… '+done+'/'+keys.length+' filters ready');
   };
   report();
   async function load(key){
@@ -1584,7 +1589,7 @@ async function refreshAll(onlyMissing){
     pruneCoverCache();
     $('refreshProgress').classList.remove('is-indeterminate');
     const failed=keys.filter(k=>poolStatus[k]==='error').length;
-    updateProgress(100,succeeded?'Ready. Edition '+String(edition).padStart(3,'0')+' · '+succeeded+'/'+keys.length+' decades'+(failed?' · '+failed+' kept previous':'')+'.':'Could not reach Internet Archive. Previous albums kept.');
+    updateProgress(100,succeeded?'Ready. Edition '+String(edition).padStart(3,'0')+' · '+succeeded+'/'+keys.length+' filters'+(failed?' · '+failed+' kept previous':'')+'.':'Could not reach Internet Archive. Previous albums kept.');
     hideProgressAfter(succeeded?2400:5000);
     busy=false;$('refresh').disabled=false;
   }
