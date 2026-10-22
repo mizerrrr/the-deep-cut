@@ -56,7 +56,7 @@ body::after{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;b
 .brand-logo{display:block;width:auto;height:42px;max-width:200px;object-fit:contain;filter:brightness(0) invert(1);opacity:.9;transform-origin:center}
 .brand:hover .brand-logo{animation:brand-spin 2s steps(8) infinite}
 @keyframes brand-spin{to{transform:rotate(360deg)}}
-.brand-copy{display:grid;gap:4px;font:11px/1.2 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.brand-copy{display:grid;gap:4px;font:12px/1.2 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
 .brand-copy strong{font-size:14px;font-weight:400;color:var(--ink);letter-spacing:.14em}
 .header-actions{display:flex;align-items:center;gap:12px}
 .hdr-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid var(--line);background:transparent;color:var(--muted);font:13px var(--mono);letter-spacing:.14em;text-transform:uppercase;transition:border-color .1s,color .1s,background .1s}
@@ -77,14 +77,14 @@ body::after{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;b
 .decade-btn.is-pending::after{content:'█';margin-left:6px;font-size:.8em;color:var(--mint);animation:blink .9s step-end infinite}
 .decade-btn.is-active.is-pending::after{color:var(--bg)}
 .decade-btn.is-empty:not(.is-active){opacity:.4}
-.decade-new{margin-left:7px;padding:1px 4px;background:var(--mint);color:var(--bg);font-size:9px;letter-spacing:.1em;vertical-align:1px}
+.decade-new{margin-left:7px;padding:1px 4px;background:var(--mint);color:var(--bg);font-size:10px;letter-spacing:.1em;vertical-align:1px}
 .decade-btn.is-active .decade-new{background:var(--bg);color:var(--mint)}
 .rail-empty{margin:auto;max-width:520px;padding:0 16px;color:var(--muted);font:15px/1.6 var(--mono);letter-spacing:.04em;text-align:center}
 
 /* Featured band (shared link) */
 .featured-band{flex:0 1 auto;min-width:0;display:none;align-items:center;gap:12px;padding:7px 12px;background:rgba(126,200,164,.08);border:1px solid var(--mint)}
 .featured-band:not([hidden]){display:flex}
-.featured-band-label{flex-shrink:0;color:var(--mint);font:11px var(--mono);letter-spacing:.14em;text-transform:uppercase}
+.featured-band-label{flex-shrink:0;color:var(--mint);font:12px var(--mono);letter-spacing:.14em;text-transform:uppercase}
 .featured-band-link{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink);font:14px var(--mono)}
 .featured-band-link:hover{color:var(--mint)}
 .featured-band-dismiss{flex-shrink:0;border:0;background:none;color:var(--muted);font:15px var(--mono);padding:4px 6px}
@@ -160,7 +160,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,[role="slider"]:focus-v
 @keyframes card-scan{to{top:100%}}
 
 /* Corner tag + equalizer */
-.card-tag{position:absolute;left:10px;top:10px;padding:5px 9px;background:var(--mint);color:var(--bg);font:11px var(--mono);letter-spacing:.14em;text-transform:uppercase;opacity:0;transform:translateY(-6px);transition:opacity .2s,transform .25s cubic-bezier(.2,.9,.3,1.3)}
+.card-tag{position:absolute;left:10px;top:10px;padding:5px 9px;background:var(--mint);color:var(--bg);font:12px var(--mono);letter-spacing:.14em;text-transform:uppercase;opacity:0;transform:translateY(-6px);transition:opacity .2s,transform .25s cubic-bezier(.2,.9,.3,1.3)}
 .card-tag::before{content:'▶ SELECTED'}
 .album-card.is-playing .card-tag::before{content:'♪ NOW PLAYING'}
 .album-card.is-active .card-tag,.album-card.is-playing .card-tag{opacity:1;transform:none}
@@ -177,7 +177,7 @@ body.audio-playing .album-card.is-playing .card-eq i{animation:eq .8s steps(4) i
 /* Caption */
 .card-caption{display:grid;gap:4px;min-width:0;transition:transform .35s cubic-bezier(.2,.9,.3,1.25)}
 .album-card.is-active .card-caption{transform:translateY(-8px)}
-.album-card-num{font:11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.album-card-num{font:12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .album-card.is-active .album-card-num{color:var(--mint)}
 .album-card-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:15px var(--mono);color:var(--ink)}
 .album-card.is-active .album-card-title{color:var(--mint);font-size:18px}
@@ -187,7 +187,11 @@ body.audio-playing .album-card.is-playing .card-eq i{animation:eq .8s steps(4) i
 .album-card.is-loading{cursor:default;pointer-events:none}
 .album-card.is-loading .card-ph{color:var(--line)}
 .album-card.is-loading .card-ph::after{content:' █';animation:blink .9s step-end infinite;color:var(--mint);font-size:.6em}
-.album-card.is-loading .album-card-title{color:var(--muted)}
+.album-card.is-loading .album-card-title{color:var(--muted);font-size:13px;letter-spacing:.14em}
+@media(min-width:861px){.album-list.is-scanning .album-card{width:var(--rest)}.album-list.is-scanning .album-card.is-lead{width:var(--sel)}}
+.album-card.is-lead .card-ph::after{content:none}
+.rail-status{position:absolute;left:0;right:0;bottom:18%;padding:0 8%;color:var(--mint);font:clamp(13px,1.3vw,17px)/1.5 var(--mono);letter-spacing:.08em;text-align:center}
+.rail-status:empty{display:none}
 .album-card.is-loading .album-card-title::after{content:' █';animation:blink .9s step-end infinite;color:var(--mint)}
 @keyframes blink{50%{opacity:0}}
 
@@ -215,10 +219,10 @@ body.audio-playing .album-card.is-playing .card-eq i{animation:eq .8s steps(4) i
 /* Tracklist — the strip version flows in columns of four and scrolls sideways */
 .tracklist{min-width:0;display:flex;flex-direction:column;border:1px solid var(--line);background:var(--panel);overflow:hidden}
 .tracklist-head{flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line)}
-.tracklist-label{font:11px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.tracklist-label{font:12px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
 .tracklist-label::before{content:'[ ';color:var(--mint)}
 .tracklist-label::after{content:' ]';color:var(--mint)}
-.tracklist-count{font:11px var(--mono);color:var(--muted);letter-spacing:.1em}
+.tracklist-count{font:12px var(--mono);color:var(--muted);letter-spacing:.1em}
 .tracklist-body{flex:1;min-height:0;display:grid;grid-auto-flow:column;grid-template-rows:repeat(4,auto);grid-auto-columns:minmax(230px,1fr);align-content:start;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
 .tracklist-body::-webkit-scrollbar{height:6px}
 .tracklist-body::-webkit-scrollbar,.np-panel-body::-webkit-scrollbar{width:6px}
@@ -250,7 +254,7 @@ body:not(.audio-playing) .track-row.is-active .track-num::before{content:'‖ ';
 .np-cover img{display:block;width:100%;height:100%;object-fit:cover}
 .np-cover:hover{border-color:var(--mint)}
 .np-info{min-width:0;display:grid;gap:4px}
-.np-eyebrow{font:11px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--mint)}
+.np-eyebrow{font:12px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--mint)}
 .np-track{font:16px var(--mono);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .np-album{font:13px var(--mono);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:0;background:none;padding:0;text-align:left}
 .np-album:hover{color:var(--mint)}
@@ -338,12 +342,12 @@ button.saved-link:hover .saved-title{color:var(--mint)}
 
 /* ══ Tooltip ══ */
 .material-tip{position:fixed;z-index:500;width:min(380px,calc(100vw - 24px));padding:16px 18px;background:var(--panel);border:1px solid var(--line);box-shadow:5px 5px 0 rgba(0,0,0,.6);pointer-events:none;font:14px/1.5 var(--mono)}
-.tip-eyebrow{margin:0 0 8px;color:var(--mint);font:11px var(--mono);letter-spacing:.18em;text-transform:uppercase}
+.tip-eyebrow{margin:0 0 8px;color:var(--mint);font:12px var(--mono);letter-spacing:.18em;text-transform:uppercase}
 .tip-title{margin:0 0 4px;color:var(--ink);font:18px/1.15 var(--mono)}
 .tip-artist{margin:0 0 10px;color:var(--muted);font:13px var(--mono);letter-spacing:.04em}
 .tip-description{margin:0 0 10px;color:#aaa6a0;font:13px/1.5 var(--mono)}
 .tip-row{display:grid;grid-template-columns:100px 1fr;gap:8px;border-top:1px solid var(--line);padding-top:7px;margin-top:7px}
-.tip-key{color:var(--muted);font:11px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.tip-key{color:var(--muted);font:12px var(--mono);letter-spacing:.1em;text-transform:uppercase}
 .tip-value{color:#ccc8c0;font:13px var(--mono);overflow-wrap:anywhere}
 
 /* ══ Share toast ══ */
@@ -371,7 +375,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
   .topbar{padding:0 16px;height:60px}
   .brand-logo{height:34px}
   .brand-copy{display:none}
-  .hdr-btn{padding:8px 10px;font-size:11px;letter-spacing:.08em}
+  .hdr-btn{padding:8px 10px;font-size:12px;letter-spacing:.08em}
   .header-actions{gap:6px}
   /* On phones the stage scrolls: a tall cover rail, then the details */
   .stage{overflow-y:auto}
@@ -497,7 +501,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
   <div class="saved-list" id="savedList"></div>
   <div class="saved-actions">
     <button class="back-home" id="backHome" type="button">← BACK TO THE ARCHIVE</button>
-    <button class="export-saves" id="exportSaves" type="button">↓ EXPORT JSON</button>
+    <button class="export-saves" id="exportSaves" type="button" title="Downloads your saved albums as a .json file">↓ DOWNLOAD LIST</button>
   </div>
 </div>
 
@@ -520,7 +524,9 @@ button.saved-link:hover .saved-title{color:var(--mint)}
     <p class="eyebrow">// THE PROJECT</p>
     <h1>About the archive.</h1>
     <p>The Deep Cut is a small window into the Internet Archive's music collection. Each refresh brings six albums at random, leaving room for unexpected discoveries beyond recommendation feeds.</p>
-    <p class="about-note">This page is a draft. A fuller story about the project will be added here later.</p>
+    <p>Albums come from three corners of the archive: Jamendo, Netlabels and Open Source Audio. Every pick is random. Nothing is ranked by plays, downloads or what you listened to before.</p>
+    <p>Each album is checked before it reaches you: at least four tracks, an original cover, and no podcasts, radio or lectures. Artist, year and region appear only when the record states them.</p>
+    <p class="about-note">Your saved albums and listening history are kept in this browser, with no account. To find a YouTube Music link, a saved album's title and artist are looked up on YouTube.</p>
     <button class="about-back" id="aboutBack" type="button">← BACK TO THE ARCHIVE</button>
   </div>
 </div>
@@ -631,7 +637,7 @@ async function searchPage(source,wave,decade){
   const decadeSuffix=decade?' AND year:'+decadeRange(decade):'';
   const query=source.query+decadeSuffix;
   const totalEntry=queryCache.get(query+'|total');
-  if(wave===0&&(!totalEntry||Date.now()-totalEntry.time>=QUERY_TTL)){
+  if(!totalEntry||Date.now()-totalEntry.time>=QUERY_TTL){
     const first=await fetchJson(searchUrl(query,1,36));
     if(!first.response||!Array.isArray(first.response.docs))throw new Error('Bad format');
     cacheTotal=Number(first.response.numFound)||0;
@@ -963,6 +969,14 @@ function syncActiveTrack(){
 }
 
 /* ── Player UI ── */
+function syncProgressUI(){
+  const dur=isFinite(previewAudio.duration)&&previewAudio.duration>0?previewAudio.duration:0;
+  const elapsed=Math.max(0,previewAudio.currentTime||pendingSeek||0);
+  const pct=dur>0?Math.min(100,elapsed/dur*100):0;
+  $('npSeekFill').style.width=pct+'%';
+  $('npSeek').setAttribute('aria-valuenow',String(Math.round(pct)));
+  $('npTime').textContent=dur>0?fmtTime(elapsed)+' / '+fmtTime(dur):fmtTime(elapsed);
+}
 function syncPlayerUI(){
   const item=previewItem;
   document.body.classList.toggle('has-player',!!item);
@@ -971,14 +985,9 @@ function syncPlayerUI(){
   if(!item)$('npPanel').hidden=true;
   const tidx=item&&typeof item.trackIndex==='number'?item.trackIndex:0;
   const tracks=item&&item.tracks;
-  const dur=isFinite(previewAudio.duration)&&previewAudio.duration>0?previewAudio.duration:0;
-  const elapsed=Math.max(0,previewAudio.currentTime||pendingSeek||0);
-  const pct=dur>0?Math.min(100,elapsed/dur*100):0;
   $('npPlay').textContent=previewPlaying?'‖':'▶';
   $('npPlay').setAttribute('aria-label',previewPlaying?'Pause':'Play');
-  $('npSeekFill').style.width=pct+'%';
-  $('npSeek').setAttribute('aria-valuenow',String(Math.round(pct)));
-  $('npTime').textContent=dur>0?fmtTime(elapsed)+' / '+fmtTime(dur):fmtTime(elapsed);
+  syncProgressUI();
   if(item){
     const total=tracks?tracks.length:0,name=tracks&&tracks[tidx]?trackDisplayName(tracks[tidx].name):item.title;
     $('npTrack').textContent=total>1?String(tidx+1).padStart(2,'0')+'/'+String(total).padStart(2,'0')+'  '+name:name;
@@ -1087,13 +1096,14 @@ function renderListRow(item,index,loading,total){
   cover.append(tag,eq);
   const caption=document.createElement('div');caption.className='card-caption';
   const num=document.createElement('span');num.className='album-card-num';num.textContent=String(index+1).padStart(2,'0')+(loading?'':' / '+String(total||6).padStart(2,'0'));
-  const title=document.createElement('span');title.className='album-card-title';title.textContent=loading?'SCANNING ARCHIVE':item.title;
+  const title=document.createElement('span');title.className='album-card-title';title.textContent=loading?'SCANNING':item.title;
   const sub=document.createElement('span');sub.className='album-card-sub';sub.textContent=loading?'':([item&&item.creator,item&&item.year].filter(Boolean).join(' · ')||'Internet Archive');
   caption.append(num,title,sub);
   card.append(cover,caption);
   return card;
 }
 function renderSelection(items){
+  $('albumList').classList.remove('is-scanning');
   currentAlbums.splice(0,currentAlbums.length,...items);
   const list=$('albumList');list.replaceChildren();
   items.forEach((item,i)=>list.appendChild(renderListRow(item,i,false,items.length)));
@@ -1101,12 +1111,16 @@ function renderSelection(items){
 }
 function initLoadingRows(){
   currentAlbums.splice(0,currentAlbums.length);
-  const list=$('albumList');list.replaceChildren();list.classList.remove('has-active');
+  const list=$('albumList');list.replaceChildren();list.classList.remove('has-active');list.classList.add('is-scanning');
   for(let i=0;i<6;i++)list.appendChild(renderListRow(null,i,true,6));
+  // The first skeleton takes the selected cover's place and carries the live search status
+  const lead=list.firstElementChild,status=document.createElement('p');
+  lead.classList.add('is-lead');status.className='rail-status';status.id='railStatus';status.textContent=$('status').hidden?'':$('status').textContent;
+  lead.querySelector('.card-cover').appendChild(status);
 }
 function renderEmptyPool(key){
   currentAlbums.splice(0,currentAlbums.length);
-  const list=$('albumList');list.replaceChildren();list.classList.remove('has-active');
+  const list=$('albumList');list.replaceChildren();list.classList.remove('has-active','is-scanning');
   const p=document.createElement('p');p.className='rail-empty';
   p.textContent=poolStatus[key]==='error'
     ?'// Could not load '+decadeLabel(key)+' albums. Press REFRESH to try again.'
@@ -1255,7 +1269,7 @@ function bindPreviewAudio(){
   ['playing','play'].forEach(t=>previewAudio.addEventListener(t,()=>{previewPlaying=true;syncPlayerUI();persistNowPlaying();}));
   previewAudio.addEventListener('playing',logRecentTrack);
   previewAudio.addEventListener('pause',()=>{if(previewAudio.ended)return;previewPlaying=false;syncPlayerUI();persistNowPlaying();});
-  previewAudio.addEventListener('timeupdate',()=>{syncPlayerUI();if(Date.now()-lastPersist>2000)persistNowPlaying();});
+  previewAudio.addEventListener('timeupdate',()=>{syncProgressUI();if(Date.now()-lastPersist>2000)persistNowPlaying();});
   previewAudio.addEventListener('durationchange',syncPlayerUI);
   previewAudio.addEventListener('ended',()=>{
     const item=previewItem;
@@ -1306,17 +1320,22 @@ function handleSharedAlbum(){
 
 /* ── Platform (YouTube Music) ── */
 const PLATFORM_CACHE_TTL=7*24*60*60*1000;
+const UNVERIFIED_TTL=30*1000,unverifiedCache=new Map();   // identifier|service -> {status,time}
 let platformInFlight=0;const platformQueue=[];
 function queuePlatformLookup(task){return new Promise((resolve,reject)=>{platformQueue.push({task,resolve,reject});runPlatformQueue();});}
 function runPlatformQueue(){while(platformInFlight<3&&platformQueue.length){const job=platformQueue.shift();platformInFlight++;Promise.resolve().then(job.task).then(job.resolve,job.reject).finally(()=>{platformInFlight--;runPlatformQueue();});}}
 function readPlatformCache(){try{const v=JSON.parse(localStorage.getItem(PLATFORM_CACHE_KEY)||'{}');return v&&typeof v==='object'?v:{};}catch(_){return {};}}
 function cachedPlatformStatuses(entry){
   const all=readPlatformCache(),record=all[entry.identifier]||{},statuses={};
-  PLATFORM_SERVICES.forEach(s=>{const item=record[s.key];statuses[s.key]=item&&Date.now()-item.checkedAt<PLATFORM_CACHE_TTL&&['available','missing'].includes(item.state)?item:{state:'checking'};});
+  PLATFORM_SERVICES.forEach(s=>{
+    const item=record[s.key],recent=unverifiedCache.get(entry.identifier+'|'+s.key);
+    statuses[s.key]=item&&Date.now()-item.checkedAt<PLATFORM_CACHE_TTL&&['available','missing'].includes(item.state)?item
+      :recent&&Date.now()-recent.time<UNVERIFIED_TTL?recent.status:{state:'checking'};
+  });
   return statuses;
 }
 function savePlatformCache(entry,key,status){
-  if(!['available','missing'].includes(status.state))return;
+  if(!['available','missing'].includes(status.state)){unverifiedCache.set(entry.identifier+'|'+key,{status,time:Date.now()});return;}
   const all=readPlatformCache(),record=all[entry.identifier]||{};record[key]={state:status.state,url:status.url||'',checkedAt:Date.now()};all[entry.identifier]=record;
   try{localStorage.setItem(PLATFORM_CACHE_KEY,JSON.stringify(all));}catch(_){}
 }
@@ -1512,6 +1531,7 @@ function updateProgress(pct,msg){
   clearTimeout(progressHideTimer);
   $('listFooter').classList.add('is-refreshing');
   $('status').hidden=false;$('status').textContent=msg;
+  if($('railStatus'))$('railStatus').textContent=msg;
   const prog=$('refreshProgress');prog.hidden=false;prog.setAttribute('aria-valuenow',String(Math.round(pct)));$('refreshProgressFill').style.width=Math.round(pct)+'%';
 }
 function hideProgressAfter(delay){
@@ -1570,7 +1590,8 @@ async function refreshAll(onlyMissing){
   report();
   async function load(key){
     try{
-      const items=await findAlbums(decadeOf(key),exclude,f=>{progress[key]=f;$('refreshProgress').classList.remove('is-indeterminate');report();});
+      // Two pools load at once, so drop any album the other one claimed while this one was searching
+      const items=(await findAlbums(decadeOf(key),exclude,f=>{progress[key]=f;$('refreshProgress').classList.remove('is-indeterminate');report();})).filter(item=>!exclude.has(item.identifier));
       items.forEach(item=>exclude.add(item.identifier));
       if(items.length){pools[key]=items;succeeded++;preloadCovers(items);}
       poolStatus[key]=items.length||pools[key]?'ready':'empty';

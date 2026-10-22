@@ -8,9 +8,9 @@ Como usar:
 3. Aguarde a busca; seis álbuns elegíveis aparecem em uma grade responsiva.
 4. Clique na capa ou no título para abrir o registro original no Internet Archive.
 5. Passe o mouse sobre um álbum para ver sua descrição e os metadados disponíveis. O site não inventa artista, ano, região ou contexto. A faixa de áudio que aparece na capa reproduz até 15 segundos da primeira faixa.
-6. Passe o mouse sobre a capa e clique em S para salvar. O botão Saved abre sua coleção local, guardada neste navegador por até 14 dias. É possível remover itens ou exportar a lista em JSON.
+6. Passe o mouse sobre a capa e clique em S para salvar. O botão Saved abre sua coleção local, guardada neste navegador por até 14 dias. É possível remover itens ou baixar a lista (botão Download list, arquivo .json).
 7. Na lista Saved, aparece apenas o YouTube Music. O ícone fica colorido e clicável quando uma playlist correspondente é encontrada; ausências e estados que não puderam ser verificados ficam apagados. Passe o mouse sobre o ícone para ver o motivo.
-8. Use Refresh para sortear outra seleção. Durante a busca, o site mostra a etapa atual e uma barra de progresso; as capas têm placeholders animados enquanto carregam. A página About contém um texto provisório e um espaço reservado para imagem.
+8. Use Refresh para sortear outra seleção. Durante a busca, o site mostra a etapa atual e uma barra de progresso; as capas têm placeholders animados enquanto carregam. A página About explica de onde vêm os álbuns, como são verificados e onde ficam os dados do usuário.
 
 YouTube Music:
 - A integração exige YOUTUBE_DATA_API_KEY de um projeto com YouTube Data API v3 habilitada. A API pública retorna vídeos, canais e playlists, não um catálogo próprio de álbuns do YouTube Music. A busca procura uma playlist com título e artista compatíveis e o link é rotulado como playlist correspondente, não como confirmação de um álbum oficial.
@@ -33,7 +33,7 @@ Verificação manual:
 3. Pressione Refresh algumas vezes. Os identificadores devem mudar quando houver candidatos diferentes. Repetição só é possível quando o conjunto de candidatos amostrados for insuficiente.
 4. Passe o mouse por uma capa; verifique descrição, artista, ano, região, selo, gênero, número de faixas e coleção quando o registro fornecer esses dados.
 5. Clique em um título e numa capa e confirme que cada um abre archive.org/details/IDENTIFICADOR.
-6. Salve um álbum, recarregue a página, abra Saved, remova um item e teste Export JSON.
+6. Salve um álbum, recarregue a página, abra Saved, remova um item e teste Download list.
 7. Para testar imagens quebradas, use o bloqueio de requisições do navegador para archive.org/download/*. A busca deve continuar sem travar e o espaço da capa deve mostrar o placeholder sem quebrar a grade.
 8. Para testar falhas da API, bloqueie archive.org/advancedsearch.php e use Refresh. O estado deve informar a falha, o botão deve se reativar e, se houver seleção anterior, ela deve continuar na tela.
 
