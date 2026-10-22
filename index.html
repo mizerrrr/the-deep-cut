@@ -141,8 +141,10 @@ body::after{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;b
 .card-cover.is-sharp .card-tile{animation:none;opacity:0;transition:opacity .2s .45s}
 .card-cover.is-failed .card-tile{animation:none}
 @keyframes tile-pulse{from{filter:saturate(.85) contrast(1.05) brightness(.8)}to{filter:saturate(.85) contrast(1.05) brightness(1.05)}}
-.card-img{opacity:0;clip-path:inset(0 0 100% 0)}
-.card-cover.is-sharp .card-img{opacity:1;clip-path:inset(0 0 0 0);animation:cover-scan .5s steps(10)}
+/* The resting state carries no clip-path: mobile WebKit/Blink sometimes skip repainting a
+   clipped image inside a scroll container until the next touch */
+.card-img{opacity:0}
+.card-cover.is-sharp .card-img{opacity:1;animation:cover-scan .5s steps(10)}
 .card-cover.is-sharp.is-cached .card-img{animation:cover-fade .22s ease-out}
 @keyframes cover-scan{from{opacity:1;clip-path:inset(0 0 100% 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
 @keyframes cover-fade{from{opacity:0;clip-path:inset(0)}to{opacity:1;clip-path:inset(0)}}
@@ -596,14 +598,16 @@ button.saved-link:hover .saved-title{color:var(--mint)}
         </ol>
         <p>Firefox cannot install sites as apps: use Chrome, Edge or Safari for this step.</p>
       </section>
-      <section class="app-card" data-platform="tv">
+      <section class="app-card" data-platform="tv" id="appTvCard">
         <h2>TV <span>THIS DEVICE</span></h2>
+        <button class="app-install" id="appCast" type="button">▭ PLAY ON TV</button>
         <ol>
-          <li>Chromecast or Google TV: on Android, start an album and tap <kbd>▭ TV</kbd> in the player.</li>
+          <li>Chromecast or Google TV: on Android, tap <kbd>▭ PLAY ON TV</kbd> here or <kbd>▭ TV</kbd> in the player.</li>
           <li>Apple TV or AirPlay speaker: on iPhone or Mac, tap <kbd>▭ TV</kbd> in the player, or pick AirPlay in Control Center.</li>
-          <li>From a computer: Chrome menu <kbd>⋮</kbd> → <kbd>Cast…</kbd> → choose your TV.</li>
-          <li>Smart TV with a browser: open <span class="app-url">thedeepcut.vercel.app</span> on the TV itself.</li>
+          <li>From a computer: Chrome menu <kbd>⋮</kbd> → <kbd>Cast…</kbd> → choose your TV. This mirrors the whole page.</li>
+          <li>Smart TV with a browser (Samsung, LG, Android TV, Fire TV): open <span class="app-url">thedeepcut.vercel.app</span> on the TV itself and browse with the remote: arrows move, OK selects, Back returns, play/pause and skip keys control the music.</li>
         </ol>
+        <p>Sending from a phone plays only the music on the TV; the page stays on the phone, which works as the remote.</p>
       </section>
     </div>
     <button class="about-back" id="appBack" type="button">← BACK TO THE ARCHIVE</button>
@@ -630,7 +634,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
     <input type="range" class="vol-slider" id="volSlider" min="0" max="100" step="5" value="100" aria-label="Volume">
   </div>
   <div class="np-actions">
-    <button class="np-btn np-cast" id="npCast" type="button" aria-label="Play on TV or speaker" title="Play on TV or speaker" hidden>▭<span class="np-btn-label"> TV</span></button>
+    <button class="np-btn np-cast" id="npCast" type="button" aria-label="Play on TV or speaker" title="Play on TV or speaker">▭<span class="np-btn-label"> TV</span></button>
     <button class="np-btn" id="npListToggle" type="button" aria-expanded="false" aria-controls="npPanel">≡<span class="np-btn-label"> TRACKLIST</span></button>
     <button class="np-btn np-close" id="npClose" type="button" aria-label="Stop and close player">✕</button>
   </div>
@@ -1039,22 +1043,34 @@ function popCard(card){
 function fillCardCover(cover,item){
   const t0=performance.now(),known=coverUrls.has(item.identifier);
   cover.classList.add('is-waiting');
-  const tile=document.createElement('img');tile.className='card-tile';tile.alt='';tile.decoding='async';
-  const img=document.createElement('img');img.className='card-img';img.alt='';img.decoding='async';
+  // No decoding='async': iOS Safari can leave an async-decoded image unpainted until the next touch
+  const tile=document.createElement('img');tile.className='card-tile';tile.alt='';
+  const img=document.createElement('img');img.className='card-img';img.alt='';
   const fail=()=>{if(!cover.querySelector('.card-ph'))cover.prepend(makePhEl(false));cover.classList.remove('is-waiting');};
   let tileOk=false;
   const loadTile=()=>{if(!tile.getAttribute('src')&&tile.isConnected)tile.src=thumbUrl(item.identifier);};
-  tile.onload=()=>{tileOk=true;cover.classList.remove('is-waiting');};
+  tile.onload=()=>{tileOk=true;cover.classList.remove('is-waiting');nudgeRail();};
   tile.onerror=()=>{tile.remove();if(cover.classList.contains('is-failed'))fail();};
   cover.append(tile,img);
   if(!known)setTimeout(()=>{if(!cover.classList.contains('is-sharp'))loadTile();},150);
-  img.onload=()=>{cover.classList.remove('is-waiting');cover.classList.add('is-sharp');};
+  img.onload=()=>{cover.classList.remove('is-waiting');cover.classList.add('is-sharp');nudgeRail();};
   const giveUp=()=>{cover.classList.add('is-failed');if(!tileOk&&!tile.isConnected)fail();else loadTile();};
   img.onerror=()=>{forgetCover(item.identifier);img.remove();giveUp();};
   resolveCover(item).then(url=>{
     if(!url){giveUp();return;}
     if(performance.now()-t0<250)cover.classList.add('is-cached');
     img.src=url;
+  });
+}
+/* Mobile browsers sometimes keep painting the previous rail after its cards are swapped
+   (a decade switch) until the next touch. Promoting the rail to its own layer for one
+   frame forces a fresh paint without touching its scroll position. */
+let nudgeFrame=0;
+function nudgeRail(){
+  if(nudgeFrame)return;
+  nudgeFrame=requestAnimationFrame(()=>{
+    const list=$('albumList');list.style.transform='translateZ(0)';
+    requestAnimationFrame(()=>{list.style.transform='';nudgeFrame=0;});
   });
 }
 function renderListRow(item,index,loading,total){
@@ -1082,7 +1098,8 @@ function renderSelection(items){
   currentAlbums.splice(0,currentAlbums.length,...items);
   const list=$('albumList');list.replaceChildren();
   items.forEach((item,i)=>list.appendChild(renderListRow(item,i,false,items.length)));
-  showFeatured(0);updateSavedCount();
+  list.scrollLeft=0;
+  showFeatured(0);updateSavedCount();nudgeRail();
 }
 function initLoadingRows(){
   currentAlbums.splice(0,currentAlbums.length);
@@ -1505,19 +1522,88 @@ addEventListener('appinstalled',()=>{installPrompt=null;showShareToast('[ APP IN
 
 /* ── Play on TV ──
    Remote Playback (Chromecast / Google TV, mainly Chrome on Android) and
-   AirPlay (Safari). The button only shows while a device is reachable. */
+   AirPlay (Safari). The button is always there: availability reports are
+   unreliable (desktop Chrome often says "none" while a Chromecast is on the
+   network), so a failed prompt explains the other ways instead. */
+function openCast(){
+  const remote=previewAudio.remote;
+  if(!previewItem&&viewedItem)startAlbum(viewedItem,0); // the picker needs something loaded
+  const fallback=()=>{showShareToast('[ NO TV FOUND · SEE TV STEPS ]');setAppView(true);$('appTvCard').scrollIntoView({block:'center',behavior:'smooth'});};
+  if(remote&&remote.prompt)remote.prompt().catch(err=>{if(!err||err.name!=='AbortError')fallback();});
+  else if(previewAudio.webkitShowPlaybackTargetPicker)previewAudio.webkitShowPlaybackTargetPicker();
+  else fallback();
+}
 function bindCast(){
   const btn=$('npCast'),remote=previewAudio.remote;
   document.body.appendChild(previewAudio); // both APIs want the element in the page; with no controls attribute it stays invisible
-  if(remote&&remote.watchAvailability){
-    remote.watchAvailability(ok=>{btn.hidden=!ok;}).catch(()=>{/* no remote playback for this media here */});
-    btn.addEventListener('click',()=>remote.prompt().catch(()=>{}));
+  btn.addEventListener('click',openCast);
+  $('appCast').addEventListener('click',openCast);
+  if(remote){
     const sync=()=>btn.classList.toggle('is-active',remote.state!=='disconnected');
     ['connecting','connect','disconnect'].forEach(t=>remote.addEventListener(t,sync));
-  }else if(window.WebKitPlaybackTargetAvailabilityEvent){
-    previewAudio.addEventListener('webkitplaybacktargetavailabilitychanged',event=>{btn.hidden=event.availability!=='available';});
-    btn.addEventListener('click',()=>previewAudio.webkitShowPlaybackTargetPicker());
   }
+}
+/* ── TV remote ──
+   On a TV browser the remote sends arrow keys, Enter, Back and media keys.
+   Arrows move focus to the nearest control in that direction; Back closes
+   whatever is open; media keys drive the player. */
+const FOCUSABLE='a[href],button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])';
+const BACK_KEYS=new Set(['GoBack','BrowserBack','Back']),BACK_CODES=new Set([10009,461]); // Tizen, webOS
+const MEDIA_KEYS={MediaPlayPause:togglePlayPause,MediaPlay:()=>{if(previewAudio.paused)togglePlayPause();},MediaPause:()=>{if(!previewAudio.paused)togglePlayPause();},
+  MediaTrackNext:nextTrack,MediaTrackPrevious:prevTrack,MediaFastForward:nextTrack,MediaRewind:prevTrack,MediaStop:closePlayer};
+const MEDIA_CODES={10252:'MediaPlayPause',415:'MediaPlay',19:'MediaPause',417:'MediaFastForward',412:'MediaRewind',413:'MediaStop'};
+function navScopes(){
+  const open=Object.values(VIEWS).map(([view])=>$(view)).find(el=>!el.hidden);
+  const main=open||(!$('npPanel').hidden?$('npPanel'):document.body);
+  return main===document.body?[main]:[main,$('npBar')];
+}
+function navTargets(){
+  return navScopes().flatMap(scope=>[...scope.querySelectorAll(FOCUSABLE)]).filter(el=>{
+    if(!el.getClientRects().length||el.closest('[hidden]'))return false;
+    const s=getComputedStyle(el);return s.visibility!=='hidden'&&s.pointerEvents!=='none';
+  });
+}
+function moveFocus(dir){
+  const targets=navTargets(),cur=document.activeElement;
+  if(!targets.includes(cur)){
+    const start=targets.find(el=>el.classList.contains('album-card')&&el.classList.contains('is-active'))||targets[0];
+    if(start)start.focus();return;
+  }
+  const a=cur.getBoundingClientRect(),ax=a.left+a.width/2,ay=a.top+a.height/2;
+  let best=null,bestScore=Infinity;
+  targets.forEach(el=>{
+    if(el===cur)return;
+    const b=el.getBoundingClientRect(),bx=b.left+b.width/2,by=b.top+b.height/2;
+    const along=dir==='ArrowRight'?b.left-a.right:dir==='ArrowLeft'?a.left-b.right:dir==='ArrowDown'?b.top-a.bottom:a.top-b.bottom;
+    const ahead=dir==='ArrowRight'?bx>ax:dir==='ArrowLeft'?bx<ax:dir==='ArrowDown'?by>ay:by<ay;
+    if(!ahead||along<-Math.min(a.width,a.height)/2)return;
+    const across=dir==='ArrowRight'||dir==='ArrowLeft'?Math.abs(by-ay):Math.abs(bx-ax);
+    const score=Math.max(0,along)+across*2;
+    if(score<bestScore){bestScore=score;best=el;}
+  });
+  if(best)best.focus();
+}
+function bindRemote(){
+  if(window.tizen&&tizen.tvinputdevice){ // Samsung only delivers media keys that were registered
+    ['MediaPlayPause','MediaPlay','MediaPause','MediaFastForward','MediaRewind','MediaStop'].forEach(k=>{try{tizen.tvinputdevice.registerKey(k);}catch(_){}});
+  }
+  document.addEventListener('keydown',event=>{
+    if(event.altKey||event.ctrlKey||event.metaKey)return;
+    const media=MEDIA_KEYS[event.key]||MEDIA_KEYS[MEDIA_CODES[event.keyCode]];
+    if(media){event.preventDefault();media();return;}
+    const el=document.activeElement,typing=el&&(el.isContentEditable||(el.tagName==='INPUT'&&!/^(button|checkbox|radio|range)$/.test(el.type)));
+    if(BACK_KEYS.has(event.key)||BACK_CODES.has(event.keyCode)||(event.key==='Backspace'&&!typing)){
+      if(!$('npPanel').hidden){event.preventDefault();toggleNowPlayingPanel(false);}
+      else if(Object.values(VIEWS).some(([view])=>!$(view).hidden)){event.preventDefault();setHomeView();}
+      return; // on the home view Back leaves the app as usual
+    }
+    if(!/^Arrow(Up|Down|Left|Right)$/.test(event.key)||event.defaultPrevented)return;
+    const sideways=event.key==='ArrowLeft'||event.key==='ArrowRight';
+    // Text fields, the volume slider and the seek bar use left/right themselves
+    if(sideways&&(typing||(el&&(el.type==='range'||el.id==='npSeek'))))return;
+    if(typing)return;
+    event.preventDefault();moveFocus(event.key);
+  });
 }
 function exportSaved(){
   const blob=new Blob([JSON.stringify(getSaved(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
@@ -1629,7 +1715,7 @@ async function refreshAll(onlyMissing){
 
 /* ── Bind ── */
 function bind(){
-  bindPreviewAudio();bindMediaSession();bindCast();
+  bindPreviewAudio();bindMediaSession();bindCast();bindRemote();
   $('albumList').addEventListener('click',event=>{
     const row=event.target.closest('.album-card');if(!row||row.classList.contains('is-loading'))return;
     const index=Number(row.dataset.index);if(isNaN(index))return;
