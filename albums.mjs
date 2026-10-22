@@ -10,7 +10,8 @@ const SOURCES=[
   {name:'Netlabels',collection:'netlabels',trusted:true,query:'mediatype:audio AND collection:netlabels'},
   {name:'Free Music Archive',collection:'freemusicarchive',trusted:true,query:'mediatype:audio AND collection:freemusicarchive'},
   {name:'Unlocked Recordings',collection:'unlockedrecordings',trusted:true,query:'mediatype:audio AND collection:unlockedrecordings'},
-  {name:'Hip-hop mixtapes',collection:'hiphopmixtapes',trusted:true,query:'mediatype:audio AND collection:hiphopmixtapes'},
+  // Most of this collection is anonymous DJ compilations ("VA-DJ X - Street Heat 18"); keep the artist mixtapes people played
+  {name:'Hip-hop mixtapes',collection:'hiphopmixtapes',trusted:true,query:'mediatype:audio AND collection:hiphopmixtapes AND downloads:[1000 TO *] AND NOT title:(VA OR hosted OR presents OR chopped OR screwed OR "DJ")'},
   {name:'Digitized LPs',collection:'audio_music',query:'mediatype:audio AND collection:audio_music AND subject:LP'},
   {name:'Open source albums',collection:'opensource_audio',query:'mediatype:audio AND collection:opensource_audio AND subject:album'},
   {name:'Open source album titles',collection:'opensource_audio',query:'mediatype:audio AND collection:opensource_audio AND title:album'}
@@ -123,7 +124,7 @@ function imageFile(f){const n=String(f.name||'').toLowerCase(),fmt=String(f.form
 function audioFile(f){
   const n=String(f.name||'').toLowerCase(),fmt=String(f.format||'').toLowerCase();
   if(String(f.private)==='true')return false; // listed, but the download is locked
-  if(/_sample.[a-z0-9]+$/i.test(n))return false; // the archive's 30-second previews
+  if(/_sample\.[a-z0-9]+$/i.test(n))return false; // the archive's 30-second previews
   if(/(metadata|archive bittorrent|text|thumbnail)/.test(fmt)||/(_archive\.torrent|_files\.xml|_meta\.(xml|sqlite))$/i.test(n))return false;
   return (/\.(mp3|flac|ogg|oga|wav|m4a|aac|aiff|aif|wma|opus)$/i.test(n)||/(mpeg audio|mpeg-4 audio|ogg vorbis|flac|wave audio|apple lossless|advanced audio coding|windows media audio|opus)/i.test(fmt))&&(!f.size||Number(f.size)>12000);
 }
@@ -161,7 +162,7 @@ export function rankAudioFiles(files){
    in the key, so two different songs called "Interlude" are both kept. */
 export function trackKey(file){
   // Only an audio original counts: a split LP side names its segments .json as the source
-  const derived=String(file.source||'').toLowerCase()==='derivative'&&/.(mp3|flac|ogg|oga|wav|m4a|aac|aiff?|wma|opus)$/i.test(String(file.original||''))&&file.original;
+  const derived=String(file.source||'').toLowerCase()==='derivative'&&/\.(mp3|flac|ogg|oga|wav|m4a|aac|aiff?|wma|opus)$/i.test(String(file.original||''))&&file.original;
   const path=String(derived?file.original:file.name||'').normalize('NFKD').replace(/[̀-ͯ]/g,'').toLowerCase();
   const base=path.split('/').pop().replace(/\.[^.]+$/,'').replace(/[\s._-]*(?:vbr|\d{2,3}kbp?s?|sample|hq|lq|stereo|mono)$/,'');
   // The disc can sit in a folder name ("CD2/01 Intro.mp3") as well as in the file name
@@ -245,6 +246,42 @@ export function isClassical(info){
   const text=[info.title,info.creator,info.genre,info.publisher,(info.subjects||[]).join(' ; ')].join(' \n ').replace(NOT_CLASSICAL_RE,' ');
   return CLASSICAL_WORK_RE.test(text)||CLASSICAL_NAME_RE.test(text);
 }
+/* ── Genre ──
+   Each album gets one style, the most specific one its genre tag, subjects or
+   collection name: "industrial rock" and "rock" are different styles, while
+   "rap", "hip-hop" and "hiphop" are the same. A pool holds one album per style. */
+const STYLES=[
+  ['industrial metal',/industrial[\s-]metal/],['industrial rock',/industrial[\s-]rock/],['black metal',/black[\s-]metal/],['death metal',/death[\s-]metal/],
+  ['doom metal',/doom|sludge/],['thrash metal',/thrash/],['metalcore',/metalcore|deathcore/],['grindcore',/grindcore|goregrind/],['metal',/\bmetal\b/],
+  ['post-rock',/post[\s-]?rock/],['post-punk',/post[\s-]?punk|coldwave|darkwave/],['shoegaze',/shoegaze|dream[\s-]?pop/],['math rock',/math[\s-]?rock/],
+  ['psychedelic rock',/psych/],['progressive rock',/prog(?:ressive)?[\s-]?rock|\bprog\b|krautrock/],['stoner rock',/stoner|desert rock/],['garage rock',/garage rock/],
+  ['grunge',/grunge/],['hard rock',/hard[\s-]rock/],['folk rock',/folk[\s-]rock/],['surf rock',/\bsurf\b/],['rockabilly',/rockabilly|rock[\s']*n[\s']*roll|rock and roll/],
+  ['hardcore punk',/hardcore punk|\bhardcore\b(?![\s-]?(?:techno|rap|hip))/],['punk',/punk/],['emo',/\bemo\b|screamo/],['indie rock',/indie[\s-]?rock/],
+  ['alternative rock',/alternative|alt[\s-]rock/],['rock',/\brock\b/],
+  ['trap',/\btrap\b/],['instrumental hip hop',/instrumental hip[\s-]?hop|beat ?tape|lo-?fi hip[\s-]?hop/],['trip hop',/trip[\s-]?hop/],
+  ['hip hop',/\brap\b|hip[\s-]?hop|hiphop|mixtape/],
+  ['dark ambient',/dark[\s-]?ambient/],['ambient',/ambient/],['drone',/\bdrone\b/],['noise',/\bnoise\b/],['field recordings',/field recording|soundscape/],
+  ['idm',/\bidm\b|intelligent dance/],['minimal techno',/minimal techno|\bminimal\b/],['techno',/techno/],['deep house',/deep[\s-]house/],['house',/\bhouse\b/],
+  ['trance',/trance|\bgoa\b/],['drum and bass',/drum[\s'&n]*bass|\bdnb\b|jungle/],['dubstep',/dubstep/],['breakcore',/breakcore|breakbeat|\bbreaks\b/],
+  ['chiptune',/chiptune|8[\s-]?bit|chipmusic/],['synthwave',/synthwave|retrowave|outrun/],['vaporwave',/vaporwave|future funk/],['downtempo',/downtempo|chill[\s-]?out/],
+  ['glitch',/glitch|microsound/],['electro',/\belectro\b/],['synth-pop',/synth[\s-]?pop|new wave/],['experimental',/experimental|avant[\s-]?garde/],
+  ['electronic',/electronic|electronica|\bedm\b|\bdance\b/],
+  ['free jazz',/free jazz|free improvisation|\bimprov/],['jazz fusion',/jazz[\s-]?fusion|jazz[\s-]?rock/],['jazz',/jazz|bebop|\bswing\b/],['blues',/blues/],['soul',/\bsoul\b|motown/],
+  ['funk',/\bfunk\b/],['r&b',/r&b|r'n'b|rhythm and blues|\brnb\b/],['disco',/disco/],['reggae',/reggae/],['dub',/\bdub\b/],['ska',/\bska\b|rocksteady/],
+  ['dancehall',/dancehall/],['afrobeat',/afro[\s-]?beat|\bafro\b/],['bossa nova',/bossa/],['samba',/samba|pagode/],['mpb',/\bmpb\b/],['salsa',/salsa|mambo/],
+  ['cumbia',/cumbia/],['tango',/tango/],['flamenco',/flamenco/],['latin',/\blatin/],['k-pop',/k-?pop/],['j-pop',/j-?pop|anime/],
+  ['bluegrass',/bluegrass/],['country',/country|americana/],['folk',/\bfolk\b|acoustic|singer[\s-]?songwriter/],['world',/\bworld\b|traditional|ethnic/],
+  ['soundtrack',/soundtrack|\bscore\b|motion picture|\bost\b/],['exotica',/exotica|lounge|easy listening/],['new age',/new age|meditation/],['children',/children|\bkids\b/],
+  ['comedy',/comedy|humou?r/],['gospel',/gospel|worship|christian/],['polka',/polka/],['indie pop',/indie[\s-]?pop/],['pop',/\bpop\b/],['indie',/\bindie\b/]
+];
+const COLLECTION_STYLE={hiphopmixtapes:'hip hop'};
+export function styleOf(genre,subjects,collections){
+  const tries=[genre,(subjects||[]).join(' ; ')].map(v=>String(v||'').toLowerCase());
+  for(const text of tries){if(!text)continue;const hit=STYLES.find(([,re])=>re.test(text));if(hit)return hit[0];}
+  const c=(collections||[]).find(x=>COLLECTION_STYLE[x]);return c?COLLECTION_STYLE[c]:'';
+}
+/* Anonymous DJ compilations ("VA-DJ Kurupt - Streetcorner Gangstas 18", "... Hosted By ...") */
+const DJ_COMPILATION_RE=/^\s*va\s*[-–]|\bhosted by\b|\bchopped (?:and|n|not) (?:screwed|slopped)\b|^\s*(?:dj|og)\s[^-–]{1,40}\s(?:presents?|&\s.+\spresent)\b/i;
 function qualityCheck(candidate,details){
   const meta=details.metadata,doc=candidate.doc;
   const collections=Array.from(new Set(candidate.collections.concat(collectionList(meta.collection))));
@@ -259,6 +296,8 @@ function qualityCheck(candidate,details){
   const creator=resolveArtist(title,meta,doc);
   const subjects=values(meta.subject||doc.subject).filter(v=>!/^\d{4}$/.test(v)&&!/^(album|music|audio)$/i.test(v));
   const genre=clean(meta.genre||subjects.slice(0,3).join(' · '),100);
+  if(DJ_COMPILATION_RE.test(title)||DJ_COMPILATION_RE.test(creator))return null;
+  const style=styleOf(clean(meta.genre,200),subjects,collections);
   const description=clean(meta.description||doc.description,900);
   if(isClassical({title,creator,genre:clean(meta.genre,200),publisher:clean(meta.publisher||meta.label||doc.publisher,180),subjects:values(meta.subject||doc.subject)}))return null;
   const cover=chooseCover(details.files);
@@ -275,14 +314,14 @@ function qualityCheck(candidate,details){
     region:clean(meta.coverage||meta.country||doc.coverage,160),
     publisher:clean(meta.publisher||meta.label||doc.publisher,180),genre,
     subjects:subjects.slice(0,8).join(', '),language:clean(meta.language||doc.language,100),
-    trackCount,source:sources[0],collections,coverName:cover.name,
+    trackCount,source:sources[0],collections,coverName:cover.name,style,
     tracks,trackIndex:0,
     previewUrl:tracks.length?tracks[0].url:downloadUrl({identifier:candidate.identifier},firstTrack),
     imageUrl:downloadUrl({identifier:candidate.identifier},cover),
     coverLoaded:false
   };
 }
-async function inspectCandidates(candidates,already,limit,onProgress){
+async function inspectCandidates(candidates,already,limit,onProgress,enough){
   const eligible=[],remaining=shuffle(candidates.filter(c=>!already.has(c.identifier))).slice(0,limit);
   let completed=0;
   for(let start=0;start<remaining.length;start+=6){
@@ -292,7 +331,7 @@ async function inspectCandidates(candidates,already,limit,onProgress){
     const items=results.filter(r=>r.status==='fulfilled').map(r=>qualityCheck(r.value.candidate,r.value.details)).filter(Boolean);
     eligible.push(...items);completed+=batch.length;
     if(onProgress)onProgress(completed,remaining.length,eligible.length);
-    if(eligible.length>=6)break;
+    if(enough(eligible))break;
   }
   return eligible;
 }
@@ -309,17 +348,34 @@ export function distinctArtists(items){
   const seen=new Set();
   return items.filter(item=>{const k=artistKey(item);if(!k)return true;if(seen.has(k))return false;seen.add(k);return true;});
 }
+/* Up to six albums, one per artist and one per style (an album with no
+   recognisable style is never blocked). perStyle 2 is only the fallback when
+   the searches could not turn up six different styles. */
+function pickDiverse(items,perStyle){
+  const artists=new Set(),styles=new Map(),out=[];
+  for(const item of items){
+    const a=artistKey(item),st=item.style||'';
+    if(a&&artists.has(a))continue;
+    if(st&&(styles.get(st)||0)>=perStyle)continue;
+    if(a)artists.add(a);if(st)styles.set(st,(styles.get(st)||0)+1);
+    out.push(item);if(out.length===6)break;
+  }
+  return out;
+}
 function chooseSix(eligible){
   const byId=new Map();eligible.forEach(item=>{if(!byId.has(item.identifier))byId.set(item.identifier,item);});
   const all=Array.from(byId.values()),fresh=shuffle(all.filter(item=>!recentIds.includes(item.identifier)));
-  return distinctArtists(fresh.concat(shuffle(all.filter(item=>recentIds.includes(item.identifier))))).slice(0,6);
+  const ordered=fresh.concat(shuffle(all.filter(item=>recentIds.includes(item.identifier))));
+  const strict=pickDiverse(ordered,1);
+  return strict.length===6?strict:pickDiverse(ordered,2);
 }
 export async function findAlbums(decade,exclude,onProgress){
   const inspected=new Set(),eligible=[];
-  for(let wave=0;wave<3&&distinctArtists(eligible).length<6;wave++){
+  const enough=more=>pickDiverse(eligible.concat(more),1).length>=6;
+  for(let wave=0;wave<3&&!enough([]);wave++){
     const candidates=(await retrieveCandidates(wave,decade)).filter(c=>!exclude.has(c.identifier));
     const base=[0,.45,.75][wave],span=[.45,.3,.25][wave];
-    const next=await inspectCandidates(candidates,inspected,wave===0?24:18,(done,total)=>onProgress(base+(total?done/total*span:span)));
+    const next=await inspectCandidates(candidates,inspected,wave===0?24:18,(done,total)=>onProgress(base+(total?done/total*span:span)),enough);
     eligible.push(...next.filter(item=>!exclude.has(item.identifier)));
   }
   return chooseSix(eligible);
