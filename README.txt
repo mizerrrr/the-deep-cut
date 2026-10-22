@@ -38,8 +38,15 @@ Arquivos:
 - albums.mjs: busca e verificação dos álbuns no Internet Archive, usada tanto pela página quanto pelo servidor.
 - api/pool.mjs: monta no servidor os seis álbuns de cada filtro de época (/api/pool?decade=all|1960|...|2025). Na primeira visita a página usa essas listas prontas; na Vercel o resultado fica em cache por 5 minutos, e o cache antigo é servido enquanto um novo é montado. O botão Refresh continua buscando direto do navegador.
 - api/thumb.mjs: cópia das capas do archive.org pelo mesmo endereço do site, para extrair a paleta.
+- manifest.webmanifest, sw.js e assets/icons/: tornam o site instalável como app (PWA) no celular e no desktop. O service worker busca sempre a versão mais nova na rede e só usa o cache quando não há conexão; ele não guarda as respostas de /api nem do archive.org.
 - vercel.json e .vercelignore: configuração do deploy na Vercel (site estático + as funções em api/).
 - server.mjs: servidor local; entrega o site e roda as mesmas funções de api/.
 - .env.example: configuração opcional da porta local.
 - .gitignore: evita incluir .env em um repositório Git.
 - assets/: logo, ícones e fonte Geist Pixel usada no site. Os arquivos Fraunces antigos permanecem disponíveis, mas já não são carregados pela página.
+
+Instalar como app:
+- Android (Chrome): menu ⋮ → Instalar app (ou Adicionar à tela inicial).
+- iPhone/iPad (Safari): Compartilhar → Adicionar à Tela de Início.
+- Windows/Mac (Chrome ou Edge): ícone de instalar na barra de endereço, ou menu → Instalar The Deep Cut.
+O app mostra a faixa atual, o artista e a capa na tela de bloqueio, nas notificações e nas teclas de mídia, com play/pausa, anterior, próxima e busca na faixa.

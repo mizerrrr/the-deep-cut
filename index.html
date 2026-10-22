@@ -3,10 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#080808">
+<meta name="theme-color" content="#07080a">
 <meta name="description" content="Six randomly selected albums from the Internet Archive. No feed, no recommendations — just discovery.">
 <title>THE DEEP CUT</title>
 <link rel="icon" type="image/svg+xml" href="./assets/thedeepcut-logo.svg">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Deep Cut">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <style>
 @font-face{font-family:GeistPixel;src:url('./assets/GeistPixel-Regular-VariableFont_ELSH.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
 
@@ -1085,10 +1090,41 @@ function loadTrack(idx,autoplay,startAt){
   const item=previewItem;if(!item)return;
   item.trackIndex=Math.max(0,Math.min(idx,(item.tracks&&item.tracks.length||1)-1));
   pendingSeek=startAt||0;
-  previewAudio.src=trackUrl(item,item.trackIndex);previewAudio.load();
+  previewAudio.src=trackUrl(item,item.trackIndex);previewAudio.load();updateMediaMetadata();
   if(autoplay)previewAudio.play().then(()=>{previewPlaying=true;syncPlayerUI();}).catch(()=>{previewPlaying=false;syncPlayerUI();});
   else previewPlaying=false;
   syncPlayerUI();persistNowPlaying();
+}
+/* ── Media Session: lock screen, notification and media keys ── */
+const mediaSession='mediaSession' in navigator?navigator.mediaSession:null;
+function updateMediaMetadata(){
+  if(!mediaSession)return;
+  const item=previewItem;
+  if(!item){mediaSession.metadata=null;mediaSession.playbackState='none';return;}
+  const track=item.tracks&&item.tracks[item.trackIndex||0];
+  const artwork=[{src:thumbUrl(item.identifier),sizes:'180x180'}];
+  if(item.imageUrl)artwork.push({src:item.imageUrl,sizes:'512x512'});
+  try{mediaSession.metadata=new MediaMetadata({title:track?trackDisplayName(track.name):item.title,artist:item.creator||'',album:item.title,artwork});}catch(_){}
+}
+function updateMediaPosition(){
+  const dur=previewAudio.duration;
+  if(!mediaSession||!mediaSession.setPositionState||!isFinite(dur)||dur<=0)return;
+  try{mediaSession.setPositionState({duration:dur,position:Math.min(previewAudio.currentTime||0,dur),playbackRate:previewAudio.playbackRate||1});}catch(_){}
+}
+function bindMediaSession(){
+  if(!mediaSession)return;
+  const handlers={
+    play:()=>{if(previewAudio.paused)togglePlayPause();},
+    pause:()=>{if(!previewAudio.paused)togglePlayPause();},
+    previoustrack:prevTrack,
+    nexttrack:nextTrack,
+    seekto:details=>{if(isFinite(details.seekTime)){previewAudio.currentTime=details.seekTime;syncPlayerUI();updateMediaPosition();}},
+    stop:closePlayer
+  };
+  Object.entries(handlers).forEach(([action,handler])=>{try{mediaSession.setActionHandler(action,handler);}catch(_){/* action not supported here */}});
+  previewAudio.addEventListener('play',()=>{mediaSession.playbackState='playing';});
+  previewAudio.addEventListener('pause',()=>{mediaSession.playbackState='paused';});
+  ['loadedmetadata','seeked','ratechange'].forEach(t=>previewAudio.addEventListener(t,updateMediaPosition));
 }
 function startAlbum(item,trackIdx){
   if(!item||!item.previewUrl)return;
@@ -1113,7 +1149,7 @@ function prevTrack(){
 }
 function closePlayer(){
   previewAudio.pause();previewAudio.removeAttribute('src');previewAudio.load();
-  previewItem=null;previewPlaying=false;pendingSeek=0;
+  previewItem=null;previewPlaying=false;pendingSeek=0;updateMediaMetadata();
   $('npPanel').hidden=true;$('npListToggle').setAttribute('aria-expanded','false');
   syncPlayerUI();persistNowPlaying();
 }
@@ -1459,7 +1495,7 @@ async function refreshAll(onlyMissing){
 
 /* ── Bind ── */
 function bind(){
-  bindPreviewAudio();
+  bindPreviewAudio();bindMediaSession();
   $('albumList').addEventListener('click',event=>{
     const row=event.target.closest('.album-card');if(!row||row.classList.contains('is-loading'))return;
     const index=Number(row.dataset.index);if(isNaN(index))return;
@@ -1571,6 +1607,8 @@ initLoadingRows();bind();renderSaved();restorePools();syncDecadeButtons();
 if(pools[activeKey()])showPool(activeKey());
 preloadAllPools();
 restoreNowPlaying();handleSharedAlbum();refreshAll(true);
+// Installable app (PWA): the service worker only runs on https or localhost
+if('serviceWorker' in navigator&&window.isSecureContext&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();
 </script>
 </body>
