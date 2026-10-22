@@ -656,7 +656,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
 <div class="material-tip" id="materialTip" role="tooltip" hidden></div>
 
 <script type="module">
-import {aiSlopReason,archiveUrl,chooseCover,clean,collectionList,deriveYear,distinctArtists,downloadUrl,findAlbums,getMetadata,rankAudioFiles,recentIds,resolveArtist,uniqueTrackCount,values,wait} from './albums.mjs';
+import {aiSlopReason,archiveUrl,chooseCover,clean,collectionList,deriveYear,distinctArtists,downloadUrl,findAlbums,getMetadata,rankAudioFiles,recentIds,resolveArtist,trackKey,uniqueTrackCount,values,wait} from './albums.mjs';
 (function(){
 'use strict';
 const SAVED_KEY='internet-lottery-saved-v1';
@@ -674,11 +674,21 @@ const $=id=>document.getElementById(id);
 /* ── Utilities ── */
 function fmtTime(s){if(!isFinite(s)||s<0)return '—';const m=Math.floor(s/60),ss=String(Math.floor(s%60)).padStart(2,'0');return m+':'+ss;}
 function trackDisplayName(fn){return String(fn||'').split('/').pop().replace(/\.[^.]+$/,'').replace(/^\d+[\s._-]+/,'').replace(/[_]+/g,' ').replace(/-+/g,' ').trim()||'Track';}
+/* Albums stored before duplicate formats were dropped (MP3 + FLAC + OGG of the
+   same song) keep one copy of each; the playing track keeps its place. */
+function dedupeTracks(item){
+  if(!item||!Array.isArray(item.tracks))return item;
+  const key=t=>trackKey({name:t&&t.name}),seen=new Set();
+  const tracks=item.tracks.filter(t=>{const k=key(t);if(seen.has(k))return false;seen.add(k);return true;});
+  if(tracks.length===item.tracks.length)return item;
+  const cur=item.tracks[Number(item.trackIndex)||0],idx=cur?tracks.findIndex(t=>key(t)===key(cur)):0;
+  return Object.assign({},item,{tracks,trackIndex:Math.max(0,idx)});
+}
 function getSaved(){
   try{
     const v=JSON.parse(localStorage.getItem(SAVED_KEY)||'[]');if(!Array.isArray(v))return [];
     const kept=v.filter(x=>x&&x.identifier&&x.title&&Date.now()-(Number(x.savedAt)||0)<SAVED_TTL&&x.type==='album');
-    if(kept.length!==v.length)localStorage.setItem(SAVED_KEY,JSON.stringify(kept));return kept;
+    if(kept.length!==v.length)localStorage.setItem(SAVED_KEY,JSON.stringify(kept));return kept.map(dedupeTracks);
   }catch(_){return [];}
 }
 function updateSavedCount(){$('savedCount').textContent=String(getSaved().length).padStart(2,'0');}
@@ -1164,7 +1174,7 @@ function restorePools(){
       // Pools saved before the AI filter existed are screened again with what was stored
       const items=Array.isArray(data.pools[key])?data.pools[key].filter(x=>x&&x.identifier&&x.title&&x.previewUrl&&!(key==='2010'&&Number(x.year)>=2025)
         &&!(Number(x.year)>=2025&&aiSlopReason({title:x.title,creator:x.creator||'',description:x.description||'',subjects:String(x.subjects||'').split(/\s*,\s*/).filter(Boolean),coverName:x.coverName}))):[];
-      if(items.length){pools[key]=distinctArtists(items);poolStatus[key]='ready';}
+      if(items.length){pools[key]=distinctArtists(items).map(dedupeTracks);poolStatus[key]='ready';}
       else if(Array.isArray(data.empty)&&data.empty.includes(key))poolStatus[key]='empty';
     });
   }catch(_){}
@@ -1273,8 +1283,8 @@ function restoreNowPlaying(){
   try{
     const data=JSON.parse(localStorage.getItem(NOW_KEY)||'null');
     if(!data||!data.item||!data.item.identifier||Date.now()-Number(data.savedAt)>CURRENT_TTL)return;
-    previewItem=data.item;renderNowPlayingPanel();
-    loadTrack(Number(data.item.trackIndex)||0,false,Number(data.time)||0);
+    previewItem=dedupeTracks(data.item);renderNowPlayingPanel();
+    loadTrack(Number(previewItem.trackIndex)||0,false,Number(data.time)||0);
     if(data.playing)previewAudio.play().then(()=>{previewPlaying=true;syncPlayerUI();}).catch(()=>{previewPlaying=false;syncPlayerUI();showShareToast('[ PRESS ▶ TO RESUME ]');});
   }catch(_){}
 }

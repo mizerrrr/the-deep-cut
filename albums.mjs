@@ -123,6 +123,7 @@ function imageFile(f){const n=String(f.name||'').toLowerCase(),fmt=String(f.form
 function audioFile(f){
   const n=String(f.name||'').toLowerCase(),fmt=String(f.format||'').toLowerCase();
   if(String(f.private)==='true')return false; // listed, but the download is locked
+  if(/_sample.[a-z0-9]+$/i.test(n))return false; // the archive's 30-second previews
   if(/(metadata|archive bittorrent|text|thumbnail)/.test(fmt)||/(_archive\.torrent|_files\.xml|_meta\.(xml|sqlite))$/i.test(n))return false;
   return (/\.(mp3|flac|ogg|oga|wav|m4a|aac|aiff|aif|wma|opus)$/i.test(n)||/(mpeg audio|mpeg-4 audio|ogg vorbis|flac|wave audio|apple lossless|advanced audio coding|windows media audio|opus)/i.test(fmt))&&(!f.size||Number(f.size)>12000);
 }
@@ -146,7 +147,28 @@ export function rankAudioFiles(files){
     if(!a.hasTrack&&a.index!==b.index)return a.index-b.index;
     return a.codec-b.codec||a.src-b.src||a.index-b.index;
   });
-  return ranked;
+  // One entry per song: keep the most playable format and drop the copies
+  const best=new Map();
+  ranked.forEach(r=>{
+    const k=trackKey(r.file),old=best.get(k);
+    if(!old||r.codec<old.codec||(r.codec===old.codec&&r.src<old.src))best.set(k,r);
+  });
+  return ranked.filter(r=>best.get(trackKey(r.file))===r);
+}
+/* The same song uploaded in several formats (MP3 + FLAC + OGG…), in format
+   folders, or as the archive's own derivatives (which name their source in
+   "original") all share one key. The track number from the file name stays
+   in the key, so two different songs called "Interlude" are both kept. */
+export function trackKey(file){
+  // Only an audio original counts: a split LP side names its segments .json as the source
+  const derived=String(file.source||'').toLowerCase()==='derivative'&&/.(mp3|flac|ogg|oga|wav|m4a|aac|aiff?|wma|opus)$/i.test(String(file.original||''))&&file.original;
+  const path=String(derived?file.original:file.name||'').normalize('NFKD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  const base=path.split('/').pop().replace(/\.[^.]+$/,'').replace(/[\s._-]*(?:vbr|\d{2,3}kbp?s?|sample|hq|lq|stereo|mono)$/,'');
+  // The disc can sit in a folder name ("CD2/01 Intro.mp3") as well as in the file name
+  const disc=(path.match(/(?:^|[ /._-])(?:disc|disk|cd)\s*0*(\d{1,2})(?:[ /._-]|$)/)||[])[1]||'1';
+  const num=(base.match(/(?:^|[ ._-])(?:track|trk)\s*0*(\d{1,3})(?:[ ._-]|$)/)||base.match(/^\s*(?:(?:disc|cd)\s*\d+[\s._-]+)?0*(\d{1,3})(?:[ ._-]|$)/)||[])[1]||'';
+  const title=base.replace(/^(?:(?:disc|cd)\s*\d+[\s._-]+)?(?:\d{1,3}[\s._-]+)+/,'').replace(/[^a-z0-9]+/g,' ').trim();
+  return disc+'|'+num+'|'+title;
 }
 function chooseFirstTrack(files){const r=rankAudioFiles(files);return r.length?r[0].file:null;}
 export function chooseCover(files){
