@@ -3,13 +3,27 @@
    albums with exactly the same rules. No DOM access in here. */
 const API='https://archive.org/advancedsearch.php';
 const FIELDS=['identifier','title','description','creator','year','date','mediatype','subject','publisher','coverage','language','collection','format'];
+/* trusted: every item in the collection is an album, so the "album" wording
+   check is skipped (the four-track, cover and spoken-word checks still apply) */
 const SOURCES=[
-  {name:'Jamendo albums',collection:'jamendo-albums',query:'mediatype:audio AND collection:jamendo-albums'},
-  {name:'Netlabels',collection:'netlabels',query:'mediatype:audio AND collection:netlabels'},
+  {name:'Jamendo albums',collection:'jamendo-albums',trusted:true,query:'mediatype:audio AND collection:jamendo-albums'},
+  {name:'Netlabels',collection:'netlabels',trusted:true,query:'mediatype:audio AND collection:netlabels'},
+  {name:'Free Music Archive',collection:'freemusicarchive',trusted:true,query:'mediatype:audio AND collection:freemusicarchive'},
+  {name:'Unlocked Recordings',collection:'unlockedrecordings',trusted:true,query:'mediatype:audio AND collection:unlockedrecordings'},
+  {name:'Hip-hop mixtapes',collection:'hiphopmixtapes',trusted:true,query:'mediatype:audio AND collection:hiphopmixtapes'},
+  {name:'Digitized LPs',collection:'audio_music',query:'mediatype:audio AND collection:audio_music AND subject:LP'},
   {name:'Open source albums',collection:'opensource_audio',query:'mediatype:audio AND collection:opensource_audio AND subject:album'},
   {name:'Open source album titles',collection:'opensource_audio',query:'mediatype:audio AND collection:opensource_audio AND title:album'}
 ];
-const QUERY_TTL=5*60*1000,METADATA_TTL=30*60*1000;
+const QUERY_TTL=5*60*1000,TOTAL_TTL=60*60*1000,METADATA_TTL=30*60*1000;
+/* The search API stops at result 10,000, so a page drawn from the whole
+   collection mostly failed and the big collections were almost never read.
+   Each search now picks one of these orderings and a page inside that window;
+   big collections are first cut down by a random title prefix, so every part
+   of them can come up. */
+const PAGE_ROWS=36,MAX_PAGE=Math.floor(10000/PAGE_ROWS);
+const SORTS=['titleSorter','creatorSorter','identifier','publicdate','downloads','item_size','avg_rating'];
+const PREFIXES='a b c d e f g h i j k l m n o p r s t u v w y'.split(' ');
 /* Albums handed out recently; picks avoid them while there are alternatives */
 export const recentIds=[];
 const queryCache=new Map(),metadataCache=new Map(),pendingMetadata=new Map();
@@ -29,7 +43,7 @@ export function downloadUrl(item,file){return 'https://archive.org/download/'+en
 async function fetchJson(url){
   let lastErr;
   for(let attempt=0;attempt<2;attempt++){
-    const ctrl=new AbortController(),t=setTimeout(()=>ctrl.abort(),8500);
+    const ctrl=new AbortController(),t=setTimeout(()=>ctrl.abort(),12000); // a cold first connection to the archive can take several seconds
     try{
       const r=await fetch(url,{signal:ctrl.signal,mode:'cors'});
       if((r.status===429||r.status>=500)&&attempt<1){await wait(250);continue;}
@@ -42,35 +56,35 @@ async function fetchJson(url){
   }
   throw lastErr||new Error('Fetch failed');
 }
-function searchUrl(query,page,rows){return API+'?'+new URLSearchParams({q:query,fl:FIELDS.join(','),rows:String(rows||36),page:String(page),output:'json'});}
+function searchUrl(query,page,rows,sort){
+  const params=new URLSearchParams({q:query,fl:FIELDS.join(','),rows:String(rows||PAGE_ROWS),page:String(page),output:'json'});
+  if(sort)params.append('sort[]',sort);
+  return API+'?'+params;
+}
 /* "10s+" runs 2010–2024; "25–26" holds the newest releases (open-ended, so later years still land here) */
 function decadeRange(decade){return decade>=2025?'[2025 TO 2099]':decade>=2010?'[2010 TO 2024]':'['+decade+' TO '+(decade+9)+']';}
+function pick(list){return list[Math.floor(Math.random()*list.length)];}
+async function search(query,page,sort){
+  const key=query+'|'+sort+'|'+page,cached=queryCache.get(key);
+  if(cached&&Date.now()-cached.time<QUERY_TTL)return cached;
+  const data=await fetchJson(searchUrl(query,page,PAGE_ROWS,sort));
+  if(!data.response||!Array.isArray(data.response.docs))throw new Error(data.error||'Bad format');
+  const entry={time:Date.now(),docs:data.response.docs,total:Number(data.response.numFound)||0};
+  queryCache.set(key,entry);return entry;
+}
 async function searchPage(source,wave,decade){
-  let firstPage=1,cacheTotal=0;
-  const decadeSuffix=decade?' AND year:'+decadeRange(decade):'';
-  const query=source.query+decadeSuffix;
-  const totalEntry=queryCache.get(query+'|total');
-  if(!totalEntry||Date.now()-totalEntry.time>=QUERY_TTL){
-    const first=await fetchJson(searchUrl(query,1,36));
-    if(!first.response||!Array.isArray(first.response.docs))throw new Error('Bad format');
-    cacheTotal=Number(first.response.numFound)||0;
-    const pages=Math.max(1,Math.ceil(cacheTotal/36));
-    firstPage=Math.min(pages,Math.floor(Math.random()*pages)+1);
-    queryCache.set(query+'|total',{time:Date.now(),total:cacheTotal});
-    if(firstPage===1){queryCache.set(query+'|1',{time:Date.now(),docs:first.response.docs,total:cacheTotal});return first.response.docs;}
-  }else{
-    const total=totalEntry&&Date.now()-totalEntry.time<QUERY_TTL?totalEntry.total:0;
-    const pages=Math.max(1,Math.ceil(total/36));
-    firstPage=Math.min(pages,Math.floor(Math.random()*pages)+1);
-  }
-  const key=query+'|'+firstPage,cached=queryCache.get(key);
-  if(cached&&Date.now()-cached.time<QUERY_TTL)return cached.docs;
-  const data=await fetchJson(searchUrl(query,firstPage,36));
-  if(!data.response||!Array.isArray(data.response.docs))throw new Error('Bad format');
-  const total=Number(data.response.numFound)||cacheTotal||(totalEntry&&totalEntry.total)||0;
-  queryCache.set(key,{time:Date.now(),docs:data.response.docs,total});
-  queryCache.set(query+'|total',{time:Date.now(),total});
-  return data.response.docs;
+  const query=source.query+(decade?' AND year:'+decadeRange(decade):'');
+  const known=queryCache.get(query+'|total');
+  if(known&&Date.now()-known.time<TOTAL_TTL&&!known.total)return []; // nothing from this collection in this era
+  const sort=pick(SORTS)+(Math.random()<.5?' asc':' desc');
+  // Big result sets are cut by a random title prefix first; small ones are read whole
+  const sliced=known&&known.total>MAX_PAGE*PAGE_ROWS?query+' AND title:('+pick(PREFIXES)+'*)':query;
+  const first=await search(sliced,1,sort);
+  if(sliced===query)queryCache.set(query+'|total',{time:Date.now(),total:first.total});
+  const pages=Math.min(MAX_PAGE,Math.ceil(first.total/PAGE_ROWS));
+  const page=Math.floor(Math.random()*pages)+1;
+  if(pages<=1||page===1)return first.docs;
+  return (await search(sliced,page,sort)).docs;
 }
 function normalizeCandidate(doc,source){
   const identifier=clean(doc&&doc.identifier,220),title=clean(doc&&doc.title,220);
@@ -79,7 +93,8 @@ function normalizeCandidate(doc,source){
   return {identifier,title,doc,sourceNames:[source.name],collections:collectionList(doc.collection)};
 }
 async function retrieveCandidates(wave,decade){
-  const sources=shuffle(SOURCES),results=await Promise.allSettled(sources.map(s=>searchPage(s,wave,decade)));
+  // A different handful of collections each wave keeps the archive load light and the mix varied
+  const sources=shuffle(SOURCES).slice(0,5),results=await Promise.allSettled(sources.map(s=>searchPage(s,wave,decade)));
   if(!results.some(r=>r.status==='fulfilled'))throw new Error('All archive searches failed');
   const unique=new Map();
   results.forEach((r,i)=>{
@@ -105,6 +120,7 @@ export async function getMetadata(identifier){
 function imageFile(f){const n=String(f.name||'').toLowerCase(),fmt=String(f.format||'').toLowerCase();return /\.(jpe?g|png|webp|gif|avif)$/i.test(n)||/(jpeg|png|webp|gif|avif)/.test(fmt);}
 function audioFile(f){
   const n=String(f.name||'').toLowerCase(),fmt=String(f.format||'').toLowerCase();
+  if(String(f.private)==='true')return false; // listed, but the download is locked
   if(/(metadata|archive bittorrent|text|thumbnail)/.test(fmt)||/(_archive\.torrent|_files\.xml|_meta\.(xml|sqlite))$/i.test(n))return false;
   return (/\.(mp3|flac|ogg|oga|wav|m4a|aac|aiff|aif|wma|opus)$/i.test(n)||/(mpeg audio|mpeg-4 audio|ogg vorbis|flac|wave audio|apple lossless|advanced audio coding|windows media audio|opus)/i.test(fmt))&&(!f.size||Number(f.size)>12000);
 }
@@ -196,16 +212,13 @@ export function aiSlopReason(info){
 function qualityCheck(candidate,details){
   const meta=details.metadata,doc=candidate.doc;
   const collections=Array.from(new Set(candidate.collections.concat(collectionList(meta.collection))));
-  const sources=candidate.sourceNames.filter(name=>{
-    if(name==='Jamendo albums')return collections.includes('jamendo-albums');
-    if(name==='Netlabels')return collections.includes('netlabels');
-    return collections.includes('opensource_audio');
-  });
+  const sources=candidate.sourceNames.filter(name=>{const s=SOURCES.find(x=>x.name===name);return s&&collections.includes(s.collection);});
   if(!sources.length)return null;
+  if(/^true$/i.test(clean(meta['access-restricted-item'],10)))return null; // borrow-only: nothing streams
   if(isSpokenRecord(meta,doc,collections))return null;
   const trackCount=uniqueTrackCount(details.files),albumEvidence=albumMarker(clean(meta.title||doc.title,220),meta,doc);
-  const jamendo=sources.includes('Jamendo albums'),netlabel=sources.includes('Netlabels');
-  if(!(trackCount>=4&&(jamendo||netlabel||albumEvidence)))return null;
+  const trusted=sources.some(name=>SOURCES.find(x=>x.name===name).trusted);
+  if(!(trackCount>=4&&(trusted||albumEvidence)))return null;
   const title=clean(meta.title||doc.title,220);if(!title||genericTitle(title))return null;
   const creator=resolveArtist(title,meta,doc);
   const subjects=values(meta.subject||doc.subject).filter(v=>!/^\d{4}$/.test(v)&&!/^(album|music|audio)$/i.test(v));
