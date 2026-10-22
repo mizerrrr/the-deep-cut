@@ -47,6 +47,10 @@ body::after{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;b
 /* ── Blurred album background ── */
 .bg-blur{position:fixed;inset:-40px;z-index:0;background-size:cover;background-position:center;filter:blur(80px) brightness(.1) saturate(1.8);pointer-events:none}
 
+/* ── Pixel ambient: dithered plasma in the selected album's palette ── */
+.bg-pixels{position:fixed;inset:0;z-index:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none;opacity:0;transition:opacity 1.6s ease}
+.bg-pixels.is-on{opacity:.28}
+
 /* ── App shell ── */
 .app-shell{position:relative;z-index:1;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;padding-bottom:var(--np-offset)}
 
@@ -323,15 +327,6 @@ button.saved-link:hover .saved-title{color:var(--mint)}
 .saved-actions{display:flex;justify-content:space-between;align-items:center;padding:16px 0 22px;border-top:1px solid var(--line)}
 .back-home{border:1px solid var(--line);background:none;padding:11px 18px;color:var(--ink);font:13px var(--mono);letter-spacing:.12em;text-transform:uppercase;transition:border-color .1s,color .1s}
 .back-home:hover{border-color:var(--mint);color:var(--mint)}
-.platform-links{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:max-content}
-.platform-link{display:grid;width:38px;height:38px;place-items:center;padding:5px;border:1px solid transparent;background:transparent;color:#aab0b8;opacity:.24;transition:color .1s,opacity .1s,background .1s,border-color .1s}
-.platform-link svg{display:block;width:24px;height:24px}
-.platform-link.is-available{color:var(--platform-color);opacity:1}
-.platform-link.is-available:hover{border-color:currentColor;background:rgba(255,255,255,.06)}
-.platform-link.is-missing{filter:grayscale(1);opacity:.18;cursor:not-allowed}
-.platform-link.is-unverified{filter:grayscale(1);opacity:.28;cursor:help}
-.platform-link.is-checking{animation:plat-blink .9s step-end infinite alternate}
-@keyframes plat-blink{to{opacity:.5}}
 .about-view{display:flex;align-items:center;justify-content:center}
 .about-inner{max-width:680px}
 .about-inner h1{margin:0 0 26px;font:400 clamp(44px,7vw,80px)/.98 var(--mono)}
@@ -404,6 +399,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
 <body>
 
 <div class="bg-blur" id="bgBlur"></div>
+<canvas class="bg-pixels" id="bgPixels" aria-hidden="true"></canvas>
 
 <div class="app-shell">
 
@@ -526,7 +522,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
     <p>The Deep Cut is a small window into the Internet Archive's music collection. Each refresh brings six albums at random, leaving room for unexpected discoveries beyond recommendation feeds.</p>
     <p>Albums come from three corners of the archive: Jamendo, Netlabels and Open Source Audio. Every pick is random. Nothing is ranked by plays, downloads or what you listened to before.</p>
     <p>Each album is checked before it reaches you: at least four tracks, an original cover, and no podcasts, radio or lectures. Artist, year and region appear only when the record states them.</p>
-    <p class="about-note">Your saved albums and listening history are kept in this browser, with no account. To find a YouTube Music link, a saved album's title and artist are looked up on YouTube.</p>
+    <p class="about-note">Your saved albums and listening history are kept in this browser, with no account.</p>
     <button class="about-back" id="aboutBack" type="button">← BACK TO THE ARCHIVE</button>
   </div>
 </div>
@@ -577,8 +573,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
 'use strict';
 const API='https://archive.org/advancedsearch.php';
 const SAVED_KEY='internet-lottery-saved-v1';
-const PLATFORM_CACHE_KEY='deep-cuts-youtube-music-link-v1';
-try{localStorage.removeItem('deep-cuts-platform-links-v2');}catch(_){}
+try{['deep-cuts-platform-links-v2','deep-cuts-youtube-music-link-v1'].forEach(k=>localStorage.removeItem(k));}catch(_){}
 const CURRENT_KEY='deep-cuts-last-selection-v4';
 const SAVED_TTL=14*24*60*60*1000,CURRENT_TTL=7*24*60*60*1000,QUERY_TTL=5*60*1000,METADATA_TTL=30*60*1000;
 const FIELDS=['identifier','title','description','creator','year','date','mediatype','subject','publisher','coverage','language','collection','format'];
@@ -587,9 +582,6 @@ const SOURCES=[
   {name:'Netlabels',collection:'netlabels',query:'mediatype:audio AND collection:netlabels'},
   {name:'Open source albums',collection:'opensource_audio',query:'mediatype:audio AND collection:opensource_audio AND subject:album'},
   {name:'Open source album titles',collection:'opensource_audio',query:'mediatype:audio AND collection:opensource_audio AND title:album'}
-];
-const PLATFORM_SERVICES=[
-  {key:'youtube',label:'YouTube Music',destination:'matching playlist',color:'#ff0033',icon:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M10 7.8v8.4l6.4-4.2z" fill="#090909"/></svg>'}
 ];
 
 const currentAlbums=Array(6).fill(null),recentIds=[],queryCache=new Map(),metadataCache=new Map(),pendingMetadata=new Map();
@@ -748,6 +740,38 @@ function isSpokenRecord(meta,doc,collections){
   const s=values(meta.subject||doc.subject).join(' '),words=[meta.title,meta.description,meta.genre,s].map(v=>clean(v,500)).join(' ');
   return collections.some(c=>/podcast|radiostation|radio_program|audiobook|librivox/i.test(c))||/\b(podcast|radio program|radio show|sermon|lecture|audiobook|audio book|talk show|news broadcast)\b/i.test(words);
 }
+/* ── AI slop filter (releases from 2025 on) ──
+   Strong signals reject on their own: a declared AI tool in the text or the
+   audio tags, or a cover whose file name is an AI image tool's default
+   (ChatGPT saves "file_0000…png", Gemini "Gemini_Generated_Image_…", etc.).
+   Weak signals only reject in pairs: keyword-stuffed tags, no artist, SEO
+   titles like "(Hardpsy / Psytrance Fusion Album)", numbered mass series,
+   mood filler titles, religious themes. A religious album by a
+   named artist with ordinary metadata therefore still passes. */
+const AI_TEXT_RE=/\b(?:udio|stable[\s-]?audio|comfyui|mubert|boomy|soundraw|riffusion|musicgen|aiva|soundful|beatoven|freegen|midjourney|dall[\s·.-]?e|leonardo\.ai|ideogram|artificial intelligence|ai[\s-]?(?:generated|music|songs?|album|artist|vocals?|voice|cover|art)|(?:generated|created|made|produced|composed)\s+(?:with|by|using|on|in)\s+(?:ai|a\.i\.|suno|udio)|suno(?:\.ai|\.com|\s?ai|\s?v\d)|a\.i\.?\s+(?:is\s+)?used)\b/i;
+const AI_COVER_RE=/^(?:file_0{5,}[0-9a-f]+|chatgpt[\s_-]?image|dall[\s·._-]?e|gemini_generated_image|comfyui_|leonardo_|midjourney|firefly|ideogram|grok[\s_-]?image|imagefx|sora[\s_-])/i;
+const RELIGIOUS_RE=/\b(?:worship|gospel|christian|jesus|christ|bible|biblical|scriptures?|psalms?|hymns?|prayers?|praise|prophec(?:y|ies)|holy spirit|lord|ministry|louvor|adora[cç][aã]o|evang[eé]lic[oa]s?|crist[aã]o?s?|deus|senhor)\b/i;
+const AI_DENIAL_RE=/\b(?:no|not|without|zero|never|free of)\s+(?:any\s+|use of\s+)?(?:ai|a\.i\.|artificial intelligence)\b[\w\s-]{0,24}|\bai[\s-]free\b|\b100\s*%\s*human\b/gi;
+const FILLER_RE=/\b(?:relax(?:ing)?|sleep(?:ing)?|meditation|healing|\d{3}\s?hz|study music|focus music|lo-?fi beats|spa music|yoga|background music|bgm|no copyright|royalty[\s-]free)\b/i;
+function aiSlopReason(info){
+  const subjects=info.subjects||[],files=info.files||[];
+  const text=[info.title,info.creator,info.description,subjects.join(' ; ')].join(' \n ');
+  // "NO AI generated", "made without AI"… are claims of the opposite
+  if(subjects.some(s=>/^(?:ai|a\.i\.|suno|udio)$/i.test(s.trim()))||AI_TEXT_RE.test(text.replace(AI_DENIAL_RE,' ')))return 'declared AI';
+  const images=files.filter(imageFile).map(f=>String(f.name||'').split('/').pop());
+  if(info.coverName)images.push(String(info.coverName).split('/').pop());
+  if(images.some(n=>AI_COVER_RE.test(n)))return 'AI cover';
+  if(files.some(f=>audioFile(f)&&AI_TEXT_RE.test([f.comment,f.title,f.album,f.artist].map(v=>clean(v,300)).join(' '))))return 'AI audio tags';
+  let weak=0;
+  // SEO stuffing: a long run of mostly one-word tags ("Free; Download; The; Album; Epic…")
+  if(subjects.length>=18&&subjects.filter(s=>!/\s/.test(s.trim())).length/subjects.length>=.75)weak++;
+  if(!info.creator||/^(?:undefined|null|unknown|various)$/i.test(info.creator))weak++;
+  if(/\((?=[^)]*\balbum\b)[^)]*(?:\/|\sx\s)[^)]*\)/i.test(info.title))weak++;
+  if(/^albums?\s*\d+|\balbums?\s*\d+\s*[-–]\s*\d+/i.test(info.title))weak++;
+  if(FILLER_RE.test(info.title))weak++;
+  if(RELIGIOUS_RE.test(info.title+' '+info.creator+' '+subjects.join(' ')))weak++;
+  return weak>=2?'generic metadata':'';
+}
 function qualityCheck(candidate,details){
   const meta=details.metadata,doc=candidate.doc;
   const collections=Array.from(new Set(candidate.collections.concat(collectionList(meta.collection))));
@@ -770,6 +794,9 @@ function qualityCheck(candidate,details){
   const firstTrack=chooseFirstTrack(details.files);
   if(!cover||!firstTrack)return null;
   const year=deriveYear(meta,doc);
+  if(Number(year)>=2025&&aiSlopReason({title,creator,description:clean(meta.description||doc.description,4000),
+    subjects:[].concat(meta.subject||doc.subject||[]).flatMap(s=>scalar(s).split(/\s*;\s*/)).map(s=>s.trim()).filter(Boolean),
+    files:details.files,coverName:cover.name}))return null;
   const allRanked=rankAudioFiles(details.files);
   const tracks=allRanked.slice(0,40).map(r=>({name:r.file.name,url:downloadUrl({identifier:candidate.identifier},r.file)}));
   return {
@@ -798,10 +825,23 @@ async function inspectCandidates(candidates,already,limit,onProgress){
   }
   return eligible;
 }
+/* One album per artist in a pool. The key is the lead artist, so "Pink Floyd"
+   and "The Pink Floyd & David Gilmour" collide; blank and "Various Artists"
+   never do. */
+function artistKey(item){
+  const lead=String(item&&item.creator||'').normalize('NFKD').replace(/[̀-ͯ]/g,'').toLowerCase()
+    .split(/\s*(?:[,;&+]|\bfeat\.?|\bft\.|\bfeaturing\b|\sx\s|\bvs\.?)\s*/)[0]
+    .replace(/^the\s+/,'').replace(/[^a-z0-9Ͱ-￿]+/g,'');
+  return /^(?:variousartists?|various|va|unknown|undefined|artistnotlisted)?$/.test(lead)?'':lead;
+}
+function distinctArtists(items){
+  const seen=new Set();
+  return items.filter(item=>{const k=artistKey(item);if(!k)return true;if(seen.has(k))return false;seen.add(k);return true;});
+}
 function chooseSix(eligible){
   const byId=new Map();eligible.forEach(item=>{if(!byId.has(item.identifier))byId.set(item.identifier,item);});
   const all=Array.from(byId.values()),fresh=shuffle(all.filter(item=>!recentIds.includes(item.identifier)));
-  return fresh.concat(shuffle(all.filter(item=>recentIds.includes(item.identifier)))).slice(0,6);
+  return distinctArtists(fresh.concat(shuffle(all.filter(item=>recentIds.includes(item.identifier))))).slice(0,6);
 }
 function getSaved(){
   try{
@@ -814,6 +854,112 @@ function updateSavedCount(){$('savedCount').textContent=String(getSaved().length
 
 /* ── Background ── */
 function setBlur(url){if(!url)return;$('bgBlur').style.backgroundImage='url('+JSON.stringify(url)+')';}
+
+/* ── Pixel ambient ──
+   The selected album's tile is shrunk to 32×32 and its colours bucketed; the
+   most common vivid buckets become a 4-colour palette. A low-res canvas (one
+   cell = PIX_CELL css px, scaled up with image-rendering:pixelated) draws a
+   slow sine plasma, Bayer-dithered into that palette at ~12 fps so it moves in
+   stepped, retro frames. Colours ease into a new palette when the album changes.
+   Pixels are read from the cover blob the site already cached (works without
+   the server); /api/thumb is the fallback, since archive.org tiles send no CORS header. */
+const PIX_CELL=12,PIX_FPS=12,PIX_FADE=1400;
+const PIX_DEFAULT=[[126,200,164],[200,168,64],[122,176,208],[200,72,72]]; // --mint --amber --blue --red
+const BAYER4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v=>v/16-.5);
+const pixState={from:PIX_DEFAULT,to:PIX_DEFAULT,fadeStart:0,id:'',raf:0,last:0,t:0,cols:0,rows:0,img:null};
+const pixReduced=matchMedia('(prefers-reduced-motion: reduce)');
+const paletteCache=new Map();
+
+function extractPalette(img){
+  const c=document.createElement('canvas');c.width=c.height=32;
+  const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,32,32);
+  const data=ctx.getImageData(0,0,32,32).data,buckets=new Map();
+  for(let i=0;i<data.length;i+=4){
+    if(data[i+3]<128)continue;
+    const r=data[i],g=data[i+1],b=data[i+2],key=(r>>5)<<6|(g>>5)<<3|(b>>5);
+    const bk=buckets.get(key)||{n:0,r:0,g:0,b:0};bk.n++;bk.r+=r;bk.g+=g;bk.b+=b;buckets.set(key,bk);
+  }
+  // Weight by frequency, favour saturated mid-tones so near-black/white borders don't dominate
+  const ranked=[...buckets.values()].map(bk=>{
+    const rgb=[bk.r/bk.n,bk.g/bk.n,bk.b/bk.n],mx=Math.max(...rgb),mn=Math.min(...rgb),l=(mx+mn)/510;
+    const s=mx===mn?0:(mx-mn)/(255-Math.abs(mx+mn-255));
+    return {rgb,score:bk.n*(.25+s)*(l<.08||l>.94?.2:1)};
+  }).sort((a,b)=>b.score-a.score);
+  const picked=[];
+  for(const c of ranked){
+    if(picked.every(p=>Math.hypot(p[0]-c.rgb[0],p[1]-c.rgb[1],p[2]-c.rgb[2])>56))picked.push(c.rgb);
+    if(picked.length===4)break;
+  }
+  if(!picked.length)return PIX_DEFAULT;
+  // Monochrome covers: pad with lighter/darker shades of what was found
+  for(let k=0;picked.length<4;k++){const base=picked[k%picked.length],f=k%2?.55:1.5;picked.push(base.map(v=>Math.min(255,v*f+(f>1?24:0))));}
+  // Lift very dark colours so the pattern stays visible on the near-black page
+  return picked.map(rgb=>{const mx=Math.max(...rgb);return mx<90?rgb.map(v=>v*(90/Math.max(mx,1))+12):rgb;});
+}
+function paletteFrom(src){
+  return new Promise(resolve=>{
+    if(!src){resolve(null);return;}
+    const img=new Image();
+    img.onload=()=>{try{resolve(extractPalette(img));}catch(_){resolve(null);}}; // a tainted canvas throws: try the next source
+    img.onerror=()=>resolve(null);
+    img.src=src;
+  });
+}
+async function loadPalette(item){
+  const id=item.identifier;
+  if(paletteCache.has(id))return paletteCache.get(id);
+  let p=await paletteFrom(coverUrls.get(id));
+  if(!p&&/^https?:$/.test(location.protocol))p=await paletteFrom('/api/thumb?id='+encodeURIComponent(id));
+  if(!p&&item.imageUrl)p=await paletteFrom(await resolveCover(item));
+  if(p)paletteCache.set(id,p);
+  return p;
+}
+function currentPixPalette(now){
+  const k=Math.min(1,(now-pixState.fadeStart)/PIX_FADE),e=k*k*(3-2*k);
+  return pixState.to.map((c,i)=>c.map((v,j)=>pixState.from[i][j]+(v-pixState.from[i][j])*e));
+}
+async function setAmbient(item){
+  const identifier=item&&item.identifier;
+  if(!identifier||identifier===pixState.id)return;
+  pixState.id=identifier;
+  const palette=await loadPalette(item);
+  if(pixState.id!==identifier||!palette)return; // another album was picked meanwhile, or no readable cover
+  const now=performance.now(),cv=$('bgPixels');
+  // The first album starts directly in its own colours (the canvas is still fading in)
+  pixState.from=cv.classList.contains('is-on')?currentPixPalette(now):palette;pixState.to=palette;pixState.fadeStart=now;
+  cv.classList.add('is-on');
+  startPixels();
+}
+function resizePixels(){
+  const cv=$('bgPixels'),cols=Math.ceil(innerWidth/PIX_CELL),rows=Math.ceil(innerHeight/PIX_CELL);
+  if(cols===pixState.cols&&rows===pixState.rows)return;
+  cv.width=pixState.cols=cols;cv.height=pixState.rows=rows;
+  pixState.img=cv.getContext('2d').createImageData(cols,rows);
+}
+function drawPixels(now){
+  resizePixels();
+  const {cols,rows,img}=pixState,px=img.data,pal=currentPixPalette(now),t=pixState.t,n=pal.length;
+  const cx=cols*(.5+.3*Math.sin(t*.13)),cy=rows*(.5+.3*Math.cos(t*.17));
+  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+    let v=Math.sin(x*.07+t*.5)+Math.sin(y*.09-t*.4)+Math.sin((x+y)*.05+t*.3)+Math.sin(Math.hypot(x-cx,y-cy)*.11-t*.6);
+    v=(v+4)/8; // 0..1
+    // n colour bands plus two empty ones, so the pattern breathes instead of filling the screen
+    const level=Math.floor(v*(n+2)+BAYER4[(y&3)*4+(x&3)]*.9)-2,o=(y*cols+x)*4;
+    if(level<0){px[o+3]=0;continue;}
+    const c=pal[Math.min(n-1,level)];px[o]=c[0];px[o+1]=c[1];px[o+2]=c[2];px[o+3]=255;
+  }
+  $('bgPixels').getContext('2d').putImageData(img,0,0);
+}
+function pixelFrame(now){
+  pixState.raf=0;
+  if(document.hidden)return;
+  if(now-pixState.last>=1000/PIX_FPS){pixState.t+=1/PIX_FPS;pixState.last=now;drawPixels(now);}
+  // Reduced motion: hold a still frame once the palette fade is done
+  if(!pixReduced.matches||now-pixState.fadeStart<PIX_FADE)pixState.raf=requestAnimationFrame(pixelFrame);
+}
+function startPixels(){if(!pixState.raf&&pixState.id)pixState.raf=requestAnimationFrame(pixelFrame);}
+document.addEventListener('visibilitychange',startPixels);
+addEventListener('resize',()=>{if(pixReduced.matches&&pixState.id)drawPixels(performance.now());});
 
 /* ── Covers ──
    Original cover files on archive.org/download often take 2–30 s and are not
@@ -1031,6 +1177,7 @@ function showFeaturedItem(item,index){
     if(!on)card.classList.remove('is-popping');else if(changed)popCard(card);
   });
   setBlur(thumbUrl(item.identifier)); // blurred to 80px anyway: the small tile is plenty
+  setAmbient(item);
   // The rail already shows the cover; the strip only needs one for albums opened from Saved/Recent
   const cover=$('detailCover'),showCover=index<0&&!!item.imageUrl;
   cover.hidden=!showCover;$('detail').classList.toggle('has-cover',showCover);
@@ -1167,15 +1314,17 @@ function restorePools(){
     if(!data||!data.pools)return;
     edition=Number(data.edition)||0;
     DECADES.forEach(({key})=>{
-      const items=Array.isArray(data.pools[key])?data.pools[key].filter(x=>x&&x.identifier&&x.title&&x.previewUrl&&!(key==='2010'&&Number(x.year)>=2025)):[];
-      if(items.length){pools[key]=items;poolStatus[key]='ready';}
+      // Pools saved before the AI filter existed are screened again with what was stored
+      const items=Array.isArray(data.pools[key])?data.pools[key].filter(x=>x&&x.identifier&&x.title&&x.previewUrl&&!(key==='2010'&&Number(x.year)>=2025)
+        &&!(Number(x.year)>=2025&&aiSlopReason({title:x.title,creator:x.creator||'',description:x.description||'',subjects:String(x.subjects||'').split(/\s*,\s*/).filter(Boolean),coverName:x.coverName}))):[];
+      if(items.length){pools[key]=distinctArtists(items);poolStatus[key]='ready';}
       else if(Array.isArray(data.empty)&&data.empty.includes(key))poolStatus[key]='empty';
     });
   }catch(_){}
 }
 async function findAlbums(decade,exclude,onProgress){
   const inspected=new Set(),eligible=[];
-  for(let wave=0;wave<3&&eligible.length<6;wave++){
+  for(let wave=0;wave<3&&distinctArtists(eligible).length<6;wave++){
     const candidates=(await retrieveCandidates(wave,decade)).filter(c=>!exclude.has(c.identifier));
     const base=[0,.45,.75][wave],span=[.45,.3,.25][wave];
     const next=await inspectCandidates(candidates,inspected,wave===0?24:18,(done,total)=>onProgress(base+(total?done/total*span:span)));
@@ -1318,60 +1467,6 @@ function handleSharedAlbum(){
   }).catch(()=>{});
 }
 
-/* ── Platform (YouTube Music) ── */
-const PLATFORM_CACHE_TTL=7*24*60*60*1000;
-const UNVERIFIED_TTL=30*1000,unverifiedCache=new Map();   // identifier|service -> {status,time}
-let platformInFlight=0;const platformQueue=[];
-function queuePlatformLookup(task){return new Promise((resolve,reject)=>{platformQueue.push({task,resolve,reject});runPlatformQueue();});}
-function runPlatformQueue(){while(platformInFlight<3&&platformQueue.length){const job=platformQueue.shift();platformInFlight++;Promise.resolve().then(job.task).then(job.resolve,job.reject).finally(()=>{platformInFlight--;runPlatformQueue();});}}
-function readPlatformCache(){try{const v=JSON.parse(localStorage.getItem(PLATFORM_CACHE_KEY)||'{}');return v&&typeof v==='object'?v:{};}catch(_){return {};}}
-function cachedPlatformStatuses(entry){
-  const all=readPlatformCache(),record=all[entry.identifier]||{},statuses={};
-  PLATFORM_SERVICES.forEach(s=>{
-    const item=record[s.key],recent=unverifiedCache.get(entry.identifier+'|'+s.key);
-    statuses[s.key]=item&&Date.now()-item.checkedAt<PLATFORM_CACHE_TTL&&['available','missing'].includes(item.state)?item
-      :recent&&Date.now()-recent.time<UNVERIFIED_TTL?recent.status:{state:'checking'};
-  });
-  return statuses;
-}
-function savePlatformCache(entry,key,status){
-  if(!['available','missing'].includes(status.state)){unverifiedCache.set(entry.identifier+'|'+key,{status,time:Date.now()});return;}
-  const all=readPlatformCache(),record=all[entry.identifier]||{};record[key]={state:status.state,url:status.url||'',checkedAt:Date.now()};all[entry.identifier]=record;
-  try{localStorage.setItem(PLATFORM_CACHE_KEY,JSON.stringify(all));}catch(_){}
-}
-function platformHostAllowed(key,value){
-  try{const url=new URL(value);if(url.protocol!=='https:')return false;return ({youtube:['music.youtube.com','youtube.com']}[key]||[]).includes(url.hostname.toLowerCase());}catch(_){return false;}
-}
-function drawPlatformIcons(container,statuses){
-  container.replaceChildren();
-  PLATFORM_SERVICES.forEach(svc=>{
-    const st=statuses[svc.key]||{state:'unverified'},ok=st.state==='available'&&platformHostAllowed(svc.key,st.url),ds=ok?'available':st.state==='available'?'unverified':st.state;
-    const el=ok?document.createElement('a'):document.createElement('button');
-    if(ok){el.href=st.url;el.target='_blank';el.rel='noopener noreferrer';}else{el.type='button';el.disabled=true;}
-    el.className='platform-link is-'+ds;el.dataset.platform=svc.key;el.style.setProperty('--platform-color',svc.color);
-    const detail=ok?'Open on '+svc.label:st.state==='missing'?'Not found in '+svc.label:st.state==='checking'?'Checking...':st.reason||'Could not verify';
-    el.setAttribute('aria-label',detail);el.title=detail;el.innerHTML=svc.icon;container.appendChild(el);
-  });
-}
-async function resolvePlatformLinks(entry,container){
-  const statuses=cachedPlatformStatuses(entry);drawPlatformIcons(container,statuses);
-  if(!PLATFORM_SERVICES.some(s=>statuses[s.key].state==='checking'))return;
-  try{
-    const params=new URLSearchParams({title:entry.title||'',artist:entry.creator||''}),response=await queuePlatformLookup(()=>fetch('/api/youtube-music-link?'+params,{headers:{Accept:'application/json'}}));
-    if(!response.ok)throw new Error('API unavailable');
-    const payload=await response.json(),results=payload&&payload.platforms||{};
-    PLATFORM_SERVICES.forEach(svc=>{
-      if(statuses[svc.key].state!=='checking')return;
-      const r=results[svc.key];let next;
-      if(r&&r.state==='available'&&platformHostAllowed(svc.key,r.url))next={state:'available',url:r.url};
-      else if(r&&r.state==='missing')next={state:'missing'};
-      else next={state:'unverified',reason:r&&r.reason||'Catalog could not be checked'};
-      statuses[svc.key]=next;savePlatformCache(entry,svc.key,next);
-    });
-  }catch(_){PLATFORM_SERVICES.forEach(svc=>{if(statuses[svc.key].state==='checking'){statuses[svc.key]={state:'unverified',reason:'Start the local server to check availability'};savePlatformCache(entry,svc.key,statuses[svc.key]);}});}
-  if(container.isConnected)drawPlatformIcons(container,statuses);
-}
-
 /* ── Library: load any album in-site (saved entries, recent tracks) ── */
 /* Lenient builder: saved/recent albums were already chosen, so only playable audio is required */
 function albumFromDetails(identifier,details,fallback){
@@ -1485,12 +1580,11 @@ function renderSaved(){
     const title=document.createElement('span');title.className='saved-title';title.textContent=entry.title;
     const meta=document.createElement('span');meta.className='saved-meta';meta.textContent=[entry.creator,entry.year].filter(Boolean).join(' / ')||'Internet Archive';link.append(title,meta);
     const actions=document.createElement('div');actions.className='row-actions';
-    const platforms=document.createElement('div');platforms.className='platform-links';platforms.setAttribute('role','group');platforms.setAttribute('aria-label','YouTube Music');
     const play=document.createElement('button');play.type='button';play.className='row-play';play.dataset.play=entry.identifier;play.textContent='▶ PLAY';
     const archive=document.createElement('a');archive.className='row-btn';archive.href=entry.url||archiveUrl(entry);archive.target='_blank';archive.rel='noopener noreferrer';archive.textContent='↗ ARCHIVE';archive.title='Open on archive.org';
     const remove=document.createElement('button');remove.type='button';remove.className='remove-save';remove.dataset.remove=entry.identifier;remove.textContent='[ REMOVE ]';
-    actions.append(platforms,play,archive,remove);
-    row.append(makeCover(entry.identifier,entry.coverUrl),link,actions);list.appendChild(row);resolvePlatformLinks(entry,platforms);
+    actions.append(play,archive,remove);
+    row.append(makeCover(entry.identifier,entry.coverUrl),link,actions);list.appendChild(row);
   });
   syncLibraryRows();
 }

@@ -1,0 +1,5 @@
+.env*
+server.mjs
+README.txt
+index_backup_*.html
+index_v1.html
