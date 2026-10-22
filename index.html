@@ -656,7 +656,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
 <div class="material-tip" id="materialTip" role="tooltip" hidden></div>
 
 <script type="module">
-import {aiSlopReason,archiveUrl,chooseCover,clean,collectionList,deriveYear,distinctArtists,downloadUrl,findAlbums,getMetadata,rankAudioFiles,recentIds,recentStyles,resolveArtist,trackKey,uniqueTrackCount,values,wait} from './albums.mjs';
+import {aiSlopReason,archiveUrl,chooseCover,clean,collectionList,deriveYear,distinctArtists,downloadUrl,findAlbums,getMetadata,isClassical,isSpokenText,rankAudioFiles,recentIds,recentStyles,resolveArtist,trackKey,uniqueTrackCount,values,wait} from './albums.mjs';
 (function(){
 'use strict';
 const SAVED_KEY='internet-lottery-saved-v1';
@@ -1179,8 +1179,10 @@ function restorePools(){
     if(!data||!data.pools)return;
     edition=Number(data.edition)||0;
     DECADES.forEach(({key})=>{
-      // Pools saved before the AI filter existed are screened again with what was stored
+      // Pools saved before the AI, classical and spoken-word filters existed are screened again with what was stored
       const items=Array.isArray(data.pools[key])?data.pools[key].filter(x=>x&&x.identifier&&x.title&&x.previewUrl&&!(key==='2010'&&Number(x.year)>=2025)
+        &&!isClassical({title:x.title,creator:x.creator||'',genre:x.genre||'',publisher:x.publisher||'',subjects:String(x.subjects||'').split(/\s*,\s*/).filter(Boolean)})
+        &&!isSpokenText([x.title,x.genre,x.subjects].join(' '))
         &&!(Number(x.year)>=2025&&aiSlopReason({title:x.title,creator:x.creator||'',description:x.description||'',subjects:String(x.subjects||'').split(/\s*,\s*/).filter(Boolean),coverName:x.coverName}))):[];
       if(items.length){pools[key]=distinctArtists(items).map(dedupeTracks);poolStatus[key]='ready';}
       else if(Array.isArray(data.empty)&&data.empty.includes(key))poolStatus[key]='empty';
