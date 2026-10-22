@@ -34,8 +34,12 @@ Verificação manual:
 8. Para testar falhas da API, bloqueie archive.org/advancedsearch.php e use Refresh. O estado deve informar a falha, o botão deve se reativar e, se houver seleção anterior, ela deve continuar na tela.
 
 Arquivos:
-- index.html: layout, estilo, integração com a API, seleção, hover e salvos.
-- server.mjs: servidor local que entrega o site e uma cópia das capas do archive.org (/api/thumb).
+- index.html: layout, estilo, player, seleção, hover e salvos.
+- albums.mjs: busca e verificação dos álbuns no Internet Archive, usada tanto pela página quanto pelo servidor.
+- api/pool.mjs: monta no servidor os seis álbuns de cada filtro de época (/api/pool?decade=all|1960|...|2025). Na primeira visita a página usa essas listas prontas; na Vercel o resultado fica em cache por 5 minutos, e o cache antigo é servido enquanto um novo é montado. O botão Refresh continua buscando direto do navegador.
+- api/thumb.mjs: cópia das capas do archive.org pelo mesmo endereço do site, para extrair a paleta.
+- vercel.json e .vercelignore: configuração do deploy na Vercel (site estático + as funções em api/).
+- server.mjs: servidor local; entrega o site e roda as mesmas funções de api/.
 - .env.example: configuração opcional da porta local.
 - .gitignore: evita incluir .env em um repositório Git.
 - assets/: logo, ícones e fonte Geist Pixel usada no site. Os arquivos Fraunces antigos permanecem disponíveis, mas já não são carregados pela página.

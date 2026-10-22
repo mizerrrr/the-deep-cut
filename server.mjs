@@ -2,7 +2,8 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GET } from './api/thumb.mjs';
+import { GET as thumb } from './api/thumb.mjs';
+import { GET as pool } from './api/pool.mjs';
 
 const ROOT=path.dirname(fileURLToPath(import.meta.url));
 
@@ -20,8 +21,9 @@ function loadLocalEnv(){
 }
 loadLocalEnv();
 
-async function albumThumb(request,response){
-  const result=await GET(new Request(new URL(request.url,'http://localhost')));
+/* Runs a Vercel-style handler (Request in, Response out) on the local server */
+async function runHandler(handler,request,response){
+  const result=await handler(new Request(new URL(request.url,'http://localhost')));
   response.writeHead(result.status,Object.fromEntries(result.headers));
   response.end(Buffer.from(await result.arrayBuffer()));
 }
@@ -41,7 +43,8 @@ function serveFile(request,response){
 const server=http.createServer((request,response)=>{
   if(request.method!=='GET'){response.writeHead(405,{'Allow':'GET'});response.end('Method not allowed');return;}
   const pathname=new URL(request.url,'http://localhost').pathname;
-  if(pathname==='/api/thumb'){albumThumb(request,response);return;}
+  if(pathname==='/api/thumb'){runHandler(thumb,request,response);return;}
+  if(pathname==='/api/pool'){runHandler(pool,request,response);return;}
   serveFile(request,response);
 });
 const port=Number(process.env.PORT)||4177;
