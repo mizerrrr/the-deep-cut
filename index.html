@@ -73,6 +73,11 @@ body::after{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;b
 .hdr-btn.is-accent[aria-pressed="true"]{background:var(--mint);color:var(--bg);border-color:var(--mint)}
 .hdr-saved-count{color:var(--ink)}
 .np-like.is-liked{color:var(--mint);border-color:var(--mint)}
+/* Runner mini game in the free middle of the topbar — wide desktop screens only */
+.runner{display:none}
+@media(min-width:1180px){.runner{display:block;flex:1;min-width:240px;max-width:560px;height:70px;margin:0 32px}}
+.runner canvas{display:block;width:100%;height:100%;cursor:pointer;outline:none}
+.runner canvas:focus-visible{outline:1px solid var(--mint);outline-offset:3px}
 
 /* ══ STAGE: horizontal — toolbar / cover rail / detail strip ══ */
 .stage{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
@@ -458,6 +463,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
       <img class="brand-logo" src="./assets/thedeepcut-logo.svg" alt="THE DEEP CUT">
       <span class="brand-copy"><strong>THE DEEP CUT</strong><span>Internet Archive · Music</span></span>
     </a>
+    <div class="runner"><canvas id="runnerCanvas" tabindex="0" aria-label="Mini game: jump over the cacti. Click or press Space to play."></canvas></div>
     <nav class="header-actions" aria-label="Site navigation">
       <button class="hdr-btn" id="appToggle" type="button" aria-label="Get the app" aria-pressed="false">[ APP ]</button>
       <button class="hdr-btn" id="aboutToggle" type="button" aria-pressed="false">[ ABOUT ]</button>
@@ -1964,12 +1970,91 @@ function bind(){
   $('featuredDismiss').addEventListener('click',()=>{$('featuredBand').hidden=true;});
 }
 
+/* ── Runner mini game ──
+   A pixel dino jumps cacti in the topbar's free space (wide desktops only;
+   CSS hides it elsewhere). Click or Space/↑ while it has focus: the keys never
+   reach the player or the TV remote navigation. It pauses when it loses focus
+   or the tab is hidden, and only animates while a run is on. */
+function initRunner(){
+  const canvas=$('runnerCanvas');if(!canvas||!canvas.getContext)return;
+  const ctx=canvas.getContext('2d'),P=2,DX=10,GRAVITY=1700,JUMP=-350,HI_KEY='deep-cut-runner-hi';
+  const DINO=['......######','.....##.####','.....#######','.....####...','.....######.','#...#####...','##.#######..','##########..','.#########..','..#######...'];
+  const LEGS=[['...##.##....','...#...#....','...##..##...'],['...##.##....','...##..#....','.......##...']];
+  const CACTI=[['..##..','..##.#','#.##.#','#.####','####..','..##..','..##..','..##..'],
+    ['...##...','...##..#','#..##..#','#..##..#','#..##.##','##.####.','.####...','...##...','...##...','...##...','...##...']];
+  const DH=(DINO.length+3)*P,DW=DINO[0].length*P;
+  let w=0,h=0,state='idle',raf=0,last=0,overAt=0,speed=0,dist=0,y=0,vy=0,legT=0,gap=0,obstacles=[],hi=0;
+  try{hi=Number(localStorage.getItem(HI_KEY))||0;}catch(_){}
+  const css=name=>getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const ground=()=>h-6,score=()=>Math.floor(dist/10),pad=n=>String(n).padStart(5,'0');
+  function sprite(rows,x,top){rows.forEach((r,j)=>{for(let i=0;i<r.length;i++)if(r[i]==='#')ctx.fillRect(Math.round(x+i*P),Math.round(top+j*P),P,P);});}
+  function reset(){speed=240;dist=0;y=0;vy=0;legT=0;obstacles=[];gap=w*.5;}
+  function draw(){
+    ctx.clearRect(0,0,w,h);if(!w)return;
+    const g=ground();
+    ctx.fillStyle=css('--line');ctx.fillRect(0,g,w,1);
+    for(let i=0;i<w/47;i++){const x=((i*47-dist)%w+w)%w;ctx.fillRect(x,g+3+(i%3),i%2?3:2,1);}
+    ctx.fillStyle=css('--mint');
+    obstacles.forEach(o=>{for(let k=0;k<o.n;k++)sprite(o.rows,o.x+k*(o.rows[0].length*P+2),g-o.h);});
+    ctx.fillStyle=css('--ink');
+    const frame=state==='running'&&y===0?Math.floor(legT*12)%2:0;
+    sprite(DINO.concat(LEGS[frame]),DX,g-DH+y);
+    ctx.font='11px GeistPixel, monospace';ctx.textBaseline='top';ctx.textAlign='right';ctx.fillStyle=css('--muted');
+    ctx.fillText('HI '+pad(hi)+'  '+pad(score()),w-2,2);
+    const msg=state==='idle'?'▶ CLICK OR SPACE TO RUN':state==='over'?'GAME OVER · CLICK TO RETRY':state==='paused'?'‖ PAUSED · CLICK TO RESUME':'';
+    if(msg){ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=css('--mint');ctx.fillText(msg,w/2+DW/2,h/2-6);}
+  }
+  function update(dt){
+    speed=Math.min(560,speed+dt*9);dist+=speed*dt;legT+=dt;
+    vy+=GRAVITY*dt;y+=vy*dt;if(y>0){y=0;vy=0;}
+    obstacles.forEach(o=>o.x-=speed*dt);obstacles=obstacles.filter(o=>o.x+o.w>0);
+    gap-=speed*dt;
+    if(gap<=0){
+      const rows=CACTI[Math.random()<.6?0:1],n=speed>300&&Math.random()<.22?2:1; // doubles only once the jump covers them
+      obstacles.push({rows,n,x:w+4,w:rows[0].length*P*n+(n-1)*2,h:rows.length*P});
+      gap=speed*.55+90+Math.random()*240;
+    }
+    // Boxes are trimmed a little so a pixel-perfect graze still counts as a clear jump
+    const g=ground(),top=g-DH+y;
+    if(obstacles.some(o=>DX+4<o.x+o.w-2&&DX+DW-6>o.x+2&&top+4<g&&top+DH-2>g-o.h+3)){
+      state='over';overAt=performance.now();
+      if(score()>hi){hi=score();try{localStorage.setItem(HI_KEY,String(hi));}catch(_){}}
+    }
+  }
+  function tick(now){
+    update(Math.min(.05,(now-last)/1000));last=now;draw();
+    raf=state==='running'?requestAnimationFrame(tick):0;
+  }
+  function act(){
+    if(state==='running'){if(y===0)vy=JUMP;return;}
+    if(state==='over'&&performance.now()-overAt<400)return; // a held key does not restart at once
+    if(state!=='paused')reset();
+    state='running';last=performance.now();
+    if(!raf)raf=requestAnimationFrame(tick);
+  }
+  function pause(){if(state!=='running')return;state='paused';cancelAnimationFrame(raf);raf=0;draw();}
+  function resize(){
+    const r=canvas.getBoundingClientRect(),d=window.devicePixelRatio||1;
+    w=r.width;h=r.height;canvas.width=Math.round(w*d);canvas.height=Math.round(h*d);ctx.setTransform(d,0,0,d,0,0);
+    if(!w)pause();draw();
+  }
+  canvas.addEventListener('pointerdown',event=>{event.preventDefault();canvas.focus();act();});
+  canvas.addEventListener('keydown',event=>{
+    if(event.key!==' '&&event.key!=='ArrowUp'&&event.key!=='Enter')return;
+    event.preventDefault();event.stopPropagation();if(!event.repeat||state==='running')act();
+  });
+  canvas.addEventListener('blur',pause);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});
+  if('ResizeObserver' in window)new ResizeObserver(resize).observe(canvas);else resize();
+  if(document.fonts)document.fonts.ready.then(draw);
+}
+
 window.__deepCutsDiagnostics=()=>({edition,count:currentAlbums.filter(Boolean).length,activeIndex,activeDecade:activeKey(),
   pools:Object.fromEntries(DECADES.map(({key})=>[key,{status:poolStatus[key]||'missing',albums:pools[key]?pools[key].length:0}])),
   selection:currentAlbums.filter(Boolean).map(item=>({identifier:item.identifier,title:item.title,artist:item.creator,year:item.year,tracks:item.tracks&&item.tracks.length})),requestInProgress:busy});
 
 // Albums only change on REFRESH: reuse the stored pools and fetch just the ones that are missing
-initLoadingRows();bind();renderSaved();syncLikes();restorePools();syncDecadeButtons();
+initLoadingRows();bind();initRunner();renderSaved();syncLikes();restorePools();syncDecadeButtons();
 if(pools[activeKey()])showPool(activeKey());
 preloadAllPools();
 restoreNowPlaying();handleSharedAlbum();refreshAll(true);
