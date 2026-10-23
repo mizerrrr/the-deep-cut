@@ -281,6 +281,11 @@ body:not(.audio-playing) .track-row.is-active .track-num::before{content:'‖ ';
 .np-ctl:disabled{opacity:.25;cursor:default}
 .np-play{width:54px;height:54px;font:20px var(--mono);color:var(--mint);border-color:var(--mint)}
 .np-play:hover:not(:disabled){background:var(--mint);color:var(--bg)}
+/* Play/pause is the logo's record: it spins while music plays and freezes where it stopped on pause */
+.np-disc{display:block;width:70%;height:70%;background:currentColor;-webkit-mask:url(./assets/thedeepcut-logo.svg) center/contain no-repeat;mask:url(./assets/thedeepcut-logo.svg) center/contain no-repeat;animation:disc-spin 1.8s linear infinite;animation-play-state:paused}
+body.audio-playing .np-disc{animation-play-state:running}
+@keyframes disc-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.np-disc{animation:none}}
 .np-time{font:13px var(--mono);color:var(--muted);white-space:nowrap;min-width:110px;text-align:right}
 .vol-ctrl{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .vol-icon{font:14px var(--mono);color:var(--muted);white-space:nowrap;min-width:40px;letter-spacing:-.02em}
@@ -650,7 +655,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
   </div>
   <div class="np-controls">
     <button class="np-ctl np-prev" id="npPrev" type="button" aria-label="Previous track">|◀</button>
-    <button class="np-ctl np-play" id="npPlay" type="button" aria-label="Play">▶</button>
+    <button class="np-ctl np-play" id="npPlay" type="button" aria-label="Play"><span class="np-disc" aria-hidden="true"></span></button>
     <button class="np-ctl np-next" id="npNext" type="button" aria-label="Next track">▶|</button>
   </div>
   <span class="np-time" id="npTime">0:00</span>
@@ -1001,7 +1006,6 @@ function syncPlayerUI(){
   if(!item)$('npPanel').hidden=true;
   const tidx=item&&typeof item.trackIndex==='number'?item.trackIndex:0;
   const tracks=item&&item.tracks;
-  $('npPlay').textContent=previewPlaying?'‖':'▶';
   $('npPlay').setAttribute('aria-label',previewPlaying?'Pause':'Play');
   syncProgressUI();
   if(item){
