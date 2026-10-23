@@ -350,8 +350,8 @@ button.saved-link:hover .saved-title{color:var(--mint)}
 .saved-actions{display:flex;justify-content:space-between;align-items:center;padding:16px 0 22px;border-top:1px solid var(--line)}
 .back-home{border:1px solid var(--line);background:none;padding:11px 18px;color:var(--ink);font:13px var(--mono);letter-spacing:.12em;text-transform:uppercase;transition:border-color .1s,color .1s}
 .back-home:hover{border-color:var(--mint);color:var(--mint)}
-.about-view{display:flex;align-items:center;justify-content:center}
-.about-inner{max-width:680px}
+.about-view{display:flex}
+.about-inner{max-width:680px;margin:auto}
 .about-inner h1{margin:0 0 26px;font:400 clamp(44px,7vw,80px)/.98 var(--mono)}
 .about-inner>p:not(.eyebrow){max-width:640px;color:#aaa6a0;font:16px/1.7 var(--mono);letter-spacing:.04em}
 .about-inner .about-note{color:var(--muted)}
@@ -592,9 +592,10 @@ button.saved-link:hover .saved-title{color:var(--mint)}
     <p class="eyebrow">// THE PROJECT</p>
     <h1>About the archive.</h1>
     <p>The Deep Cut is a small window into the Internet Archive's music collection. Each Search More brings six albums at random, each in a different style, leaving room for unexpected discoveries beyond recommendation feeds.</p>
-    <p>Albums come from three corners of the archive: Jamendo, Netlabels and Open Source Audio. Every pick is random. Nothing is ranked by plays, downloads or what you listened to before.</p>
-    <p>Each album is checked before it reaches you: at least four tracks, an original cover, and no podcasts, radio or lectures. Artist, year and region appear only when the record states them.</p>
-    <p class="about-note">Your saved albums, liked tracks and listening history are kept in this browser, with no account.</p>
+    <p>Albums come from across the archive's music collections: Jamendo, Netlabels, the Free Music Archive, Unlocked Recordings, digitized LPs, open source releases, hip-hop mixtapes, and Brazilian, Latin American and Colombian campesino music. Classical recordings are left out.</p>
+    <p>Every pick is random. Each search samples a different slice of the archive and shuffles it, so nothing is ranked by plays or by what you listened to before. The one exception is hip-hop mixtapes, which need at least 1,000 downloads to keep out anonymous DJ compilations.</p>
+    <p>Each album is checked before it reaches you: at least four tracks, an original cover, and no podcasts, radio or lectures. Releases from 2025 on also leave out albums that say they were made with AI tools such as Suno or Udio. Artist, year and region appear only when the record states them.</p>
+    <p class="about-note">Your saved albums, liked tracks and listening history are kept in this browser, with no account. Visits are counted with Vercel Web Analytics, which sets no cookies.</p>
     <button class="about-back" id="aboutBack" type="button">← BACK TO THE ARCHIVE</button>
   </div>
 </div>
