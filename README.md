@@ -2,7 +2,7 @@
 
 **Six random albums from the Internet Archive. No feed, no recommendations, just discovery.**
 
-Live at **https://thedeepcut.vercel.app**
+Live at **https://thedeepcut.vercel.app** · Source: **https://github.com/mizerrrr/the-deep-cut**
 
 The Internet Archive holds hundreds of thousands of freely licensed and historical music releases, most of them almost impossible to stumble upon. The Deep Cut picks six of them at random, each in a different style, and shows them as an editorial page: the cover, the tracklist and a player, with colors taken from each cover.
 
@@ -44,7 +44,7 @@ The local server serves the page and the same two endpoints that run as Vercel F
 | `assets/` | Logo, app icons and the Geist Pixel font |
 | `sw.js`, `manifest.webmanifest` | Service worker and manifest for the installable app |
 
-It is deployed on Vercel with no build step. Visits are counted with Vercel Web Analytics, which sets no cookies.
+It is deployed on Vercel with no build step. Every push to `main` deploys to production; other branches get preview deployments. Visits are counted with Vercel Web Analytics, which sets no cookies.
 
 ## Credits
 
