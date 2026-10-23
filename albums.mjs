@@ -110,7 +110,8 @@ function normalizeCandidate(doc,source){
 }
 async function retrieveCandidates(wave,decade,skipRegional){
   // A different handful of collections each wave keeps the archive load light and the mix varied
-  const sources=shuffle(SOURCES.filter(s=>!(skipRegional&&s.regional))).slice(0,5),results=await Promise.allSettled(sources.map(s=>searchPage(s,wave,decade)));
+  // 2025–26 loses many items to the release-year check below, so it searches more collections at once
+  const sources=shuffle(SOURCES.filter(s=>!(skipRegional&&s.regional))).slice(0,decade>=2025?9:5),results=await Promise.allSettled(sources.map(s=>searchPage(s,wave,decade)));
   if(!results.some(r=>r.status==='fulfilled'))throw new Error('All archive searches failed');
   const unique=new Map();
   results.forEach((r,i)=>{
