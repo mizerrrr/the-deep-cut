@@ -6,3 +6,7 @@ index_v1.html
 .vercel
 .env*
 !.env.example
+
+# Private notes, not part of the public repo
+marketing/
+.claude/
