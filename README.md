@@ -1,3 +1,5 @@
+<p align="center"><img src=".github/banner.png" alt="The Deep Cut: six random albums from the Internet Archive. No feed, no recommendations, just discovery." width="100%"></p>
+
 # The Deep Cut
 
 **Six random albums from the Internet Archive. No feed, no recommendations, just discovery.**
