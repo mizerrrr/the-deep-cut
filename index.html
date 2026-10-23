@@ -72,6 +72,7 @@ body::after{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;b
 .hdr-btn:hover,.hdr-btn[aria-pressed="true"]{border-color:var(--mint);color:var(--mint)}
 .hdr-btn.is-accent[aria-pressed="true"]{background:var(--mint);color:var(--bg);border-color:var(--mint)}
 .hdr-saved-count{color:var(--ink)}
+.np-like.is-liked{color:var(--mint);border-color:var(--mint)}
 
 /* ══ STAGE: horizontal — toolbar / cover rail / detail strip ══ */
 .stage{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
@@ -238,8 +239,13 @@ body.audio-playing .album-card.is-playing .card-eq i{animation:eq .8s steps(4) i
 .tracklist-body::-webkit-scrollbar{height:6px}
 .tracklist-body::-webkit-scrollbar,.np-panel-body::-webkit-scrollbar{width:6px}
 .tracklist-body::-webkit-scrollbar-thumb,.np-panel-body::-webkit-scrollbar-thumb{background:var(--line)}
-.track-row{display:grid;grid-template-columns:52px 1fr;gap:0;padding:11px 28px;border-bottom:1px solid rgba(255,255,255,.03);cursor:pointer;transition:background .08s}
-.tracklist-body .track-row{grid-template-columns:40px 1fr;padding:7px 14px;border-bottom:0;border-right:1px solid rgba(255,255,255,.04)}
+.track-row{display:grid;grid-template-columns:52px 1fr auto;gap:0;padding:11px 28px;border-bottom:1px solid rgba(255,255,255,.03);cursor:pointer;transition:background .08s}
+.tracklist-body .track-row{grid-template-columns:40px 1fr auto;padding:7px 14px;border-bottom:0;border-right:1px solid rgba(255,255,255,.04)}
+/* Like one track: the heart stays faint until the row is hovered or the track is liked */
+.track-like{align-self:center;margin-left:8px;padding:2px 6px;border:0;background:none;color:var(--muted);font:15px var(--mono);line-height:1;opacity:.4;cursor:pointer;transition:opacity .1s,color .1s}
+.track-row:hover .track-like,.track-like:focus-visible{opacity:1}
+.track-like:hover{color:var(--mint)}
+.track-like.is-liked{color:var(--mint);opacity:1}
 .track-row:hover{background:var(--hi)}
 .track-row.is-active{background:rgba(126,200,164,.08);color:var(--mint)}
 .track-num{font:13px var(--mono);color:var(--muted);letter-spacing:.08em;align-self:center}
@@ -399,8 +405,13 @@ button.saved-link:hover .saved-title{color:var(--mint)}
   .topbar{padding:0 16px;height:60px}
   .brand-logo{height:34px}
   .brand-copy{display:none}
-  .hdr-btn{padding:8px 10px;font-size:12px;letter-spacing:.08em}
-  .header-actions{gap:6px}
+  .hdr-btn{padding:8px 8px;font-size:11px;letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
+  /* Five buttons do not fit beside the logo on a phone: they scroll sideways instead of wrapping over it */
+  .brand{flex-shrink:0}
+  .header-actions{gap:6px;min-width:0;margin-left:12px;overflow-x:auto;scrollbar-width:none}
+  .header-actions::-webkit-scrollbar{display:none}
+  .np-actions{gap:4px}
+  .np-btn{padding:10px 9px}
   /* On phones the stage scrolls: a tall cover rail, then the details */
   .stage{overflow-y:auto}
   .album-list{flex:0 0 54vh;--card-min:62vw;--caption:70px;padding:24px 16px 10px}
@@ -446,6 +457,9 @@ button.saved-link:hover .saved-title{color:var(--mint)}
       <button class="hdr-btn" id="appToggle" type="button" aria-label="Get the app" aria-pressed="false">[ APP ]</button>
       <button class="hdr-btn" id="aboutToggle" type="button" aria-pressed="false">[ ABOUT ]</button>
       <button class="hdr-btn" id="recentToggle" type="button" aria-label="Open recently played tracks" aria-pressed="false">[ RECENT ]</button>
+      <button class="hdr-btn" id="likedToggle" type="button" aria-label="Open liked tracks" aria-pressed="false">
+        [ TRACKS <span id="likedCount" class="hdr-saved-count">00</span> ]
+      </button>
       <button class="hdr-btn" id="savedToggle" type="button" aria-label="Open saved albums" aria-pressed="false">
         [ SAVED <span id="savedCount" class="hdr-saved-count">00</span> ]
       </button>
@@ -547,6 +561,18 @@ button.saved-link:hover .saved-title{color:var(--mint)}
   </div>
 </div>
 
+<!-- Liked tracks overlay: single songs, kept until removed -->
+<div class="recent-view" id="likedView" hidden>
+  <section class="saved-heading">
+    <div><p class="eyebrow">// FAVOURITE SONGS</p><h1>Liked tracks.</h1></div>
+    <p class="saved-note">Every track you gave a ♥, newest first. Kept only in this browser.</p>
+  </section>
+  <div class="saved-list" id="likedList"></div>
+  <div class="saved-actions">
+    <button class="back-home" id="likedBack" type="button">← BACK TO THE ARCHIVE</button>
+  </div>
+</div>
+
 <!-- About overlay -->
 <div class="about-view" id="aboutView" hidden>
   <div class="about-inner">
@@ -555,7 +581,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
     <p>The Deep Cut is a small window into the Internet Archive's music collection. Each Search More brings six albums at random, each in a different style, leaving room for unexpected discoveries beyond recommendation feeds.</p>
     <p>Albums come from three corners of the archive: Jamendo, Netlabels and Open Source Audio. Every pick is random. Nothing is ranked by plays, downloads or what you listened to before.</p>
     <p>Each album is checked before it reaches you: at least four tracks, an original cover, and no podcasts, radio or lectures. Artist, year and region appear only when the record states them.</p>
-    <p class="about-note">Your saved albums and listening history are kept in this browser, with no account.</p>
+    <p class="about-note">Your saved albums, liked tracks and listening history are kept in this browser, with no account.</p>
     <button class="about-back" id="aboutBack" type="button">← BACK TO THE ARCHIVE</button>
   </div>
 </div>
@@ -633,6 +659,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
     <input type="range" class="vol-slider" id="volSlider" min="0" max="100" step="5" value="100" aria-label="Volume">
   </div>
   <div class="np-actions">
+    <button class="np-btn np-like" id="npLike" type="button" aria-pressed="false" aria-label="Like this track" title="Like this track">♡<span class="np-btn-label"> LIKE</span></button>
     <button class="np-btn np-cast" id="npCast" type="button" aria-label="Play on TV or speaker" title="Play on TV or speaker">▭<span class="np-btn-label"> TV</span></button>
     <button class="np-btn" id="npListToggle" type="button" aria-expanded="false" aria-controls="npPanel">≡<span class="np-btn-label"> TRACKLIST</span></button>
     <button class="np-btn np-close" id="npClose" type="button" aria-label="Stop and close player">✕</button>
@@ -925,11 +952,13 @@ function fillTrackRows(body,item){
   }
   item.tracks.forEach((track,idx)=>{
     const row=document.createElement('div');
-    row.className='track-row';row.dataset.trackIdx=String(idx);
+    row.className='track-row';row.dataset.trackIdx=String(idx);row.dataset.likeKey=likeKey(item.identifier,track.url);
     const num=document.createElement('span');num.className='track-num';num.textContent=String(idx+1).padStart(2,'0');
     const name=document.createElement('span');name.className='track-name';name.textContent=trackDisplayName(track.name);
-    row.append(num,name);body.appendChild(row);
+    const like=document.createElement('button');like.type='button';like.className='track-like';
+    row.append(num,name,like);body.appendChild(row);
   });
+  syncLikes();
 }
 function renderTracklist(item){
   fillTrackRows($('tracklistBody'),item);
@@ -980,6 +1009,7 @@ function syncPlayerUI(){
     $('npTrack').textContent=total>1?String(tidx+1).padStart(2,'0')+'/'+String(total).padStart(2,'0')+'  '+name:name;
     $('npAlbum').textContent=item.title+(item.creator?' — '+item.creator:'');
   }
+  syncLikes();
   $('npPrev').disabled=!item;
   $('npNext').disabled=!tracks||tidx>=tracks.length-1;
   const viewed=viewedItem,btn=$('featPlayBtn');
@@ -1418,12 +1448,65 @@ function logRecentTrack(){
   try{localStorage.setItem(RECENT_KEY,JSON.stringify(list.slice(0,RECENT_MAX)));}catch(_){}
   if(!$('recentView').hidden)renderRecent();
 }
-function playRecentTrack(key){
-  const entry=getRecent().find(e=>e.key===key);if(!entry)return;
+/* Recent and Tracks entries share one shape, and each plays as a one-track queue */
+function playSingleTrack(entry){
+  if(!entry)return;
   const item={identifier:entry.albumId,title:entry.albumTitle,creator:entry.creator,imageUrl:entry.imageUrl,previewUrl:entry.url,
     tracks:[{name:entry.name,url:entry.url}],trackIndex:0,isSingle:true,origIndex:entry.trackIndex||0};
   if(sameAlbum(item,previewItem)){togglePlayPause();return;}
   startAlbum(item,0);
+}
+function playRecentTrack(key){playSingleTrack(getRecent().find(e=>e.key===key));}
+
+/* ── Liked tracks ──
+   A ♥ on any track (album tracklist, now-playing panel or player bar) keeps
+   that one song in TRACKS. Unlike saved albums, likes never expire. */
+const LIKED_KEY='deep-cuts-liked-tracks-v1';
+function likeKey(albumId,url){return albumId+'|'+url;}
+function getLiked(){try{const v=JSON.parse(localStorage.getItem(LIKED_KEY)||'[]');return Array.isArray(v)?v.filter(e=>e&&e.url&&e.albumId&&e.key):[];}catch(_){return [];}}
+function setLiked(list){try{localStorage.setItem(LIKED_KEY,JSON.stringify(list));}catch(_){showShareToast('[ COULD NOT SAVE LIKE ]');}}
+function toggleLike(item,idx){
+  const track=item&&item.tracks&&item.tracks[idx];if(!track)return;
+  const key=likeKey(item.identifier,track.url),list=getLiked(),at=list.findIndex(e=>e.key===key);
+  if(at>=0)list.splice(at,1);
+  else list.unshift({key,url:track.url,name:track.name,trackIndex:item.isSingle?item.origIndex||0:idx,
+    albumId:item.identifier,albumTitle:item.title,creator:item.creator||'',imageUrl:item.imageUrl||item.coverUrl||'',likedAt:Date.now()});
+  setLiked(list);syncLikes();
+  if(!$('likedView').hidden)renderLiked();
+}
+/* Paints every heart, the player's LIKE button and the header count */
+function syncLikes(){
+  const keys=new Set(getLiked().map(e=>e.key));
+  $('likedCount').textContent=String(keys.size).padStart(2,'0');
+  document.querySelectorAll('.track-row[data-like-key]').forEach(row=>{
+    const on=keys.has(row.dataset.likeKey),btn=row.querySelector('.track-like');if(!btn)return;
+    btn.textContent=on?'♥':'♡';btn.classList.toggle('is-liked',on);btn.setAttribute('aria-pressed',String(on));
+    btn.setAttribute('aria-label',on?'Remove from liked tracks':'Like this track');btn.title=on?'Unlike':'Like this track';
+  });
+  const it=previewItem,track=it&&it.tracks&&it.tracks[it.trackIndex||0],on=!!track&&keys.has(likeKey(it.identifier,track.url)),np=$('npLike');
+  np.firstChild.textContent=on?'♥':'♡';np.classList.toggle('is-liked',on);np.setAttribute('aria-pressed',String(on));
+  np.setAttribute('aria-label',on?'Remove from liked tracks':'Like this track');np.title=on?'Unlike':'Like this track';
+}
+function renderLiked(){
+  const list=$('likedList');list.replaceChildren();const entries=getLiked();
+  if(!entries.length){const p=document.createElement('p');p.className='saved-empty';p.textContent='// No liked tracks yet. Tap ♡ next to any song to keep it here.';list.appendChild(p);return;}
+  entries.forEach(entry=>{
+    const row=document.createElement('div');row.className='saved-row recent-row';row.dataset.key=entry.key;row.dataset.url=entry.url;
+    const info=document.createElement('button');info.type='button';info.className='saved-link';info.dataset.likedPlay=entry.key;info.title='Play this track';
+    const line=document.createElement('span');line.className='recent-track';
+    const num=document.createElement('span');num.className='recent-num';num.textContent='♥';
+    const title=document.createElement('span');title.className='saved-title';title.textContent=trackDisplayName(entry.name);
+    line.append(num,title);
+    const meta=document.createElement('span');meta.className='saved-meta';meta.textContent=[entry.albumTitle,entry.creator].filter(Boolean).join(' — ');
+    info.append(line,meta);
+    const actions=document.createElement('div');actions.className='row-actions';
+    const play=document.createElement('button');play.type='button';play.className='row-play';play.dataset.likedPlay=entry.key;play.textContent='▶ PLAY';
+    const album=document.createElement('button');album.type='button';album.className='row-btn';album.dataset.likedAlbum=entry.key;album.textContent='ALBUM';album.title='Open the full album';
+    const remove=document.createElement('button');remove.type='button';remove.className='remove-save';remove.dataset.likedRemove=entry.key;remove.textContent='[ REMOVE ]';
+    actions.append(play,album,remove);
+    row.append(makeCover(entry.albumId,entry.imageUrl),info,actions);list.appendChild(row);
+  });
+  syncLibraryRows();
 }
 function timeAgo(ts){
   const s=Math.max(0,(Date.now()-Number(ts))/1000);
@@ -1485,7 +1568,7 @@ function syncLibraryRows(){
     if(btn&&!btn.disabled){btn.textContent=on?(previewPlaying?'‖ PAUSE':'▶ RESUME'):'▶ PLAY';btn.classList.toggle('is-playing',on&&previewPlaying);}
   });
   const url=item&&item.tracks&&item.tracks[item.trackIndex||0]?item.tracks[item.trackIndex||0].url:'';
-  document.querySelectorAll('#recentList .recent-row').forEach(row=>{
+  document.querySelectorAll('#recentList .recent-row,#likedList .recent-row').forEach(row=>{
     const on=!!url&&row.dataset.url===url,btn=row.querySelector('.row-play');
     row.classList.toggle('is-playing',on);
     if(btn){btn.textContent=on?(previewPlaying?'‖ PAUSE':'▶ RESUME'):'▶ PLAY';btn.classList.toggle('is-playing',on&&previewPlaying);}
@@ -1493,11 +1576,12 @@ function syncLibraryRows(){
 }
 
 /* ── Views ── */
-const VIEWS={saved:['savedView','savedToggle'],recent:['recentView','recentToggle'],about:['aboutView','aboutToggle'],app:['appView','appToggle']};
+const VIEWS={saved:['savedView','savedToggle'],recent:['recentView','recentToggle'],liked:['likedView','likedToggle'],about:['aboutView','aboutToggle'],app:['appView','appToggle']};
 function setView(name){
   Object.keys(VIEWS).forEach(key=>{const [view,toggle]=VIEWS[key];$(view).hidden=key!==name;$(toggle).setAttribute('aria-pressed',String(key===name));});
   if(name==='saved')renderSaved();
   if(name==='recent')renderRecent();
+  if(name==='liked')renderLiked();
   if(name==='app')renderAppView();
 }
 function setHomeView(){setView(null);}
@@ -1775,14 +1859,18 @@ function bind(){
     if(el.scrollWidth<=el.clientWidth||Math.abs(event.deltaX)>Math.abs(event.deltaY))return;
     event.preventDefault();el.scrollLeft+=event.deltaY;
   },{passive:false}));
+  // A tap on the heart likes the track instead of playing it
   $('tracklistBody').addEventListener('click',event=>{
     const row=event.target.closest('.track-row');if(!row)return;
+    if(event.target.closest('.track-like')){toggleLike(viewedItem,Number(row.dataset.trackIdx));return;}
     startAlbum(viewedItem,Number(row.dataset.trackIdx));
   });
   $('npPanelBody').addEventListener('click',event=>{
     const row=event.target.closest('.track-row');if(!row)return;
+    if(event.target.closest('.track-like')){toggleLike(previewItem,Number(row.dataset.trackIdx));return;}
     loadTrack(Number(row.dataset.trackIdx),true);
   });
+  $('npLike').addEventListener('click',()=>{if(previewItem)toggleLike(previewItem,previewItem.trackIndex||0);});
   $('featPlayBtn').addEventListener('click',()=>{
     const item=viewedItem;
     if(sameAlbum(item,previewItem))togglePlayPause();else startAlbum(item,0);
@@ -1841,6 +1929,20 @@ function bind(){
     const entry=getRecent().find(e=>e.key===album.dataset.recentAlbum);
     if(entry)openAlbum({identifier:entry.albumId,title:entry.albumTitle,creator:entry.creator,coverUrl:entry.imageUrl});
   });
+  $('likedToggle').addEventListener('click',()=>setView($('likedView').hidden?'liked':null));
+  $('likedBack').addEventListener('click',setHomeView);
+  $('likedList').addEventListener('click',event=>{
+    const play=event.target.closest('[data-liked-play]');
+    if(play){playSingleTrack(getLiked().find(e=>e.key===play.dataset.likedPlay));return;}
+    const album=event.target.closest('[data-liked-album]');
+    if(album){
+      const entry=getLiked().find(e=>e.key===album.dataset.likedAlbum);
+      if(entry)openAlbum({identifier:entry.albumId,title:entry.albumTitle,creator:entry.creator,coverUrl:entry.imageUrl});
+      return;
+    }
+    const remove=event.target.closest('[data-liked-remove]');if(!remove)return;
+    setLiked(getLiked().filter(e=>e.key!==remove.dataset.likedRemove));syncLikes();renderLiked();
+  });
   $('clearRecent').addEventListener('click',()=>{try{localStorage.removeItem(RECENT_KEY);}catch(_){}lastLoggedKey='';renderRecent();});
   document.addEventListener('keydown',event=>{
     if(event.key==='Escape'&&!event.defaultPrevented&&Object.values(VIEWS).some(([view])=>!$(view).hidden))setHomeView();
@@ -1863,7 +1965,7 @@ window.__deepCutsDiagnostics=()=>({edition,count:currentAlbums.filter(Boolean).l
   selection:currentAlbums.filter(Boolean).map(item=>({identifier:item.identifier,title:item.title,artist:item.creator,year:item.year,tracks:item.tracks&&item.tracks.length})),requestInProgress:busy});
 
 // Albums only change on REFRESH: reuse the stored pools and fetch just the ones that are missing
-initLoadingRows();bind();renderSaved();restorePools();syncDecadeButtons();
+initLoadingRows();bind();renderSaved();syncLikes();restorePools();syncDecadeButtons();
 if(pools[activeKey()])showPool(activeKey());
 preloadAllPools();
 restoreNowPlaying();handleSharedAlbum();refreshAll(true);
