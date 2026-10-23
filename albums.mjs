@@ -2,7 +2,7 @@
    Shared by the page (index.html) and the server (/api/pool), so both pick
    albums with exactly the same rules. No DOM access in here. */
 const API='https://archive.org/advancedsearch.php';
-const FIELDS=['identifier','title','description','creator','year','date','mediatype','subject','publisher','coverage','language','collection','format'];
+const FIELDS=['identifier','title','description','creator','year','date','publicdate','mediatype','subject','publisher','coverage','language','collection','format'];
 const REGIONAL_COLLECTIONS=['audio_music','hifidelity','opensource_audio','cratediggers','netlabels','jamendo-albums','unlockedrecordings','folksoundomy_music'];
 const BRAZILIAN_SUBJECTS='mpb OR samba OR "bossa nova" OR bossanova OR "musica brasileira" OR "música brasileira" OR "brazilian music" OR "brazilian jazz" OR "brazilian rock" OR "rock brasileiro" OR brazilian OR forro OR forró OR choro OR tropicalia OR tropicália OR baiao OR baião OR frevo OR "samba rock" OR "samba-jazz" OR "jovem guarda" OR axé OR brega OR sertanejo OR pagode';
 const LATIN_SUBJECTS='cumbia OR salsa OR bolero OR boleros OR merengue OR "son cubano" OR "afro-cuban" OR "latin jazz" OR "latin rock" OR "latin music" OR "música latina" OR "musica latina" OR "música tropical" OR "musica tropical" OR ranchera OR mariachi OR bachata OR "nueva canción" OR "nueva cancion" OR "rock en español" OR "rock nacional" OR vallenato OR huayno OR guaracha OR mambo OR tango OR reggaeton';
@@ -122,7 +122,8 @@ async function retrieveCandidates(wave,decade,skipRegional){
       else unique.set(c.identifier,c);
     });
   });
-  return shuffle(Array.from(unique.values()));
+  // Search results already carry the dates, so items outside the era are dropped before their metadata is fetched
+  return shuffle(Array.from(unique.values()).filter(c=>inDecade(deriveYear({},c.doc),decade)));
 }
 export async function getMetadata(identifier){
   const cached=metadataCache.get(identifier);if(cached&&Date.now()-cached.time<METADATA_TTL)return cached.value;
