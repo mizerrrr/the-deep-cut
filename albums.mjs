@@ -201,7 +201,46 @@ export function uniqueTrackCount(files){
   const names=(files||[]).filter(audioFile).map(f=>String(f.name||'').split('/').pop().replace(/\.[^.]+$/,'').normalize('NFKD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/^(?:(?:disc|cd)\s*\d+[\s._-]+)?(?:\d{1,2}[\s._-]+)+/,'').replace(/[^a-z0-9]+/g,' ').trim()).filter(n=>n.length>1);
   return new Set(names).size;
 }
-export function deriveYear(meta,doc){const v=clean(meta.year||doc.year||meta.date||doc.date,50),m=v.match(/\b(18|19|20|21)\d{2}\b/);return m?m[0]:'';}
+/* Many items carry only their upload date as "year", so an LP from 1971
+   uploaded in 2025 would land under 2025–26. A release year the record states
+   itself wins when it is earlier: "(1971)" or "[1971]" in the title, or
+   "℗ 1971", "Originally released 1971", "Released: 1971" in the description.
+   A bare year elsewhere in the text is not enough ("live since 2015", "a
+   remix of a 2022 track"), and neither is "recorded in", which often
+   describes a sample ("a cassette recorded in 1988"). */
+const STATED_TITLE_YEAR_RE=/[(\[]\s*((?:18|19|20)\d{2})\s*[)\]]/;
+const STATED_DESC_YEAR_RE=/(?:℗|\(p\)|\boriginally (?:released|issued)(?: in| on)?|\breleased(?: in| on)?\s*:|\brelease date\b)\s*:?\s*(?:[a-z]{3,9}\.?\s+(?:\d{1,2}(?:st|nd|rd|th)?,?\s+)?)?((?:18|19|20)\d{2})\b/i;
+export function statedYear(title,description){
+  const hits=[clean(title,300).match(STATED_TITLE_YEAR_RE),clean(description,4000).replace(/<[^>]+>/g,' ').match(STATED_DESC_YEAR_RE)].filter(Boolean);
+  return hits.length?String(Math.min(...hits.map(m=>Number(m[1])))):'';
+}
+/* In open upload collections (opensource_audio, audio_music…) the "date" is
+   often just the day it was uploaded, typed in by the uploader, so a 2001 CD
+   uploaded in 2026 reads as 2026. Labels publishing on Jamendo, Netlabels and
+   the Free Music Archive date the release itself. Elsewhere a date within a
+   few days of the upload, or only the upload's year, says nothing about the
+   release, and the year is left out. An explicit "year" field is kept. */
+const RELEASE_DATED=['jamendo-albums','netlabels','freemusicarchive'];
+function uploadDateOnly(meta,doc){
+  if(meta.year||doc.year||collectionList(meta.collection||doc.collection).some(c=>RELEASE_DATED.includes(c)))return false;
+  const date=clean(meta.date||doc.date,30),uploaded=clean(meta.publicdate||doc.publicdate,30);
+  if(!date||!uploaded)return false;
+  if(/^\d{4}$/.test(date))return date===uploaded.slice(0,4);
+  const gap=Math.abs(Date.parse(date.slice(0,10))-Date.parse(uploaded.slice(0,10)));
+  return gap<=3*864e5;
+}
+export function deriveYear(meta,doc){
+  const v=clean(meta.year||doc.year||meta.date||doc.date,50),m=v.match(/\b(18|19|20|21)\d{2}\b/);
+  const own=m&&!uploadDateOnly(meta,doc)?m[0]:'';
+  const stated=statedYear(meta.title||doc.title,meta.description||doc.description);
+  return stated&&(!own||Number(stated)<Number(own))?stated:own;
+}
+function inDecade(year,decade){
+  if(!decade)return true;
+  if(!year)return false; // an era filter needs a year the record really states
+  const y=Number(year);
+  return decade>=2025?y>=2025:decade>=2010?y>=2010&&y<=2024:y>=decade&&y<=decade+9;
+}
 function albumMarker(title,meta,doc){const s=values(meta.subject||doc.subject).join(' '),af=clean(meta.album||meta.release||'');return !!af||/\b(album|albums|ep|lp|full album|discography|record|soundtrack)\b|álbum/i.test(title+' '+s);}
 export function resolveArtist(title,meta,doc){
   const direct=clean(meta.creator||meta.artist||meta.albumartist||meta.album_artist||doc.creator,180);
@@ -329,7 +368,9 @@ function qualityCheck(candidate,details){
   const firstTrack=chooseFirstTrack(details.files);
   if(!cover||!firstTrack)return null;
   const year=deriveYear(meta,doc);
-  if(Number(year)>=2025&&aiSlopReason({title,creator,description:clean(meta.description||doc.description,4000),
+  // The AI filter goes by the record's own date, even where deriveYear drops it as an upload date
+  const recordYear=Number((clean(meta.year||doc.year||meta.date||doc.date,50).match(/\b(?:19|20)\d{2}\b/)||[0])[0]);
+  if(Math.max(Number(year),recordYear)>=2025&&aiSlopReason({title,creator,description:clean(meta.description||doc.description,4000),
     subjects:[].concat(meta.subject||doc.subject||[]).flatMap(s=>scalar(s).split(/\s*;\s*/)).map(s=>s.trim()).filter(Boolean),
     files:details.files,coverName:cover.name}))return null;
   const allRanked=rankAudioFiles(details.files);
@@ -422,7 +463,7 @@ export async function findAlbums(decade,exclude,onProgress,options={}){
     const candidates=(await retrieveCandidates(wave,decade,quota&&quota.left<=0)).filter(c=>!exclude.has(c.identifier));
     const base=[0,.45,.75][wave],span=[.45,.3,.25][wave];
     const next=await inspectCandidates(candidates,inspected,wave===0?24:18,(done,total)=>onProgress(base+(total?done/total*span:span)),enough);
-    eligible.push(...next.filter(item=>!exclude.has(item.identifier)));
+    eligible.push(...next.filter(item=>!exclude.has(item.identifier)&&inDecade(item.year,decade)));
   }
   const {picked,rest}=chooseSix(eligible,quota);
   if(options.spares)options.spares.push(...distinctArtists(rest.filter(item=>!isRegional(item))).slice(0,6));
