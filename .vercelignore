@@ -1,9 +1,7 @@
 .env*
-server.mjs
-README.txt
-index_backup_*.html
-index_v1.html
-marketing/
 .claude/
+marketing/
+server.mjs
+package.json
 README.md
 LICENSE

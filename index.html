@@ -6,14 +6,14 @@
 <meta name="theme-color" content="#07080a">
 <meta name="description" content="Six randomly selected albums from the Internet Archive. No feed, no recommendations — just discovery.">
 <title>THE DEEP CUT</title>
-<link rel="icon" type="image/svg+xml" href="./assets/thedeepcut-logo.svg">
+<link rel="icon" type="image/svg+xml" href="./assets/logo.svg">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Deep Cut">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <style>
-@font-face{font-family:GeistPixel;src:url('./assets/GeistPixel-Regular-VariableFont_ELSH.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:GeistPixel;src:url('./assets/fonts/geist-pixel.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
 
 /* ══════════════════════════════════════
    DESIGN TOKENS — retro pixel terminal
@@ -287,7 +287,7 @@ body:not(.audio-playing) .track-row.is-active .track-num::before{content:'‖ ';
 .np-play{width:54px;height:54px;font:20px var(--mono);color:var(--mint);border-color:var(--mint)}
 .np-play:hover:not(:disabled){background:var(--mint);color:var(--bg)}
 /* Play/pause is the logo's record: it spins while music plays and freezes where it stopped on pause */
-.np-disc{display:block;width:70%;height:70%;background:currentColor;-webkit-mask:url(./assets/thedeepcut-logo.svg) center/contain no-repeat;mask:url(./assets/thedeepcut-logo.svg) center/contain no-repeat;animation:disc-spin 1.8s linear infinite;animation-play-state:paused}
+.np-disc{display:block;width:70%;height:70%;background:currentColor;-webkit-mask:url(./assets/logo.svg) center/contain no-repeat;mask:url(./assets/logo.svg) center/contain no-repeat;animation:disc-spin 1.8s linear infinite;animation-play-state:paused}
 body.audio-playing .np-disc{animation-play-state:running}
 @keyframes disc-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.np-disc{animation:none}}
@@ -462,7 +462,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
   <!-- ══ HEADER ══ -->
   <header class="topbar">
     <a class="brand" href="#home" id="brandHome" aria-label="THE DEEP CUT — home">
-      <img class="brand-logo" src="./assets/thedeepcut-logo.svg" alt="THE DEEP CUT">
+      <img class="brand-logo" src="./assets/logo.svg" alt="THE DEEP CUT">
       <span class="brand-copy"><strong>THE DEEP CUT</strong><span>Internet Archive · Music</span></span>
     </a>
     <div class="mini-game"><canvas id="gameCanvas" tabindex="0" aria-label="Snake mini game: click it, then use the arrow keys to eat the squares."></canvas></div>

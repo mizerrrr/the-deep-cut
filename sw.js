@@ -2,9 +2,9 @@
    available offline. Pages and code are network-first, so a new deploy is
    picked up on the next load; the cache is only the fallback. The API, the
    archive and the cover cache the page keeps itself are never touched. */
-const SHELL_CACHE='deep-cut-shell-v1';
-const SHELL=['/','/albums.mjs','/manifest.webmanifest','/assets/thedeepcut-logo.svg','/assets/save-icon.svg',
-  '/assets/GeistPixel-Regular-VariableFont_ELSH.ttf','/assets/icons/icon-192.png','/assets/icons/apple-touch-icon.png'];
+const SHELL_CACHE='deep-cut-shell-v2';
+const SHELL=['/','/albums.mjs','/manifest.webmanifest','/assets/logo.svg',
+  '/assets/fonts/geist-pixel.ttf','/assets/icons/icon-192.png','/assets/icons/apple-touch-icon.png'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(SHELL_CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));

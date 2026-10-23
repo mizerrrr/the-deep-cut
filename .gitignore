@@ -1,11 +1,6 @@
-﻿.env
-
-# Old copies kept on disk only (the history now lives in git)
-index_backup_*.html
-index_v1.html
-.vercel
 .env*
 !.env.example
+.vercel
 
 # Private notes, not part of the public repo
 marketing/

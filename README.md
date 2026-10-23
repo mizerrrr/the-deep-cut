@@ -25,7 +25,7 @@ Jamendo, Netlabels, the Free Music Archive, Unlocked Recordings, digitized LPs, 
 Requires Node.js 18 or newer. There are no dependencies to install.
 
 ```sh
-node server.mjs
+npm run dev
 ```
 
 Then open http://127.0.0.1:4177. To use another port, copy `.env.example` to `.env` and set `PORT`.
@@ -40,7 +40,8 @@ The local server serves the page and the same two endpoints that run as Vercel F
 | `albums.mjs` | Searches the archive, checks each item and builds the album list |
 | `api/pool.mjs` | `/api/pool`: a ready-made set of six albums per era filter, cached at the CDN so a first visit doesn't wait on the search |
 | `api/thumb.mjs` | `/api/thumb`: a same-origin copy of a cover thumbnail, so the page can read its colors |
-| `server.mjs` | Local development server |
+| `server.mjs` | Local development server (`npm run dev`) |
+| `assets/` | Logo, app icons and the Geist Pixel font |
 | `sw.js`, `manifest.webmanifest` | Service worker and manifest for the installable app |
 
 It is deployed on Vercel with no build step. Visits are counted with Vercel Web Analytics, which sets no cookies.
@@ -48,7 +49,7 @@ It is deployed on Vercel with no build step. Visits are counted with Vercel Web 
 ## Credits
 
 - Music and metadata: the [Internet Archive](https://archive.org) and the artists and labels who shared their work there.
-- Font: Geist Pixel, under the SIL Open Font License (see `assets/OFL.txt`).
+- Font: Geist Pixel, under the SIL Open Font License (see `assets/fonts/OFL.txt`).
 
 ## License
 

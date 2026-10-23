@@ -1,0 +1,16 @@
+{
+  "name": "the-deep-cut",
+  "version": "1.0.0",
+  "description": "Six random albums from the Internet Archive. No feed, no recommendations, just discovery.",
+  "homepage": "https://thedeepcut.vercel.app",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
