@@ -22,9 +22,9 @@ const SOURCES=[
   {name:'Open source album titles',collection:'opensource_audio',query:'mediatype:audio AND collection:opensource_audio AND title:album'},
   // Brazilian and Latin American records are scattered across the big collections, so these two read them by genre.
   // Trusted: rips like "Tim Maia (1971)" or "Secos & Molhados" never say "album", and the genre tag already vouches for them
-  {name:'Brazilian albums',collection:REGIONAL_COLLECTIONS,trusted:true,query:regionalQuery(BRAZILIAN_SUBJECTS)},
-  {name:'Latin American albums',collection:REGIONAL_COLLECTIONS,trusted:true,query:regionalQuery(LATIN_SUBJECTS)},
-  {name:'Colombian música campesina',collection:'musica-campesina',trusted:true,query:'mediatype:audio AND collection:musica-campesina'}
+  {name:'Brazilian albums',collection:REGIONAL_COLLECTIONS,trusted:true,regional:true,query:regionalQuery(BRAZILIAN_SUBJECTS)},
+  {name:'Latin American albums',collection:REGIONAL_COLLECTIONS,trusted:true,regional:true,query:regionalQuery(LATIN_SUBJECTS)},
+  {name:'Colombian música campesina',collection:'musica-campesina',trusted:true,regional:true,query:'mediatype:audio AND collection:musica-campesina'}
 ];
 function sourceCollections(source){return [].concat(source.collection);}
 const QUERY_TTL=5*60*1000,TOTAL_TTL=60*60*1000,METADATA_TTL=30*60*1000;
@@ -108,9 +108,9 @@ function normalizeCandidate(doc,source){
   if(doc.mediatype&&clean(doc.mediatype,30).toLowerCase()!=='audio')return null;
   return {identifier,title,doc,sourceNames:[source.name],collections:collectionList(doc.collection)};
 }
-async function retrieveCandidates(wave,decade){
+async function retrieveCandidates(wave,decade,skipRegional){
   // A different handful of collections each wave keeps the archive load light and the mix varied
-  const sources=shuffle(SOURCES).slice(0,5),results=await Promise.allSettled(sources.map(s=>searchPage(s,wave,decade)));
+  const sources=shuffle(SOURCES.filter(s=>!(skipRegional&&s.regional))).slice(0,5),results=await Promise.allSettled(sources.map(s=>searchPage(s,wave,decade)));
   if(!results.some(r=>r.status==='fulfilled'))throw new Error('All archive searches failed');
   const unique=new Map();
   results.forEach((r,i)=>{
@@ -376,33 +376,55 @@ export function distinctArtists(items){
 /* Up to six albums, one per artist and one per style (an album with no
    recognisable style is never blocked). perStyle 2 is only the fallback when
    the searches could not turn up six different styles. */
-function pickDiverse(items,perStyle){
-  const artists=new Set(),styles=new Map(),out=[];
+/* ── Brazilian and Latin American quota ──
+   Their sources are so rich that they took over the pools, so one Search More
+   hands out at most REGIONAL_QUOTA of them across all the era filters
+   together. An album counts when it came from a regional source or carries
+   a Brazilian or Latin style, whichever collection it was found in. */
+export const REGIONAL_QUOTA=3;
+const REGIONAL_STYLES=new Set(['samba rock','bossa nova','mpb','samba','tropicália','jovem guarda','forró','choro','frevo','axé','brega','sertanejo','rock en español',
+  'latin jazz','vallenato','música campesina','bolero','merengue','bachata','reggaeton','ranchera','nueva canción','son cubano','salsa','cumbia','tango','latin']);
+export function isRegional(item){
+  const s=SOURCES.find(x=>x.name===(item&&item.source));
+  return !!(s&&s.regional)||REGIONAL_STYLES.has(item&&item.style);
+}
+/* quota: {left} shared by every pool of one Search More; null means no limit */
+function pickDiverse(items,perStyle,quota){
+  const artists=new Set(),styles=new Map(),out=[];let regional=0;
   for(const item of items){
     const a=artistKey(item),st=item.style||'';
     if(a&&artists.has(a))continue;
     if(st&&(styles.get(st)||0)>=perStyle)continue;
+    // At most one per pool, so the quota spreads over the eras instead of filling the first pool drawn
+    if(quota&&isRegional(item)){if(regional>=Math.min(1,quota.left))continue;regional++;}
     if(a)artists.add(a);if(st)styles.set(st,(styles.get(st)||0)+1);
     out.push(item);if(out.length===6)break;
   }
   return out;
 }
-function chooseSix(eligible){
+function chooseSix(eligible,quota){
   const byId=new Map();eligible.forEach(item=>{if(!byId.has(item.identifier))byId.set(item.identifier,item);});
   // Unseen albums in styles not shown lately come first, then unseen albums in recent styles, then repeats
   const rank=item=>(recentIds.includes(item.identifier)?2:0)+(item.style&&recentStyles.includes(item.style)?1:0);
   const ordered=shuffle(Array.from(byId.values())).sort((a,b)=>rank(a)-rank(b));
-  const strict=pickDiverse(ordered,1);
-  return strict.length===6?strict:pickDiverse(ordered,2);
+  const strict=pickDiverse(ordered,1,quota);
+  const picked=strict.length===6?strict:pickDiverse(ordered,2,quota);
+  if(quota)quota.left-=picked.filter(isRegional).length;
+  return {picked,rest:ordered.filter(item=>!picked.includes(item))};
 }
-export async function findAlbums(decade,exclude,onProgress){
-  const inspected=new Set(),eligible=[];
-  const enough=more=>pickDiverse(eligible.concat(more),1).length>=6;
+/* options.quota: the shared regional quota. options.spares: an array that
+   receives extra non-regional albums, for a caller that may have to swap
+   regional ones out later (the server's ready-made pools). */
+export async function findAlbums(decade,exclude,onProgress,options={}){
+  const inspected=new Set(),eligible=[],quota=options.quota||null;
+  const enough=more=>pickDiverse(eligible.concat(more),1,quota).length>=6;
   for(let wave=0;wave<3&&!enough([]);wave++){
-    const candidates=(await retrieveCandidates(wave,decade)).filter(c=>!exclude.has(c.identifier));
+    const candidates=(await retrieveCandidates(wave,decade,quota&&quota.left<=0)).filter(c=>!exclude.has(c.identifier));
     const base=[0,.45,.75][wave],span=[.45,.3,.25][wave];
     const next=await inspectCandidates(candidates,inspected,wave===0?24:18,(done,total)=>onProgress(base+(total?done/total*span:span)),enough);
     eligible.push(...next.filter(item=>!exclude.has(item.identifier)));
   }
-  return chooseSix(eligible);
+  const {picked,rest}=chooseSix(eligible,quota);
+  if(options.spares)options.spares.push(...distinctArtists(rest.filter(item=>!isRegional(item))).slice(0,6));
+  return picked;
 }

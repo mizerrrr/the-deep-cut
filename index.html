@@ -656,7 +656,7 @@ button.saved-link:hover .saved-title{color:var(--mint)}
 <div class="material-tip" id="materialTip" role="tooltip" hidden></div>
 
 <script type="module">
-import {aiSlopReason,archiveUrl,chooseCover,clean,collectionList,deriveYear,distinctArtists,downloadUrl,findAlbums,getMetadata,isClassical,isSpokenText,rankAudioFiles,recentIds,recentStyles,resolveArtist,trackKey,uniqueTrackCount,values,wait} from './albums.mjs';
+import {aiSlopReason,archiveUrl,chooseCover,clean,collectionList,deriveYear,distinctArtists,downloadUrl,findAlbums,getMetadata,isClassical,isRegional,isSpokenText,rankAudioFiles,REGIONAL_QUOTA,recentIds,recentStyles,resolveArtist,trackKey,uniqueTrackCount,values,wait} from './albums.mjs';
 (function(){
 'use strict';
 const SAVED_KEY='internet-lottery-saved-v1';
@@ -1187,6 +1187,13 @@ function restorePools(){
       if(items.length){pools[key]=distinctArtists(items).map(dedupeTracks);poolStatus[key]='ready';}
       else if(Array.isArray(data.empty)&&data.empty.includes(key))poolStatus[key]='empty';
     });
+    // Pools saved before the Brazilian/Latin quota keep only its first albums; an emptied pool is drawn again
+    const quota={left:REGIONAL_QUOTA};
+    DECADES.forEach(({key})=>{
+      if(!pools[key])return;
+      pools[key]=pools[key].filter(x=>!isRegional(x)||quota.left-->0);
+      if(!pools[key].length){delete pools[key];delete poolStatus[key];}
+    });
   }catch(_){}
 }
 
@@ -1677,10 +1684,23 @@ async function serverPool(key){
   try{
     const r=await fetch('/api/pool?decade='+encodeURIComponent(key),{headers:{Accept:'application/json'}});
     if(!r.ok)return null;
-    const data=await r.json();
-    return Array.isArray(data&&data.items)?data.items.filter(x=>x&&x.identifier&&x.title&&x.previewUrl):null;
+    const data=await r.json(),ok=list=>Array.isArray(list)?list.filter(x=>x&&x.identifier&&x.title&&x.previewUrl):[];
+    return Array.isArray(data&&data.items)?{items:ok(data.items),spares:ok(data.spares)}:null;
   }catch(_){return null;}
 }
+/* Keeps a pool inside the shared Brazilian/Latin quota: regional albums past it
+   are swapped for spares (new artists only) or dropped */
+function withinQuota(items,spares,quota,exclude){
+  const out=[],pool=spares.filter(s=>!exclude.has(s.identifier));
+  for(const item of items){
+    if(!isRegional(item)){out.push(item);continue;}
+    if(quota.left>0){quota.left--;out.push(item);continue;}
+    const i=pool.findIndex(s=>distinctArtists(out.concat(items.filter(x=>!isRegional(x)),[s])).includes(s));
+    if(i>=0)out.push(pool.splice(i,1)[0]);
+  }
+  return out;
+}
+function regionalCount(keys){return keys.reduce((n,k)=>n+(pools[k]||[]).filter(isRegional).length,0);}
 async function refreshAll(onlyMissing){
   if(busy)return;
   const first=activeKey();
@@ -1688,6 +1708,8 @@ async function refreshAll(onlyMissing){
   if(!keys.length)return;
   busy=true;$('refresh').disabled=true;$('refreshProgress').classList.add('is-indeterminate');
   const exclude=new Set(),progress={};let done=0,succeeded=0;
+  // Pools kept from before still count against the Brazilian/Latin quota
+  const quota={left:Math.max(0,REGIONAL_QUOTA-regionalCount(DECADES.map(d=>d.key).filter(k=>!keys.includes(k))))};
   keys.forEach(k=>{poolStatus[k]='loading';progress[k]=0;});
   syncDecadeButtons();
   if(keys.includes(first)&&!(pools[first]&&pools[first].length))initLoadingRows();
@@ -1700,10 +1722,10 @@ async function refreshAll(onlyMissing){
   async function load(key){
     try{
       // A first visit takes the server's ready-made pool; REFRESH always draws a fresh one here
-      let items=onlyMissing?await serverPool(key):null;
+      const ready=onlyMissing?await serverPool(key):null;
       // Two pools load at once, so drop any album the other one claimed while this one was searching
-      if(items)items=items.filter(item=>!exclude.has(item.identifier));
-      if(!items||!items.length)items=(await findAlbums(decadeOf(key),exclude,f=>{progress[key]=f;$('refreshProgress').classList.remove('is-indeterminate');report();})).filter(item=>!exclude.has(item.identifier));
+      let items=ready?withinQuota(ready.items.filter(item=>!exclude.has(item.identifier)),ready.spares,quota,exclude):null;
+      if(!items||!items.length)items=(await findAlbums(decadeOf(key),exclude,f=>{progress[key]=f;$('refreshProgress').classList.remove('is-indeterminate');report();},{quota})).filter(item=>!exclude.has(item.identifier));
       items.forEach(item=>exclude.add(item.identifier));
       if(items.length){pools[key]=items;succeeded++;preloadCovers(items);}
       poolStatus[key]=items.length||pools[key]?'ready':'empty';

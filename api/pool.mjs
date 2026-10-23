@@ -11,9 +11,10 @@ export async function GET(request){
   const key=new URL(request.url).searchParams.get('decade')||'all';
   if(!DECADES.has(key))return Response.json({error:'Unknown era filter'},{status:400});
   try{
-    const items=await findAlbums(key==='all'?null:Number(key),new Set(),()=>{});
+    // Each pool is built on its own, so the page enforces the shared Brazilian/Latin quota and swaps extras for spares
+    const spares=[],items=await findAlbums(key==='all'?null:Number(key),new Set(),()=>{},{quota:{left:1},spares});
     if(!items.length)throw new Error('No albums found');
-    return Response.json({items},{headers:{'Cache-Control':'public, s-maxage=300, stale-while-revalidate=86400','X-Content-Type-Options':'nosniff'}});
+    return Response.json({items,spares},{headers:{'Cache-Control':'public, s-maxage=300, stale-while-revalidate=86400','X-Content-Type-Options':'nosniff'}});
   }catch(_){
     return Response.json({error:'Could not build the pool'},{status:502,headers:{'Cache-Control':'no-store'}});
   }
