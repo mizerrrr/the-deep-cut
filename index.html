@@ -1861,7 +1861,7 @@ function hideTip(){clearTimeout(tipTimer);tipTimer=setTimeout(()=>{$('materialTi
    quiet spell it rebuilds the pool for 10 s or more. Past POOL_WAIT the page
    takes one of the ready-made sets in pools/<era>.json (built by snapshot.mjs)
    instead; the slow request still finishes and warms the cache for the next visitor. */
-const POOL_WAIT=2500;
+const POOL_WAIT=1500;
 const poolList=list=>Array.isArray(list)?list.filter(x=>x&&x.identifier&&x.title&&x.previewUrl):[];
 async function fetchPool(url){
   try{
