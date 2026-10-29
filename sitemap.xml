@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <url><loc>https://thedeepcut.vercel.app/</loc><lastmod>2026-10-29</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://thedeepcut.vercel.app/about</loc><lastmod>2026-10-29</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://thedeepcut.vercel.app/guides</loc><lastmod>2026-10-29</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url>
-    <loc>https://thedeepcut.vercel.app/guides/how-to-find-new-music</loc><lastmod>2026-10-29</lastmod><changefreq>monthly</changefreq><priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://thedeepcut.vercel.app/guides/how-to-find-new-music"/>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://thedeepcut.vercel.app/guias/como-descobrir-musica-nova"/>
-  </url>
-  <url>
-    <loc>https://thedeepcut.vercel.app/guias/como-descobrir-musica-nova</loc><lastmod>2026-10-29</lastmod><changefreq>monthly</changefreq><priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://thedeepcut.vercel.app/guides/how-to-find-new-music"/>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://thedeepcut.vercel.app/guias/como-descobrir-musica-nova"/>
-  </url>
-  <url><loc>https://thedeepcut.vercel.app/guides/free-legal-music-internet-archive</loc><lastmod>2026-10-29</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://thedeepcut.vercel.app/guides/what-is-a-netlabel</loc><lastmod>2026-10-29</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://thedeepcut.vercel.app/</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://thedeepcut.vercel.app/about</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://thedeepcut.vercel.app/guides</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://thedeepcut.vercel.app/guides/how-to-find-new-music</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://thedeepcut.vercel.app/guides/free-legal-music-internet-archive</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://thedeepcut.vercel.app/guides/what-is-a-netlabel</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://thedeepcut.vercel.app/guias/como-descobrir-musica-nova</loc><lastmod>2026-10-29</lastmod></url>
 </urlset>
