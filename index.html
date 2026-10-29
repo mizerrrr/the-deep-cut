@@ -54,7 +54,7 @@ body::after{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;b
 
 /* ── Pixel ambient: dithered plasma in the selected album's palette ── */
 .bg-pixels{position:fixed;inset:0;z-index:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none;opacity:0;transition:opacity 1.6s ease}
-.bg-pixels.is-on{opacity:.28}
+.bg-pixels.is-on{opacity:.13}
 
 /* ── App shell ── */
 .app-shell{position:relative;z-index:1;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;padding-bottom:var(--np-offset)}
@@ -744,11 +744,12 @@ function setBlur(url){if(!url)return;$('bgBlur').style.backgroundImage='url('+JS
    The selected album's tile is shrunk to 32×32 and its colours bucketed; the
    most common vivid buckets become a 4-colour palette. A low-res canvas (one
    cell = PIX_CELL css px, scaled up with image-rendering:pixelated) draws a
-   slow sine plasma, Bayer-dithered into that palette at ~12 fps so it moves in
+   slow sine plasma, Bayer-dithered into that palette at ~8 fps so it moves in
    stepped, retro frames. Colours ease into a new palette when the album changes.
    Pixels are read from the cover blob the site already cached (works without
    the server); /api/thumb is the fallback, since archive.org tiles send no CORS header. */
-const PIX_CELL=12,PIX_FPS=12,PIX_FADE=1400;
+// PIX_SPEED slows the plasma's drift, PIX_DIM darkens the palette, PIX_GAPS is how many empty bands sit below the colours
+const PIX_CELL=12,PIX_FPS=8,PIX_FADE=2400,PIX_SPEED=.3,PIX_DIM=.6,PIX_GAPS=4;
 const PIX_DEFAULT=[[126,200,164],[200,168,64],[122,176,208],[200,72,72]]; // --mint --amber --blue --red
 const BAYER4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v=>v/16-.5);
 const pixState={from:PIX_DEFAULT,to:PIX_DEFAULT,fadeStart:0,id:'',raf:0,last:0,t:0,cols:0,rows:0,img:null};
@@ -828,17 +829,17 @@ function drawPixels(now){
   for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
     let v=Math.sin(x*.07+t*.5)+Math.sin(y*.09-t*.4)+Math.sin((x+y)*.05+t*.3)+Math.sin(Math.hypot(x-cx,y-cy)*.11-t*.6);
     v=(v+4)/8; // 0..1
-    // n colour bands plus two empty ones, so the pattern breathes instead of filling the screen
-    const level=Math.floor(v*(n+2)+BAYER4[(y&3)*4+(x&3)]*.9)-2,o=(y*cols+x)*4;
+    // n colour bands plus PIX_GAPS empty ones, so the pattern stays sparse instead of filling the screen
+    const level=Math.floor(v*(n+PIX_GAPS)+BAYER4[(y&3)*4+(x&3)]*.9)-PIX_GAPS,o=(y*cols+x)*4;
     if(level<0){px[o+3]=0;continue;}
-    const c=pal[Math.min(n-1,level)];px[o]=c[0];px[o+1]=c[1];px[o+2]=c[2];px[o+3]=255;
+    const c=pal[Math.min(n-1,level)];px[o]=c[0]*PIX_DIM;px[o+1]=c[1]*PIX_DIM;px[o+2]=c[2]*PIX_DIM;px[o+3]=255;
   }
   $('bgPixels').getContext('2d').putImageData(img,0,0);
 }
 function pixelFrame(now){
   pixState.raf=0;
   if(document.hidden)return;
-  if(now-pixState.last>=1000/PIX_FPS){pixState.t+=1/PIX_FPS;pixState.last=now;drawPixels(now);}
+  if(now-pixState.last>=1000/PIX_FPS){pixState.t+=PIX_SPEED/PIX_FPS;pixState.last=now;drawPixels(now);}
   // Reduced motion: hold a still frame once the palette fade is done
   if(!pixReduced.matches||now-pixState.fadeStart<PIX_FADE)pixState.raf=requestAnimationFrame(pixelFrame);
 }
