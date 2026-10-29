@@ -14,6 +14,7 @@ Key facts:
 - Artist, year and region appear only when the Internet Archive record states them; nothing is made up.
 - The music belongs to its artists; every album links back to its archive.org page.
 - Made by an independent developer in Brazil. Source code (MIT License): https://github.com/mizerrrr/the-deep-cut
+- Instagram: https://www.instagram.com/ethedeepcut/ (@ethedeepcut)
 
 ## Pages
 

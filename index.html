@@ -26,7 +26,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
 {"@type":"WebSite","@id":"https://thedeepcut.vercel.app/#website","name":"The Deep Cut","alternateName":"Deep Cut","url":"https://thedeepcut.vercel.app/","inLanguage":"en","description":"A free music discovery site that shows six random albums from the Internet Archive on every search.","publisher":{"@id":"https://thedeepcut.vercel.app/#org"}},
-{"@type":"Organization","@id":"https://thedeepcut.vercel.app/#org","name":"The Deep Cut","url":"https://thedeepcut.vercel.app/","logo":"https://thedeepcut.vercel.app/assets/icons/icon-512.png","sameAs":["https://github.com/mizerrrr/the-deep-cut","https://mastodon.social/@thedeepcut"]},
+{"@type":"Organization","@id":"https://thedeepcut.vercel.app/#org","name":"The Deep Cut","url":"https://thedeepcut.vercel.app/","logo":"https://thedeepcut.vercel.app/assets/icons/icon-512.png","sameAs":["https://www.instagram.com/ethedeepcut/","https://github.com/mizerrrr/the-deep-cut","https://mastodon.social/@thedeepcut"]},
 {"@type":"WebApplication","@id":"https://thedeepcut.vercel.app/#app","name":"The Deep Cut","url":"https://thedeepcut.vercel.app/","applicationCategory":"MultimediaApplication","applicationSubCategory":"Music discovery","operatingSystem":"Any (web browser, installable as a PWA)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"image":"https://thedeepcut.vercel.app/assets/og.png","description":"Shows six random albums from the Internet Archive's music collections (netlabels, Jamendo, the Free Music Archive, digitized LPs, Brazilian and Latin American music) with a built-in player. Each pick has at least four tracks and an original cover; podcasts, lectures and, for 2025–26 releases, albums declared as made with AI tools are left out.","featureList":["Six random albums per search","Era filters from the 1960s to 2025–26","Filter for AI-generated releases from 2025 on","Persistent player with tracklist","Saved albums, liked tracks and history kept in the browser","Installable web app with media controls"],"publisher":{"@id":"https://thedeepcut.vercel.app/#org"}}
 ]}
 </script>
@@ -95,6 +95,12 @@ body::after{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;b
 .hdr-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid var(--line);background:transparent;color:var(--muted);font:13px var(--mono);letter-spacing:.14em;text-transform:uppercase;transition:border-color .1s,color .1s,background .1s}
 .hdr-btn:hover,.hdr-btn[aria-pressed="true"]{border-color:var(--mint);color:var(--mint)}
 .hdr-btn.is-accent[aria-pressed="true"]{background:var(--mint);color:var(--bg);border-color:var(--mint)}
+.hdr-ig{color:var(--ink)}
+.hdr-ig .ig-icon{flex-shrink:0}
+/* The FOLLOW label only where the header has room; elsewhere the icon alone, so the other buttons don't wrap */
+@media(max-width:1500px){.hdr-ig .ig-label{display:none}.hdr-ig{padding-left:11px;padding-right:11px}}
+/* Phones: first in the row, since the rest of the buttons scroll out of view */
+@media(max-width:860px){.hdr-ig{padding-left:9px;padding-right:9px;order:-1}}
 .hdr-saved-count{color:var(--ink)}
 .np-like.is-liked{color:var(--mint);border-color:var(--mint)}
 /* Snake mini game in the free middle of the topbar — wide desktop screens only */
@@ -450,7 +456,8 @@ button.saved-link:hover .saved-title{color:var(--mint)}
   .np-btn{padding:10px 9px}
   /* On phones the stage scrolls: a tall cover rail, then the details */
   .stage{overflow-y:auto}
-  .album-list{flex:0 0 54vh;--card-min:62vw;--caption:70px;padding:24px 16px 10px}
+  /* The rail is only as tall as a card needs (width + caption + padding), capped at 54vh, so ▶ PLAY ALBUM shows without scrolling */
+  .album-list{flex:0 0 min(54vh,calc(var(--card-min) + var(--caption) + 34px));--card-min:62vw;--caption:70px;padding:24px 16px 10px}
   .list-footer{flex-basis:100%}
   .status{text-align:left}
   .tracklist-body{grid-auto-columns:minmax(200px,80%)}
@@ -502,6 +509,9 @@ button.saved-link:hover .saved-title{color:var(--mint)}
       <button class="hdr-btn" id="savedToggle" type="button" aria-label="Open saved albums" aria-pressed="false">
         [ SAVED <span id="savedCount" class="hdr-saved-count">00</span> ]
       </button>
+      <a class="hdr-btn hdr-ig" href="https://www.instagram.com/ethedeepcut/" target="_blank" rel="noopener" aria-label="Follow The Deep Cut on Instagram, @ethedeepcut" title="Follow @ethedeepcut on Instagram">
+        <svg class="ig-icon" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.3" fill="currentColor"/></svg><span class="ig-label">FOLLOW</span>
+      </a>
     </nav>
   </header>
 
@@ -623,7 +633,8 @@ button.saved-link:hover .saved-title{color:var(--mint)}
     <p>Each album is checked before it reaches you: at least four tracks, an original cover, and no podcasts, radio or lectures. Releases from 2025 on also leave out albums that say they were made with AI tools such as Suno or Udio. Artist, year and region appear only when the record states them.</p>
     <p class="about-note">Your saved albums, liked tracks and listening history are kept in this browser, with no account. Visits are counted with Vercel Web Analytics, which sets no cookies.</p>
     <p class="about-note">The code is open source under the MIT License: <a href="https://github.com/mizerrrr/the-deep-cut" target="_blank" rel="noopener">github.com/mizerrrr/the-deep-cut</a>.</p>
-    <p class="about-note">Guides: <a href="/about">how The Deep Cut works (FAQ)</a> · <a href="/guides/how-to-find-new-music">how to find new music without algorithms</a> · <a href="/guides/free-legal-music-internet-archive">free, legal music on the Internet Archive</a> · <a href="/guides/what-is-a-netlabel">what is a netlabel?</a> · <a href="/guias/como-descobrir-musica-nova" hreflang="pt-BR">como descobrir música nova (pt-BR)</a></p>
+    <p class="about-note">Follow new finds on Instagram: <a href="https://www.instagram.com/ethedeepcut/" target="_blank" rel="noopener">@ethedeepcut</a>.</p>
+    <p class="about-note">Guides:<a href="/about">how The Deep Cut works (FAQ)</a> · <a href="/guides/how-to-find-new-music">how to find new music without algorithms</a> · <a href="/guides/free-legal-music-internet-archive">free, legal music on the Internet Archive</a> · <a href="/guides/what-is-a-netlabel">what is a netlabel?</a> · <a href="/guias/como-descobrir-musica-nova" hreflang="pt-BR">como descobrir música nova (pt-BR)</a></p>
     <button class="about-back" id="aboutBack" type="button">← BACK TO THE ARCHIVE</button>
   </div>
 </div>
@@ -1053,7 +1064,10 @@ function syncPlayerUI(){
   }
   syncLikes();
   $('npPrev').disabled=!item;
-  $('npNext').disabled=!tracks||tidx>=tracks.length-1;
+  // On the last track, Next moves on to the next album of the six (radio)
+  const lastTrack=!tracks||tidx>=tracks.length-1;
+  $('npNext').disabled=lastTrack&&!(item&&!item.isSingle&&currentAlbums.some(a=>sameAlbum(a,item)));
+  $('npNext').setAttribute('aria-label',lastTrack?'Next album':'Next track');
   const viewed=viewedItem,btn=$('featPlayBtn');
   if(viewed){
     const isThis=sameAlbum(viewed,item);
@@ -1337,8 +1351,32 @@ function togglePlayPause(){
   previewAudio.play().then(()=>{previewPlaying=true;syncPlayerUI();}).catch(()=>{previewPlaying=false;syncPlayerUI();});
 }
 function nextTrack(){
-  const item=previewItem;if(!item||!item.tracks||item.trackIndex>=item.tracks.length-1)return;
+  const item=previewItem;if(!item)return;
+  if(!item.tracks||item.trackIndex>=item.tracks.length-1){playNextAlbum();return;}
   loadTrack(item.trackIndex+1,true);
+}
+/* Radio: after the last track of an album from the current six, the next of
+   the six starts; after the sixth, a new selection is drawn and its first album
+   plays. The screen follows only when it was showing the album that ended, so
+   someone browsing another album is not moved. Albums played from Saved or
+   Recent, and single tracks, are not part of the six and just stop.
+   Resolves to false when nothing new could start. */
+async function playNextAlbum(){
+  const item=previewItem;if(!item||item.isSingle)return false;
+  const idx=currentAlbums.findIndex(a=>sameAlbum(a,item));if(idx<0)return false;
+  const follow=sameAlbum(viewedItem,item);
+  let next=currentAlbums.slice(idx+1).find(a=>a&&a.previewUrl);
+  if(!next){
+    if(busy)return false;
+    await refreshAll(false);
+    if(!sameAlbum(previewItem,item))return false; // the listener picked something else meanwhile
+    next=currentAlbums.find(a=>a&&a.previewUrl);
+  }
+  if(!next||sameAlbum(next,item))return false;
+  startAlbum(next,0);
+  if(follow){const i=currentAlbums.indexOf(next);if(i>=0)showFeatured(i);}
+  showShareToast('[ NEXT ALBUM: '+clean(next.title,40).toUpperCase()+' ]');
+  return true;
 }
 function prevTrack(){
   const item=previewItem;if(!item)return;
@@ -1384,6 +1422,8 @@ function bindPreviewAudio(){
     pendingSeek=0;syncPlayerUI();
   });
   ['playing','play'].forEach(t=>previewAudio.addEventListener(t,()=>{previewPlaying=true;syncPlayerUI();persistNowPlaying();}));
+  // 'play' fires as soon as playback is asked for; 'playing' can wait on a slow archive.org response
+  previewAudio.addEventListener('play',()=>trackView('/view/play'));
   previewAudio.addEventListener('playing',logRecentTrack);
   previewAudio.addEventListener('pause',()=>{if(previewAudio.ended)return;previewPlaying=false;syncPlayerUI();persistNowPlaying();});
   previewAudio.addEventListener('timeupdate',()=>{syncProgressUI();if(Date.now()-lastPersist>2000)persistNowPlaying();});
@@ -1391,7 +1431,7 @@ function bindPreviewAudio(){
   previewAudio.addEventListener('ended',()=>{
     const item=previewItem;
     if(item&&item.tracks&&item.trackIndex<item.tracks.length-1)loadTrack(item.trackIndex+1,true);
-    else if(item)loadTrack(0,false);
+    else if(item)playNextAlbum().then(started=>{if(!started&&previewItem===item)loadTrack(0,false);});
     else{previewPlaying=false;syncPlayerUI();persistNowPlaying();}
   });
   previewAudio.addEventListener('error',()=>{if(!previewAudio.getAttribute('src'))return;previewPlaying=false;syncPlayerUI();});
@@ -1620,8 +1660,19 @@ function syncLibraryRows(){
 
 /* ── Views ── */
 const VIEWS={saved:['savedView','savedToggle'],recent:['recentView','recentToggle'],liked:['likedView','likedToggle'],about:['aboutView','aboutToggle'],app:['appView','appToggle']};
+/* Virtual page views for Vercel Web Analytics. The site is one page, so a visit
+   that only listens counted as a bounce; opening a view or starting playback now
+   records a page view (once per path and load), so the bounce rate shows who
+   left without doing anything. Page views work on the Hobby plan; custom events don't. */
+const trackedViews=new Set();
+function trackView(path){
+  if(trackedViews.has(path)||typeof window.va!=='function')return;
+  trackedViews.add(path);
+  try{window.va('pageview',{route:path,path});}catch(_){}
+}
 function setView(name){
   Object.keys(VIEWS).forEach(key=>{const [view,toggle]=VIEWS[key];$(view).hidden=key!==name;$(toggle).setAttribute('aria-pressed',String(key===name));});
+  if(name)trackView('/view/'+name);
   if(name==='saved')renderSaved();
   if(name==='recent')renderRecent();
   if(name==='liked')renderLiked();
@@ -1805,15 +1856,33 @@ function hideTip(){clearTimeout(tipTimer);tipTimer=setTimeout(()=>{$('materialTi
    The active filter loads first; the rest follow, two at a time. Each pool is
    swapped in only when its new albums are ready, so a failed decade keeps its
    previous albums. onlyMissing loads just the pools that do not exist yet. */
-/* Pool built by /api/pool (null when there is no server, as with index.html opened from disk) */
+/* Pool built by /api/pool (null when there is no server, as with index.html opened from disk).
+   The CDN answers in ~0.1 s when its cache is warm, but right after a deploy or a
+   quiet spell it rebuilds the pool for 10 s or more. Past POOL_WAIT the page
+   takes one of the ready-made sets in pools/<era>.json (built by snapshot.mjs)
+   instead; the slow request still finishes and warms the cache for the next visitor. */
+const POOL_WAIT=2500;
+const poolList=list=>Array.isArray(list)?list.filter(x=>x&&x.identifier&&x.title&&x.previewUrl):[];
+async function fetchPool(url){
+  try{
+    const r=await fetch(url,{headers:{Accept:'application/json'}});
+    return r.ok?await r.json():null;
+  }catch(_){return null;}
+}
+async function snapshotPool(key){
+  const data=await fetchPool('/pools/'+encodeURIComponent(key)+'.json');
+  const sets=data&&Array.isArray(data.sets)?data.sets.filter(s=>poolList(s&&s.items).length):[];
+  if(!sets.length)return null;
+  const set=sets[Math.floor(Math.random()*sets.length)];
+  return {items:poolList(set.items),spares:poolList(set.spares)};
+}
 async function serverPool(key){
   if(!/^https?:$/.test(location.protocol))return null;
-  try{
-    const r=await fetch('/api/pool?decade='+encodeURIComponent(key),{headers:{Accept:'application/json'}});
-    if(!r.ok)return null;
-    const data=await r.json(),ok=list=>Array.isArray(list)?list.filter(x=>x&&x.identifier&&x.title&&x.previewUrl):[];
-    return Array.isArray(data&&data.items)?{items:ok(data.items),spares:ok(data.spares)}:null;
-  }catch(_){return null;}
+  const api=fetchPool('/api/pool?decade='+encodeURIComponent(key))
+    .then(data=>Array.isArray(data&&data.items)?{items:poolList(data.items),spares:poolList(data.spares)}:null);
+  const quick=await Promise.race([api,new Promise(resolve=>setTimeout(()=>resolve('slow'),POOL_WAIT))]);
+  if(quick&&quick!=='slow'&&quick.items.length)return quick;
+  return (await snapshotPool(key))||(quick==='slow'?await api:null);
 }
 /* Keeps a pool inside the shared Brazilian/Latin quota: regional albums past it
    are swapped for spares (new artists only) or dropped */
