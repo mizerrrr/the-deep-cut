@@ -1,0 +1,25 @@
+# The Deep Cut
+
+> The Deep Cut (https://thedeepcut.vercel.app) is a free, open-source music discovery website. Every search shows six random albums from the Internet Archive's music collections, each in a different style, with a built-in player. There is no feed, no account and no personalized recommendations: it is a tool for finding new music without algorithms.
+
+Key facts:
+
+- Albums come from the Internet Archive's public music collections: netlabels, Jamendo, the Free Music Archive, Unlocked Recordings, digitized LPs, open source releases, hip-hop mixtapes, and Brazilian, Latin American and Colombian campesino music. Classical recordings are left out.
+- Picks are random: each search samples a different slice of the archive and shuffles it. Nothing is ranked by what the listener played before. One exception: hip-hop mixtapes need at least 1,000 downloads, to keep out anonymous DJ compilations.
+- Every album is checked before it is shown: at least four distinct tracks, an original cover, and no podcasts, radio, sermons, lectures or audiobooks.
+- Releases from 2025 on leave out albums that declare AI tools (such as Suno or Udio) in their title, description, tags or file metadata, or whose cover keeps an AI image generator's default file name.
+- Era filters go from the 1960s to 2025–26.
+- Saved albums, liked tracks and listening history are kept in the browser, with no account. Visits are counted with Vercel Web Analytics, which sets no cookies.
+- It installs as a web app (PWA) on phones and computers, with lock-screen and media-key controls.
+- Artist, year and region appear only when the Internet Archive record states them; nothing is made up.
+- The music belongs to its artists; every album links back to its archive.org page.
+- Made by an independent developer in Brazil. Source code (MIT License): https://github.com/mizerrrr/the-deep-cut
+
+## Pages
+
+- [The Deep Cut (app)](https://thedeepcut.vercel.app/): six random albums from the Internet Archive.
+- [How The Deep Cut works (FAQ)](https://thedeepcut.vercel.app/about): how albums are picked and checked, privacy, installing the app.
+- [How to find new music without algorithms](https://thedeepcut.vercel.app/guides/how-to-find-new-music): practical ways to discover music outside streaming recommendations.
+- [Free, legal music on the Internet Archive](https://thedeepcut.vercel.app/guides/free-legal-music-internet-archive): where to start in the archive's music collections and how to read licenses.
+- [What is a netlabel?](https://thedeepcut.vercel.app/guides/what-is-a-netlabel): online labels that release music for free download.
+- [Como descobrir música nova (pt-BR)](https://thedeepcut.vercel.app/guias/como-descobrir-musica-nova): o guia de descoberta musical em português.

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07080a">
+<title>How The Deep Cut works: FAQ</title>
+<meta name="description" content="How The Deep Cut picks six random albums from the Internet Archive, what it filters out (including AI-generated releases), where the music comes from, privacy and installing the app.">
+<link rel="canonical" href="https://thedeepcut.vercel.app/about">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="The Deep Cut">
+<meta property="og:title" content="How The Deep Cut works: FAQ">
+<meta property="og:description" content="How six random albums from the Internet Archive are picked, checked and played.">
+<meta property="og:url" content="https://thedeepcut.vercel.app/about">
+<meta property="og:image" content="https://thedeepcut.vercel.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+<link rel="stylesheet" href="/assets/guide.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"The Deep Cut","item":"https://thedeepcut.vercel.app/"},{"@type":"ListItem","position":2,"name":"How it works","item":"https://thedeepcut.vercel.app/about"}]},
+{"@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"What is The Deep Cut?","acceptedAnswer":{"@type":"Answer","text":"A free music discovery website. Every search shows six random albums from the Internet Archive's music collections, each in a different style, with a built-in player. There is no feed, no account and no personalized recommendations."}},
+{"@type":"Question","name":"Where do the albums come from?","acceptedAnswer":{"@type":"Answer","text":"From the Internet Archive's public music collections: netlabels, Jamendo, the Free Music Archive, Unlocked Recordings, digitized LPs, open source releases, hip-hop mixtapes, and Brazilian, Latin American and Colombian campesino music. Classical recordings are left out."}},
+{"@type":"Question","name":"Is it really random?","acceptedAnswer":{"@type":"Answer","text":"Yes. Each search samples a different slice of the archive and shuffles it, so nothing is ranked by plays or by what you listened to before. The one exception is hip-hop mixtapes, which need at least 1,000 downloads to keep out anonymous DJ compilations."}},
+{"@type":"Question","name":"What gets filtered out?","acceptedAnswer":{"@type":"Answer","text":"Every album needs at least four distinct tracks and an original cover. Podcasts, radio shows, sermons, lectures and audiobooks are dropped, and so are classical recordings."}},
+{"@type":"Question","name":"Does The Deep Cut filter AI-generated music?","acceptedAnswer":{"@type":"Answer","text":"For releases from 2025 on, it leaves out albums that declare AI tools such as Suno, Udio or Stable Audio in their title, description, tags or MP3 metadata, or whose cover keeps an AI image generator's default file name. It can only catch what the upload declares."}},
+{"@type":"Question","name":"Is the music free and legal to listen to?","acceptedAnswer":{"@type":"Answer","text":"The music is streamed from the Internet Archive, which hosts it. Much of it is released by the artists under Creative Commons licenses, but rights vary from item to item: each album links to its archive.org page, where its license or rights statement is shown."}},
+{"@type":"Question","name":"Do I need an account? What data is kept?","acceptedAnswer":{"@type":"Answer","text":"No account. Saved albums, liked tracks and listening history are stored only in your browser. Visits are counted with Vercel Web Analytics, which sets no cookies."}},
+{"@type":"Question","name":"Can I install The Deep Cut as an app?","acceptedAnswer":{"@type":"Answer","text":"Yes. It installs as a web app on iPhone, iPad, Android, Windows, Mac and Linux, and shows the track and cover on the lock screen and media keys. It can also play on a TV through Chromecast or AirPlay."}},
+{"@type":"Question","name":"Who made it?","acceptedAnswer":{"@type":"Answer","text":"An independent developer in Brazil. The code is open source under the MIT License on GitHub. The Deep Cut is not affiliated with the Internet Archive."}}
+]}
+]}
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<header class="g-top">
+  <a class="g-brand" href="/"><img src="/assets/logo.svg" alt="" width="34" height="34"><span><strong>THE DEEP CUT</strong><span>Internet Archive · Music</span></span></a>
+  <a class="g-open" href="/">Open the archive →</a>
+</header>
+
+<main class="g-main">
+  <p class="g-crumbs"><a href="/">The Deep Cut</a> / How it works</p>
+  <p class="g-eyebrow">// The project</p>
+  <h1>How The Deep Cut works.</h1>
+  <p class="g-lead">The Deep Cut is a free website for finding new music without algorithms. Every search shows six random albums from the Internet Archive, each in a different style, with a player built in.</p>
+  <p class="g-meta">Updated 29 October 2026</p>
+
+  <p>The Internet Archive holds hundreds of thousands of freely licensed and historical music releases, and most of them are almost impossible to stumble upon. There is no front page that surfaces them and no chart that ranks them. The Deep Cut is a small window into that collection: press <strong>Search more</strong> and six albums arrive at random, shown as an editorial page with the cover, the tracklist and a player.</p>
+  <p>There is no feed, no account and no recommendation engine. Nothing you listen to changes what you see next. That is the point: the next album you love is probably one nobody would have recommended to you.</p>
+
+  <h2>Frequently asked questions</h2>
+  <dl class="g-faq">
+    <dt>Where do the albums come from?</dt>
+    <dd>From the Internet Archive's public music collections: netlabels, Jamendo, the Free Music Archive, Unlocked Recordings, digitized LPs, open source releases, hip-hop mixtapes, and Brazilian, Latin American and Colombian <em>música campesina</em>. Classical recordings are left out. The site reads them through the Archive's public search and metadata APIs.</dd>
+
+    <dt>Is it really random?</dt>
+    <dd>Yes. Each search samples a different slice of the archive and shuffles it, so nothing is ranked by plays or by what you listened to before. The one exception is hip-hop mixtapes, which need at least 1,000 downloads to keep out anonymous DJ compilations.</dd>
+
+    <dt>What gets filtered out?</dt>
+    <dd>Every pick is checked before it reaches you. An item needs at least four distinct tracks (an MP3 and a FLAC of the same song count once), an original cover image and evidence of being a real release. Podcasts, radio shows, sermons, lectures and audiobooks are dropped.</dd>
+
+    <dt>Does it filter AI-generated music?</dt>
+    <dd>For releases from 2025 on, yes. Albums that declare AI tools such as Suno, Udio or Stable Audio in their title, description, tags or MP3 metadata are left out, and so are albums whose cover keeps an AI image generator's default file name. It can only catch what the upload declares, so it is a strong filter, not a guarantee.</dd>
+
+    <dt>Can I choose an era?</dt>
+    <dd>Yes. Filters go from the 1960s through the 2000s and 2010s to a separate 2025–26 filter for new releases.</dd>
+
+    <dt>Is the music free and legal to listen to?</dt>
+    <dd>The music is streamed straight from the Internet Archive, which hosts it. Much of it was released by the artists themselves under Creative Commons licenses, but rights vary from item to item. Every album links back to its archive.org page, where its license or rights statement is shown. The music belongs to its artists; The Deep Cut only points to it.</dd>
+
+    <dt>Why is the artist or year sometimes missing?</dt>
+    <dd>The site never makes up metadata. Artist, year and region appear only when the Internet Archive record states them.</dd>
+
+    <dt>Do I need an account? What data is kept?</dt>
+    <dd>No account. Saved albums, liked tracks and listening history are stored only in your browser. Visits are counted with Vercel Web Analytics, which sets no cookies.</dd>
+
+    <dt>Can I install it as an app?</dt>
+    <dd>Yes. It installs as a web app on iPhone and iPad (Safari → Share → Add to Home Screen), Android, Windows, Mac and Linux (Chrome or Edge), and shows the track and cover on the lock screen and media keys. It can also send the music to a TV through Chromecast or AirPlay.</dd>
+
+    <dt>Who made it?</dt>
+    <dd>An independent developer in Brazil. The code is open source under the MIT License at <a href="https://github.com/mizerrrr/the-deep-cut">github.com/mizerrrr/the-deep-cut</a>. The Deep Cut is not affiliated with the Internet Archive.</dd>
+  </dl>
+
+  <div class="g-cta">
+    <p>Six random albums are waiting. No sign-up, nothing to install.</p>
+    <a href="/">Dig the archive →</a>
+  </div>
+</main>
+
+<footer class="g-foot">
+  <nav aria-label="Guides"><a href="/">The Deep Cut</a><a href="/about">How it works</a><a href="/guides">Guides</a><a href="/guides/how-to-find-new-music">Find new music</a><a href="/guides/free-legal-music-internet-archive">Free music on the Internet Archive</a><a href="/guides/what-is-a-netlabel">What is a netlabel?</a><a href="/guias/como-descobrir-musica-nova" hreflang="pt-BR">Português</a></nav>
+  <p>The music belongs to its artists and lives on archive.org. The Deep Cut is an independent, open-source project, not affiliated with the Internet Archive.</p>
+</footer>
+</body>
+</html>

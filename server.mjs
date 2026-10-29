@@ -27,10 +27,16 @@ async function runHandler(handler,request,response){
   response.writeHead(result.status,Object.fromEntries(result.headers));
   response.end(Buffer.from(await result.arrayBuffer()));
 }
-const mimeTypes={'.html':'text/html; charset=utf-8','.txt':'text/plain; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.ttf':'font/ttf','.woff2':'font/woff2','.webmanifest':'application/manifest+json; charset=utf-8'};
+const mimeTypes={'.html':'text/html; charset=utf-8','.txt':'text/plain; charset=utf-8','.xml':'application/xml; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.ttf':'font/ttf','.woff2':'font/woff2','.webmanifest':'application/manifest+json; charset=utf-8'};
 function serveFile(request,response){
   let pathname;try{pathname=decodeURIComponent(new URL(request.url,'http://localhost').pathname);}catch(_){response.writeHead(400);response.end('Bad request');return;}
   if(pathname==='/')pathname='/index.html';
+  // Clean URLs, as vercel.json's cleanUrls does in production: /about → about.html, /guides → guides/index.html
+  if(!path.extname(pathname)){
+    const base=path.resolve(ROOT,'.'+pathname.replace(/\/$/,''));
+    if(fs.existsSync(base+'.html'))pathname=pathname.replace(/\/$/,'')+'.html';
+    else if(fs.existsSync(path.join(base,'index.html')))pathname=pathname.replace(/\/$/,'')+'/index.html';
+  }
   const file=path.resolve(ROOT,'.'+pathname),relative=path.relative(ROOT,file);
   if(relative.startsWith('..')||path.isAbsolute(relative)){response.writeHead(403);response.end('Forbidden');return;}
   if(path.basename(file)==='.env'){response.writeHead(404);response.end('Not found');return;}
