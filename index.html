@@ -95,12 +95,6 @@ body::after{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;b
 .hdr-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid var(--line);background:transparent;color:var(--muted);font:13px var(--mono);letter-spacing:.14em;text-transform:uppercase;transition:border-color .1s,color .1s,background .1s}
 .hdr-btn:hover,.hdr-btn[aria-pressed="true"]{border-color:var(--mint);color:var(--mint)}
 .hdr-btn.is-accent[aria-pressed="true"]{background:var(--mint);color:var(--bg);border-color:var(--mint)}
-.hdr-ig{color:var(--ink)}
-.hdr-ig .ig-icon{flex-shrink:0}
-/* The FOLLOW label only where the header has room; elsewhere the icon alone, so the other buttons don't wrap */
-@media(max-width:1500px){.hdr-ig .ig-label{display:none}.hdr-ig{padding-left:11px;padding-right:11px}}
-/* Phones: first in the row, since the rest of the buttons scroll out of view */
-@media(max-width:860px){.hdr-ig{padding-left:9px;padding-right:9px;order:-1}}
 .hdr-saved-count{color:var(--ink)}
 .np-like.is-liked{color:var(--mint);border-color:var(--mint)}
 /* Snake mini game in the free middle of the topbar — wide desktop screens only */
@@ -389,6 +383,9 @@ button.saved-link:hover .saved-title{color:var(--mint)}
 .about-inner .about-note a:hover{color:var(--mint)}
 .about-back{margin-top:26px;border:1px solid var(--line);background:none;padding:11px 18px;color:var(--ink);font:13px var(--mono);letter-spacing:.12em;text-transform:uppercase;transition:border-color .1s,color .1s}
 .about-back:hover{border-color:var(--mint);color:var(--mint)}
+.about-follow{display:inline-flex;align-items:center;gap:10px;margin-top:4px;border:1px solid var(--line);padding:11px 18px;color:var(--ink);font:13px var(--mono);letter-spacing:.12em;transition:border-color .1s,color .1s}
+.about-follow:hover{border-color:var(--mint);color:var(--mint)}
+.about-follow:focus-visible{outline:1px solid var(--mint);outline-offset:3px}
 /* Get the app */
 .app-inner{max-width:1080px;margin:0 auto}
 .app-inner h1{margin:0 0 18px;font:400 clamp(44px,7vw,80px)/.98 var(--mono)}
@@ -509,9 +506,6 @@ button.saved-link:hover .saved-title{color:var(--mint)}
       <button class="hdr-btn" id="savedToggle" type="button" aria-label="Open saved albums" aria-pressed="false">
         [ SAVED <span id="savedCount" class="hdr-saved-count">00</span> ]
       </button>
-      <a class="hdr-btn hdr-ig" href="https://www.instagram.com/ethedeepcut/" target="_blank" rel="noopener" aria-label="Follow The Deep Cut on Instagram, @ethedeepcut" title="Follow @ethedeepcut on Instagram">
-        <svg class="ig-icon" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.3" fill="currentColor"/></svg><span class="ig-label">FOLLOW</span>
-      </a>
     </nav>
   </header>
 
@@ -633,7 +627,10 @@ button.saved-link:hover .saved-title{color:var(--mint)}
     <p>Each album is checked before it reaches you: at least four tracks, an original cover, and no podcasts, radio or lectures. Releases from 2025 on also leave out albums that say they were made with AI tools such as Suno or Udio. Artist, year and region appear only when the record states them.</p>
     <p class="about-note">Your saved albums, liked tracks and listening history are kept in this browser, with no account. Visits are counted with Vercel Web Analytics, which sets no cookies.</p>
     <p class="about-note">The code is open source under the MIT License: <a href="https://github.com/mizerrrr/the-deep-cut" target="_blank" rel="noopener">github.com/mizerrrr/the-deep-cut</a>.</p>
-    <p class="about-note">Follow new finds on Instagram: <a href="https://www.instagram.com/ethedeepcut/" target="_blank" rel="noopener">@ethedeepcut</a>.</p>
+    <a class="about-follow" href="https://www.instagram.com/ethedeepcut/" target="_blank" rel="noopener" aria-label="Follow The Deep Cut on Instagram, @ethedeepcut">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.3" fill="currentColor"/></svg>
+      FOLLOW @ETHEDEEPCUT
+    </a>
     <p class="about-note">Guides:<a href="/about">how The Deep Cut works (FAQ)</a> · <a href="/guides/how-to-find-new-music">how to find new music without algorithms</a> · <a href="/guides/free-legal-music-internet-archive">free, legal music on the Internet Archive</a> · <a href="/guides/what-is-a-netlabel">what is a netlabel?</a> · <a href="/guias/como-descobrir-musica-nova" hreflang="pt-BR">como descobrir música nova (pt-BR)</a></p>
     <button class="about-back" id="aboutBack" type="button">← BACK TO THE ARCHIVE</button>
   </div>
