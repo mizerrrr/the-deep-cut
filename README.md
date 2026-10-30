@@ -58,3 +58,7 @@ It is deployed on Vercel with no build step. Every push to `main` deploys to pro
 The code is released under the [MIT License](LICENSE). The music is not part of this repository; each album keeps the license stated on its archive.org page.
 
 This is a personal project. Issues and suggestions are welcome, but replies may be slow.
+
+## Contact
+
+Email: [ethedeepcut@gmail.com](mailto:ethedeepcut@gmail.com) · Instagram: [@ethedeepcut](https://www.instagram.com/ethedeepcut/)
