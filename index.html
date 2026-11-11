@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#07080a">
-<meta name="description" content="The Deep Cut is a free way to find new music without algorithms: six random albums from the Internet Archive on every search, with a built-in player. No feed, no recommendations, just discovery.">
+<meta name="theme-color" content="#1b1a1a">
+<meta name="description" content="The Deep Cut is a free way to find new music without algorithms: five random albums from the Internet Archive on every search, with a built-in player. No feed, no recommendations, just discovery.">
 <title>The Deep Cut: discover random albums from the Internet Archive</title>
 <link rel="canonical" href="https://thedeepcut.vercel.app/">
 <meta name="robots" content="index,follow,max-image-preview:large">
@@ -12,22 +12,22 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="The Deep Cut">
 <meta property="og:title" content="The Deep Cut: discover random albums from the Internet Archive">
-<meta property="og:description" content="Six random albums from the Internet Archive on every search. No feed, no recommendations, just discovery.">
+<meta property="og:description" content="Five random albums from the Internet Archive on every search. No feed, no recommendations, just discovery.">
 <meta property="og:url" content="https://thedeepcut.vercel.app/">
 <meta property="og:image" content="https://thedeepcut.vercel.app/assets/og.png">
 <meta property="og:image:width" content="2560">
 <meta property="og:image:height" content="1280">
-<meta property="og:image:alt" content="The Deep Cut: dig the archive. Six albums at a time from the Internet Archive.">
+<meta property="og:image:alt" content="The Deep Cut: dig the archive. Five albums at a time from the Internet Archive.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="The Deep Cut: discover random albums from the Internet Archive">
-<meta name="twitter:description" content="Six random albums from the Internet Archive on every search. No feed, no recommendations, just discovery.">
+<meta name="twitter:description" content="Five random albums from the Internet Archive on every search. No feed, no recommendations, just discovery.">
 <meta name="twitter:image" content="https://thedeepcut.vercel.app/assets/og.png">
 <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM summary">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
-{"@type":"WebSite","@id":"https://thedeepcut.vercel.app/#website","name":"The Deep Cut","alternateName":"Deep Cut","url":"https://thedeepcut.vercel.app/","inLanguage":"en","description":"A free music discovery site that shows six random albums from the Internet Archive on every search.","publisher":{"@id":"https://thedeepcut.vercel.app/#org"}},
+{"@type":"WebSite","@id":"https://thedeepcut.vercel.app/#website","name":"The Deep Cut","alternateName":"Deep Cut","url":"https://thedeepcut.vercel.app/","inLanguage":"en","description":"A free music discovery site that shows five random albums from the Internet Archive on every search.","publisher":{"@id":"https://thedeepcut.vercel.app/#org"}},
 {"@type":"Organization","@id":"https://thedeepcut.vercel.app/#org","name":"The Deep Cut","url":"https://thedeepcut.vercel.app/","logo":"https://thedeepcut.vercel.app/assets/icons/icon-512.png","sameAs":["https://www.instagram.com/ethedeepcut/","https://github.com/mizerrrr/the-deep-cut","https://mastodon.social/@thedeepcut"]},
-{"@type":"WebApplication","@id":"https://thedeepcut.vercel.app/#app","name":"The Deep Cut","url":"https://thedeepcut.vercel.app/","applicationCategory":"MultimediaApplication","applicationSubCategory":"Music discovery","operatingSystem":"Any (web browser, installable as a PWA)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"image":"https://thedeepcut.vercel.app/assets/og.png","description":"Shows six random albums from the Internet Archive's music collections (netlabels, Jamendo, the Free Music Archive, digitized LPs, Brazilian and Latin American music) with a built-in player. Each pick has at least four tracks and an original cover; podcasts, lectures and, for 2025–26 releases, albums declared as made with AI tools are left out.","featureList":["Six random albums per search","Era filters from the 1960s to 2025–26","Filter for AI-generated releases from 2025 on","Persistent player with tracklist","Saved albums, liked tracks and history kept in the browser","Installable web app with media controls"],"publisher":{"@id":"https://thedeepcut.vercel.app/#org"}}
+{"@type":"WebApplication","@id":"https://thedeepcut.vercel.app/#app","name":"The Deep Cut","url":"https://thedeepcut.vercel.app/","applicationCategory":"MultimediaApplication","applicationSubCategory":"Music discovery","operatingSystem":"Any (web browser, installable as a PWA)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"image":"https://thedeepcut.vercel.app/assets/og.png","description":"Shows five random albums from the Internet Archive's music collections (netlabels, Jamendo, the Free Music Archive, digitized LPs, Brazilian and Latin American music) with a built-in player. Each pick has at least four tracks and an original cover; podcasts, lectures and, for 2025–26 releases, albums declared as made with AI tools are left out.","featureList":["Five random albums per search","Era filters from the 1960s to 2025–26","Filter for AI-generated releases from 2025 on","Persistent player with tracklist","Saved albums, liked tracks and history kept in the browser","Installable web app with media controls"],"publisher":{"@id":"https://thedeepcut.vercel.app/#org"}}
 ]}
 </script>
 <link rel="icon" type="image/svg+xml" href="./assets/logo.svg">
@@ -36,620 +36,241 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Deep Cut">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<style>
-@font-face{font-family:GeistPixel;src:url('./assets/fonts/geist-pixel.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
-
-/* ══════════════════════════════════════
-   DESIGN TOKENS — retro pixel terminal
-══════════════════════════════════════ */
-:root{
-  color-scheme:dark;
-  --bg:#07080a;
-  --panel:#0d0e10;
-  --ink:#ddd8cc;
-  --dim:#1a1b1e;
-  --muted:#868175;
-  --line:#2a2c31;
-  --hi:#232528;
-  --mint:#7ec8a4;       /* phosphor green — primary accent */
-  --amber:#c8a840;      /* warm secondary */
-  --blue:#7ab0d0;       /* cool third */
-  --red:#c84848;
-  --mono:GeistPixel,monospace;
-  --bar-h:92px;         /* now-playing bar height */
-  --np-offset:0px;      /* space reserved for the bar when it is visible */
-}
-body.has-player{--np-offset:var(--bar-h)}
-
-/* ── Reset ── */
-*{box-sizing:border-box;border-radius:0!important}
-html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--mono)}
-body{min-width:320px;font-size:15px}
-a{color:inherit;text-decoration:none}
-button{-webkit-tap-highlight-color:transparent;color:inherit;font:inherit;cursor:pointer}
-input[type=range]{-webkit-appearance:none;appearance:none}
-[hidden]{display:none!important}
-
-/* ── Scanlines overlay ── */
-body::after{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px)}
-
-/* ── Blurred album background ── */
-.bg-blur{position:fixed;inset:-40px;z-index:0;background-size:cover;background-position:center;filter:blur(80px) brightness(.1) saturate(1.8);pointer-events:none}
-
-/* ── Pixel ambient: dithered plasma in the selected album's palette ── */
-.bg-pixels{position:fixed;inset:0;z-index:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none;opacity:0;transition:opacity 1.6s ease}
-.bg-pixels.is-on{opacity:.13}
-
-/* ── App shell ── */
-.app-shell{position:relative;z-index:1;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;padding-bottom:var(--np-offset)}
-
-/* ══ TOPBAR ══ */
-.topbar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:76px;border-bottom:1px solid var(--line);background:var(--bg)}
-.brand{display:flex;align-items:center;gap:16px;min-width:0}
-.brand-logo{display:block;width:auto;height:42px;max-width:200px;object-fit:contain;filter:brightness(0) invert(1);opacity:.9;transform-origin:center}
-.brand:hover .brand-logo{animation:brand-spin 2s steps(8) infinite}
-@keyframes brand-spin{to{transform:rotate(360deg)}}
-.brand-copy{display:grid;gap:4px;font:12px/1.2 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
-.brand-copy strong{font-size:14px;font-weight:400;color:var(--ink);letter-spacing:.14em}
-.header-actions{display:flex;align-items:center;gap:12px}
-.hdr-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid var(--line);background:transparent;color:var(--muted);font:13px var(--mono);letter-spacing:.14em;text-transform:uppercase;transition:border-color .1s,color .1s,background .1s}
-.hdr-btn:hover,.hdr-btn[aria-pressed="true"]{border-color:var(--mint);color:var(--mint)}
-.hdr-btn.is-accent[aria-pressed="true"]{background:var(--mint);color:var(--bg);border-color:var(--mint)}
-.hdr-saved-count{color:var(--ink)}
-.np-like.is-liked{color:var(--mint);border-color:var(--mint)}
-/* Snake mini game in the free middle of the topbar — wide desktop screens only */
-.mini-game{display:none}
-@media(min-width:1180px){.mini-game{display:block;flex:1;min-width:240px;max-width:560px;height:70px;margin:0 32px}}
-.mini-game canvas{display:block;width:100%;height:100%;cursor:pointer;outline:none}
-.mini-game canvas:focus-visible{outline:1px solid var(--mint);outline-offset:3px}
-
-/* ══ STAGE: horizontal — toolbar / cover rail / detail strip ══ */
-.stage{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
-
-/* Toolbar: decade filter · shared link · status + refresh */
-.stage-toolbar{position:relative;flex:0 0 auto;display:flex;align-items:center;gap:16px;padding:12px 32px;border-bottom:1px solid var(--line);background:rgba(7,8,10,.55)}
-.list-top{flex:0 1 auto;min-width:0}
-.decade-filter{display:flex;gap:6px;flex-wrap:wrap}
-.decade-btn{padding:8px 13px;border:1px solid var(--line);background:transparent;color:var(--muted);font:12px var(--mono);letter-spacing:.14em;text-transform:uppercase;transition:border-color .1s,color .1s,background .1s}
-.decade-btn:hover{border-color:var(--mint);color:var(--mint)}
-.decade-btn.is-active{background:var(--mint);color:var(--bg);border-color:var(--mint)}
-.decade-btn.is-pending::after{content:'█';margin-left:6px;font-size:.8em;color:var(--mint);animation:blink .9s step-end infinite}
-.decade-btn.is-active.is-pending::after{color:var(--bg)}
-.decade-btn.is-empty:not(.is-active){opacity:.4}
-.decade-new{margin-left:7px;padding:1px 4px;background:var(--mint);color:var(--bg);font-size:10px;letter-spacing:.1em;vertical-align:1px}
-.decade-btn.is-active .decade-new{background:var(--bg);color:var(--mint)}
-.rail-empty{margin:auto;max-width:520px;padding:0 16px;color:var(--muted);font:15px/1.6 var(--mono);letter-spacing:.04em;text-align:center}
-
-/* Featured band (shared link) */
-.featured-band{flex:0 1 auto;min-width:0;display:none;align-items:center;gap:12px;padding:7px 12px;background:rgba(126,200,164,.08);border:1px solid var(--mint)}
-.featured-band:not([hidden]){display:flex}
-.featured-band-label{flex-shrink:0;color:var(--mint);font:12px var(--mono);letter-spacing:.14em;text-transform:uppercase}
-.featured-band-link{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink);font:14px var(--mono)}
-.featured-band-link:hover{color:var(--mint)}
-.featured-band-dismiss{flex-shrink:0;border:0;background:none;color:var(--muted);font:15px var(--mono);padding:4px 6px}
-.featured-band-dismiss:hover{color:var(--ink)}
-
-/* Status + refresh (progress bar spans the toolbar's bottom edge) */
-.list-footer{flex:1;min-width:0;display:flex;align-items:center;justify-content:flex-end;gap:14px}
-.status{margin:0;min-width:0;font:12px/1.4 var(--mono);letter-spacing:.06em;color:var(--muted);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.list-footer.is-refreshing .status{color:var(--mint)}
-.refresh-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid var(--line);background:transparent;color:var(--muted);font:13px var(--mono);letter-spacing:.14em;text-transform:uppercase;transition:border-color .1s,color .1s}
-.refresh-btn:hover{border-color:var(--mint);color:var(--mint)}
-.refresh-btn:disabled{opacity:.4;cursor:wait}
-.refresh-btn:disabled .refresh-ico{animation:spin .9s steps(8) infinite}
-.refresh-ico{font:17px var(--mono)}
-@keyframes spin{to{transform:rotate(360deg)}}
-.refresh-progress{position:absolute;bottom:-1px;left:0;right:0;height:3px;background:var(--dim);overflow:hidden}
-.refresh-progress-fill{display:block;width:0;height:100%;background:repeating-linear-gradient(90deg,var(--mint) 0px,var(--mint) 4px,transparent 4px,transparent 6px);transition:width .35s linear}
-.refresh-progress.is-indeterminate .refresh-progress-fill{width:28%;animation:progress-sweep 1s steps(6) infinite alternate}
-@keyframes progress-sweep{from{transform:translateX(-5%)}to{transform:translateX(260%)}}
-
-/* ══ Cover rail ══
-   The selected cover takes the full rail height (up to 42% of its width); the
-   other five share the rest. With nothing selected all six split the width.
-   Below --card-min the rail scrolls sideways instead of shrinking further.
-   (cq units inside these custom properties resolve on the cards, i.e. against the rail.) */
-.album-list{--gap:clamp(14px,1.6vw,28px);--card-min:150px;--caption:76px;
-  --sel:min(calc(100cqh - var(--caption)),42cqw);
-  --rest:max(var(--card-min),min(calc((100cqw - var(--sel) - 5 * var(--gap)) / 5),calc(100cqh - var(--caption))));
-  --even:max(var(--card-min),min(calc((100cqw - 5 * var(--gap)) / 6),calc(100cqh - var(--caption))));
-  flex:1;min-height:0;display:flex;align-items:flex-end;gap:var(--gap);padding:30px 32px 18px;overflow-x:auto;overflow-y:hidden;container-type:size;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
-.album-list::-webkit-scrollbar{height:6px}
-.album-list::-webkit-scrollbar-thumb{background:var(--line)}
-.album-card{position:relative;flex:0 0 auto;width:var(--even);display:flex;flex-direction:column;gap:12px;cursor:pointer;outline:none;scroll-snap-align:center;transition:width .5s cubic-bezier(.2,.85,.25,1.08)}
-.album-list.has-active .album-card{width:var(--rest)}
-.album-list.has-active .album-card.is-active{width:var(--sel)}
-.album-card:first-child{margin-left:auto}
-.album-card:last-child{margin-right:auto}
-.card-cover{position:relative;width:100%;aspect-ratio:1;background:var(--dim);border:1px solid var(--line);overflow:hidden;transition:transform .35s cubic-bezier(.2,.9,.3,1.25),box-shadow .35s ease,filter .25s ease,border-color .2s}
-/* Cover loading: pixel shimmer → pixelated tile → full cover scanning in */
-.card-tile,.card-img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
-.card-tile{image-rendering:pixelated;filter:saturate(.85) contrast(1.05);opacity:0;transition:opacity .25s steps(4)}
-.card-tile[src]{animation:tile-pulse 1.6s steps(6) infinite alternate}
-.card-tile:not([src]),.card-img:not([src]){visibility:hidden}
-.card-cover:not(.is-waiting) .card-tile{opacity:1}
-.card-cover.is-sharp .card-tile{animation:none;opacity:0;transition:opacity .2s .45s}
-.card-cover.is-failed .card-tile{animation:none}
-@keyframes tile-pulse{from{filter:saturate(.85) contrast(1.05) brightness(.8)}to{filter:saturate(.85) contrast(1.05) brightness(1.05)}}
-/* The resting state carries no clip-path: mobile WebKit/Blink sometimes skip repainting a
-   clipped image inside a scroll container until the next touch */
-.card-img{opacity:0}
-.card-cover.is-sharp .card-img{opacity:1;animation:cover-scan .5s steps(10)}
-.card-cover.is-sharp.is-cached .card-img{animation:cover-fade .22s ease-out}
-@keyframes cover-scan{from{opacity:1;clip-path:inset(0 0 100% 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
-@keyframes cover-fade{from{opacity:0;clip-path:inset(0)}to{opacity:1;clip-path:inset(0)}}
-/* Bright line riding the scan edge */
-.card-cover.is-sharp:not(.is-cached)::before{content:'';position:absolute;left:0;right:0;height:3px;top:0;z-index:1;background:var(--mint);box-shadow:0 0 0 1px rgba(126,200,164,.35);opacity:0;animation:scan-edge .5s steps(10);pointer-events:none}
-@keyframes scan-edge{from{top:0;opacity:1}99%{opacity:1}to{top:100%;opacity:0}}
-/* Nothing yet: diagonal pixel shimmer */
-.card-cover.is-waiting{background:repeating-linear-gradient(135deg,var(--dim) 0 10px,#1f2125 10px 20px);background-size:200% 200%;animation:cover-wait 1.2s steps(8) infinite}
-@keyframes cover-wait{from{background-position:0 0}to{background-position:-56px 0}}
-.card-ph{position:absolute;inset:0;display:grid;place-items:center;font:clamp(22px,3vw,40px) var(--mono);color:var(--line);user-select:none}
-.album-card:hover .card-cover{transform:translateY(-4px);border-color:var(--muted)}
-.album-card:focus-visible .card-cover{outline:2px solid var(--mint);outline-offset:4px}
-button:focus-visible,a:focus-visible,input:focus-visible,[role="slider"]:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
-
-/* Selected album: lifted, framed, the others dimmed */
-.album-list.has-active .album-card:not(.is-active) .card-cover{filter:saturate(.5) brightness(.6)}
-.album-list.has-active .album-card:not(.is-active):hover .card-cover{filter:none}
-.album-card.is-active .card-cover{transform:translateY(-14px);border-color:var(--mint);box-shadow:10px 10px 0 rgba(126,200,164,.25)}
-/* Micro-animation, replayed on every selection: a springy pop plus one scanline sweep */
-.album-card.is-popping .card-cover{animation:card-pop .55s cubic-bezier(.2,.9,.3,1.2)}
-@keyframes card-pop{0%{transform:translateY(0) scale(.97)}55%{transform:translateY(-20px) scale(1.02)}100%{transform:translateY(-14px) scale(1)}}
-.card-cover::after{content:'';position:absolute;left:0;right:0;top:-30%;height:30%;background:linear-gradient(180deg,transparent,rgba(126,200,164,.35),transparent);pointer-events:none}
-.album-card.is-popping .card-cover::after{animation:card-scan .7s steps(12) forwards}
-@keyframes card-scan{to{top:100%}}
-
-/* Corner tag + equalizer */
-.card-tag{position:absolute;left:10px;top:10px;padding:5px 9px;background:var(--mint);color:var(--bg);font:12px var(--mono);letter-spacing:.14em;text-transform:uppercase;opacity:0;transform:translateY(-6px);transition:opacity .2s,transform .25s cubic-bezier(.2,.9,.3,1.3)}
-.card-tag::before{content:'▶ SELECTED'}
-.album-card.is-playing .card-tag::before{content:'♪ NOW PLAYING'}
-.album-card.is-active .card-tag,.album-card.is-playing .card-tag{opacity:1;transform:none}
-.album-card.is-playing:not(.is-active) .card-tag{background:var(--panel);color:var(--mint);border:1px solid var(--mint)}
-.card-eq{position:absolute;right:10px;bottom:10px;display:flex;gap:3px;align-items:flex-end;height:26px;padding:5px;background:rgba(7,8,10,.8);opacity:0;transition:opacity .2s}
-.card-eq i{display:block;width:4px;height:30%;background:var(--mint)}
-body.audio-playing .album-card.is-playing .card-eq{opacity:1}
-body.audio-playing .album-card.is-playing .card-eq i{animation:eq .8s steps(4) infinite alternate}
-.card-eq i:nth-child(2){animation-delay:-.3s!important}
-.card-eq i:nth-child(3){animation-delay:-.55s!important}
-.card-eq i:nth-child(4){animation-delay:-.15s!important}
-@keyframes eq{from{height:20%}to{height:100%}}
-
-/* Caption */
-.card-caption{display:grid;gap:4px;min-width:0;transition:transform .35s cubic-bezier(.2,.9,.3,1.25)}
-.album-card.is-active .card-caption{transform:translateY(-8px)}
-.album-card-num{font:12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.album-card.is-active .album-card-num{color:var(--mint)}
-.album-card-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:15px var(--mono);color:var(--ink)}
-.album-card.is-active .album-card-title{color:var(--mint);font-size:18px}
-.album-card-sub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:12px var(--mono);color:var(--muted);letter-spacing:.04em}
-
-/* Loading state */
-.album-card.is-loading{cursor:default;pointer-events:none}
-.album-card.is-loading .card-ph{color:var(--line)}
-.album-card.is-loading .card-ph::after{content:' █';animation:blink .9s step-end infinite;color:var(--mint);font-size:.6em}
-.album-card.is-loading .album-card-title{color:var(--muted);font-size:13px;letter-spacing:.14em}
-@media(min-width:861px){.album-list.is-scanning .album-card{width:var(--rest)}.album-list.is-scanning .album-card.is-lead{width:var(--sel)}}
-.album-card.is-lead .card-ph::after{content:none}
-.rail-status{position:absolute;left:0;right:0;bottom:18%;padding:0 8%;color:var(--mint);font:clamp(13px,1.3vw,17px)/1.5 var(--mono);letter-spacing:.08em;text-align:center}
-.rail-status:empty{display:none}
-.album-card.is-loading .album-card-title::after{content:' █';animation:blink .9s step-end infinite;color:var(--mint)}
-@keyframes blink{50%{opacity:0}}
-
-/* ══ Detail strip: info · compact tracklist ══ */
-.detail{flex:0 0 auto;display:grid;grid-template-columns:minmax(260px,32%) minmax(0,1fr);gap:28px;align-items:stretch;padding:16px 32px 18px;border-top:1px solid var(--line);background:rgba(13,14,16,.88)}
-.detail.has-cover{grid-template-columns:auto minmax(240px,30%) minmax(0,1fr)}
-.detail-cover{width:150px;height:150px;align-self:center;object-fit:cover;border:1px solid var(--mint);background:var(--dim);animation:card-pop .55s cubic-bezier(.2,.9,.3,1.2) both}
-.feature-meta{min-width:0;display:flex;flex-direction:column;justify-content:center}
-.feature-index{font:12px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
-.feature-title{margin:0 0 4px;font:400 clamp(20px,2vw,30px)/1.1 var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.feature-title a{color:inherit;transition:color .1s}
-.feature-title a:hover{color:var(--mint)}
-.feature-artist{margin:0;font:14px var(--mono);color:var(--muted);letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.feature-tags{margin-top:6px;display:flex;gap:10px;align-items:center;min-width:0}
-.feature-genre{color:#a8a094;font:12px var(--mono);letter-spacing:.08em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.feature-year{flex-shrink:0;color:var(--muted);font:12px var(--mono)}
-.feature-actions{margin-top:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.feat-action-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--line);background:transparent;color:var(--muted);font:12px var(--mono);letter-spacing:.12em;text-transform:uppercase;transition:border-color .1s,color .1s,background .1s;white-space:nowrap}
-.feat-action-btn:hover:not(:disabled){border-color:var(--mint);color:var(--mint)}
-.feat-action-btn:disabled{opacity:.35;cursor:default}
-.feat-play-btn{border-color:var(--mint);color:var(--mint)}
-.feat-play-btn:hover:not(:disabled),.feat-play-btn.is-playing{background:var(--mint);color:var(--bg)!important}
-.feat-save-btn.is-saved{border-color:var(--mint);background:var(--mint);color:var(--bg)}
-
-/* Tracklist — the strip version flows in columns of four and scrolls sideways */
-.tracklist{min-width:0;display:flex;flex-direction:column;border:1px solid var(--line);background:var(--panel);overflow:hidden}
-.tracklist-head{flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line)}
-.tracklist-label{font:12px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-.tracklist-label::before{content:'[ ';color:var(--mint)}
-.tracklist-label::after{content:' ]';color:var(--mint)}
-.tracklist-count{font:12px var(--mono);color:var(--muted);letter-spacing:.1em}
-.tracklist-body{flex:1;min-height:0;display:grid;grid-auto-flow:column;grid-template-rows:repeat(4,auto);grid-auto-columns:minmax(230px,1fr);align-content:start;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
-.tracklist-body::-webkit-scrollbar{height:6px}
-.tracklist-body::-webkit-scrollbar,.np-panel-body::-webkit-scrollbar{width:6px}
-.tracklist-body::-webkit-scrollbar-thumb,.np-panel-body::-webkit-scrollbar-thumb{background:var(--line)}
-.track-row{display:grid;grid-template-columns:52px 1fr auto;gap:0;padding:11px 28px;border-bottom:1px solid rgba(255,255,255,.03);cursor:pointer;transition:background .08s}
-.tracklist-body .track-row{grid-template-columns:40px 1fr auto;padding:7px 14px;border-bottom:0;border-right:1px solid rgba(255,255,255,.04)}
-/* Like one track: the heart stays faint until the row is hovered or the track is liked */
-.track-like{align-self:center;margin-left:8px;padding:2px 6px;border:0;background:none;color:var(--muted);font:15px var(--mono);line-height:1;opacity:.4;cursor:pointer;transition:opacity .1s,color .1s}
-.track-row:hover .track-like,.track-like:focus-visible{opacity:1}
-.track-like:hover{color:var(--mint)}
-.track-like.is-liked{color:var(--mint);opacity:1}
-.track-row:hover{background:var(--hi)}
-.track-row.is-active{background:rgba(126,200,164,.08);color:var(--mint)}
-.track-num{font:13px var(--mono);color:var(--muted);letter-spacing:.08em;align-self:center}
-.tracklist-body .track-num{font-size:12px}
-.track-row.is-active .track-num{color:var(--mint)}
-.track-row.is-active .track-num::before{content:'▶ ';animation:blink .7s step-end infinite}
-body:not(.audio-playing) .track-row.is-active .track-num::before{content:'‖ ';animation:none}
-.track-name{font:15px var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;align-self:center;letter-spacing:.03em}
-.tracklist-body .track-name{font-size:13px}
-.tracklist-empty{padding:14px;font:13px var(--mono);color:var(--muted);letter-spacing:.08em;margin:0}
-
-/* ══ Spectrum ══ */
-.spectrum{flex:0 0 8px;height:8px;background:linear-gradient(90deg,#7a6438,#8a7e50,#426654,#384869,#5e4560,#604838,#7a6438);mask-image:repeating-linear-gradient(90deg,#000 0 12px,transparent 12px 16px)}
-
-/* ══════════════════════════════════════
-   NOW PLAYING — persistent bar + tracklist widget
-══════════════════════════════════════ */
-.np-bar{position:fixed;left:0;right:0;bottom:0;z-index:400;height:var(--bar-h);display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto auto;align-items:center;gap:20px;padding:6px 24px 0;background:var(--panel);border-top:1px solid var(--line);box-shadow:0 -6px 0 rgba(0,0,0,.35)}
-.np-seek{position:absolute;left:0;right:0;top:-1px;height:8px;background:var(--dim);cursor:pointer;touch-action:none}
-.np-seek:hover{height:10px;top:-3px}
-.np-seek-fill{display:block;height:100%;width:0;background:repeating-linear-gradient(90deg,var(--mint) 0px,var(--mint) 5px,transparent 5px,transparent 7px)}
-.np-cover{width:62px;height:62px;padding:0;border:1px solid var(--line);background:var(--dim);display:grid;place-items:center;overflow:hidden;color:var(--line);font:24px var(--mono)}
-.np-cover img{display:block;width:100%;height:100%;object-fit:cover}
-.np-cover:hover{border-color:var(--mint)}
-.np-info{min-width:0;display:grid;gap:4px}
-.np-eyebrow{font:12px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--mint)}
-.np-track{font:16px var(--mono);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.np-album{font:13px var(--mono);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:0;background:none;padding:0;text-align:left}
-.np-album:hover{color:var(--mint)}
-.np-controls{display:flex;align-items:center;gap:8px}
-.np-ctl{width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--line);background:transparent;color:var(--muted);font:14px var(--mono);transition:border-color .1s,color .1s,background .1s}
-.np-ctl:hover:not(:disabled){border-color:var(--mint);color:var(--mint)}
-.np-ctl:disabled{opacity:.25;cursor:default}
-.np-play{width:54px;height:54px;font:20px var(--mono);color:var(--mint);border-color:var(--mint)}
-.np-play:hover:not(:disabled){background:var(--mint);color:var(--bg)}
-/* Play/pause is the logo's record: it spins while music plays and freezes where it stopped on pause */
-.np-disc{display:block;width:70%;height:70%;background:currentColor;-webkit-mask:url(./assets/logo.svg) center/contain no-repeat;mask:url(./assets/logo.svg) center/contain no-repeat;animation:disc-spin 1.8s linear infinite;animation-play-state:paused}
-body.audio-playing .np-disc{animation-play-state:running}
-@keyframes disc-spin{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){.np-disc{animation:none}}
-.np-time{font:13px var(--mono);color:var(--muted);white-space:nowrap;min-width:110px;text-align:right}
-.vol-ctrl{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.vol-icon{font:14px var(--mono);color:var(--muted);white-space:nowrap;min-width:40px;letter-spacing:-.02em}
-.vol-slider{width:96px;height:8px;background:var(--dim);border:1px solid var(--line);outline:none;cursor:pointer}
-.vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:18px;background:var(--mint);cursor:pointer;border:none}
-.vol-slider::-moz-range-thumb{width:10px;height:18px;background:var(--mint);cursor:pointer;border:none;border-radius:0}
-.np-actions{display:flex;align-items:center;gap:8px}
-.np-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 14px;border:1px solid var(--line);background:transparent;color:var(--muted);font:13px var(--mono);letter-spacing:.12em;text-transform:uppercase;transition:border-color .1s,color .1s,background .1s;white-space:nowrap}
-.np-btn:hover,.np-btn[aria-expanded="true"],.np-btn.is-active{border-color:var(--mint);color:var(--mint)}
-
-.np-panel{position:fixed;right:24px;bottom:calc(var(--bar-h) + 14px);z-index:401;width:min(460px,calc(100vw - 32px));max-height:min(62vh,600px);display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--mint);box-shadow:8px 8px 0 rgba(0,0,0,.6)}
-.np-panel-head{flex:0 0 auto;display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
-.np-panel-cover{width:72px;height:72px;object-fit:cover;display:block;border:1px solid var(--line);background:var(--dim)}
-.np-panel-meta{min-width:0;display:grid;gap:4px}
-.np-panel-title{margin:0;font:18px/1.2 var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.np-panel-sub{font:13px var(--mono);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.np-panel-close{align-self:start;border:1px solid transparent;background:none;color:var(--muted);font:16px var(--mono);padding:6px 9px}
-.np-panel-close:hover{border-color:var(--line);color:var(--ink)}
-.np-panel-body{flex:1;min-height:0;overflow-y:auto}
-.np-panel-body .track-row{padding-left:18px;padding-right:18px}
-
-/* ══════════════════════════════════════
-   Overlay views — Saved / About
-══════════════════════════════════════ */
-.saved-view,.about-view,.recent-view,.app-view{position:fixed;inset:0;bottom:var(--np-offset);z-index:200;background:rgba(7,8,10,.96);overflow-y:auto;padding:56px 64px}
-.eyebrow{margin:0 0 12px;color:var(--mint);font:12px var(--mono);letter-spacing:.2em;text-transform:uppercase}
-.saved-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;padding-bottom:24px;border-bottom:1px solid var(--line);margin-bottom:28px}
-.saved-heading h1{margin:0;font:400 clamp(40px,6vw,72px)/.98 var(--mono);letter-spacing:-.01em}
-.saved-note{max-width:400px;margin:0;color:var(--muted);font:15px var(--mono);line-height:1.6;letter-spacing:.04em}
-.saved-list{padding-bottom:40px}
-.saved-row{display:grid;grid-template-columns:72px minmax(0,1fr) auto;align-items:center;gap:18px;padding:14px 0;border-bottom:1px solid var(--line)}
-.saved-row.is-playing{background:rgba(126,200,164,.06);box-shadow:inset 3px 0 0 var(--mint)}
-.saved-row.is-playing .saved-title{color:var(--mint)}
-.row-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
-.row-play{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid var(--mint);background:transparent;color:var(--mint);font:13px var(--mono);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;transition:background .1s,color .1s}
-.row-play:hover:not(:disabled),.row-play.is-playing{background:var(--mint);color:var(--bg)}
-.row-play:disabled{opacity:.5;cursor:wait}
-.row-btn{display:inline-flex;align-items:center;padding:10px 12px;border:1px solid var(--line);background:transparent;color:var(--muted);font:12px var(--mono);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;transition:border-color .1s,color .1s}
-.row-btn:hover{border-color:var(--mint);color:var(--mint)}
-button.saved-link{border:0;background:none;padding:0;color:inherit;text-align:left;cursor:pointer}
-button.saved-link:hover .saved-title{color:var(--mint)}
-.recent-when{color:var(--muted);font:12px var(--mono);letter-spacing:.06em;white-space:nowrap}
-.recent-track{display:flex;gap:10px;align-items:baseline;min-width:0}
-.recent-track .saved-title{min-width:0}
-.recent-num{flex-shrink:0;color:var(--muted);font:13px var(--mono)}
-.saved-row.is-playing .recent-num{color:var(--mint)}
-.saved-cover{display:grid;width:72px;height:72px;place-items:center;overflow:hidden;border:1px solid var(--line);background:var(--dim);color:var(--muted);font:26px var(--mono)}
-.saved-cover img{display:block;width:100%;height:100%;object-fit:cover}
-.saved-cover.is-empty::after{content:"◫"}
-.saved-link{display:grid;gap:5px;min-width:0}
-.saved-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:18px var(--mono)}
-.saved-meta{color:var(--muted);font:13px var(--mono);letter-spacing:.04em}
-.remove-save,.export-saves{border:0;background:none;color:var(--muted);font:12px var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:8px 12px;border:1px solid transparent;transition:border-color .1s,color .1s}
-.remove-save:hover{border-color:var(--line);color:var(--ink)}
-.export-saves:hover{color:var(--mint)}
-.saved-empty{padding:24px 0;color:var(--muted);font:15px var(--mono);letter-spacing:.08em}
-.saved-actions{display:flex;justify-content:space-between;align-items:center;padding:16px 0 22px;border-top:1px solid var(--line)}
-.back-home{border:1px solid var(--line);background:none;padding:11px 18px;color:var(--ink);font:13px var(--mono);letter-spacing:.12em;text-transform:uppercase;transition:border-color .1s,color .1s}
-.back-home:hover{border-color:var(--mint);color:var(--mint)}
-.about-view{display:flex}
-.about-inner{max-width:680px;margin:auto}
-.about-inner h1{margin:0 0 26px;font:400 clamp(44px,7vw,80px)/.98 var(--mono)}
-.about-inner>p:not(.eyebrow){max-width:640px;color:#aaa6a0;font:16px/1.7 var(--mono);letter-spacing:.04em}
-.about-inner .about-note{color:var(--muted)}
-.about-inner .about-note a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
-.about-inner .about-note a:hover{color:var(--mint)}
-.about-back{margin-top:26px;border:1px solid var(--line);background:none;padding:11px 18px;color:var(--ink);font:13px var(--mono);letter-spacing:.12em;text-transform:uppercase;transition:border-color .1s,color .1s}
-.about-back:hover{border-color:var(--mint);color:var(--mint)}
-.about-follow{display:inline-flex;align-items:center;gap:10px;margin-top:4px;border:1px solid var(--line);padding:11px 18px;color:var(--ink);font:13px var(--mono);letter-spacing:.12em;transition:border-color .1s,color .1s}
-.about-follow:hover{border-color:var(--mint);color:var(--mint)}
-.about-follow:focus-visible{outline:1px solid var(--mint);outline-offset:3px}
-/* Get the app */
-.app-inner{max-width:1080px;margin:0 auto}
-.app-inner h1{margin:0 0 18px;font:400 clamp(44px,7vw,80px)/.98 var(--mono)}
-.app-lead{max-width:640px;margin:0 0 30px;color:#aaa6a0;font:16px/1.7 var(--mono);letter-spacing:.04em}
-.app-here{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;padding:22px 24px;border:1px solid var(--mint);margin-bottom:34px}
-.app-here-text{flex:1 1 280px;margin:0;color:var(--ink);font:15px/1.6 var(--mono);letter-spacing:.04em}
-.app-here-text strong{color:var(--mint);font-weight:400}
-.app-here-text kbd,.app-card kbd{padding:1px 6px;border:1px solid var(--line);color:var(--ink);font:inherit;font-size:13px}
-.app-install{border:1px solid var(--mint);background:var(--mint);color:var(--bg);padding:14px 22px;font:14px var(--mono);letter-spacing:.14em;text-transform:uppercase;transition:opacity .1s}
-.app-install:hover{opacity:.85}
-.app-install[hidden]{display:none}
-.app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
-.app-card{display:flex;flex-direction:column;gap:12px;padding:20px;border:1px solid var(--line)}
-.app-card.is-here{border-color:var(--mint)}
-.app-card h2{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0;font:400 20px var(--mono);letter-spacing:.06em}
-.app-card h2 span{display:none;color:var(--mint);font-size:11px;letter-spacing:.18em;white-space:nowrap}
-.app-card.is-here h2 span{display:inline}
-.app-card ol{margin:0;padding-left:20px;color:#aaa6a0;font:14px/1.65 var(--mono);letter-spacing:.03em}
-.app-card li+li{margin-top:6px}
-.app-card p{margin:0;color:var(--muted);font:13px/1.6 var(--mono);letter-spacing:.03em}
-.app-url{color:var(--mint);word-break:break-all}
-.np-cast[hidden]{display:none}
-
-/* ══ Tooltip ══ */
-.material-tip{position:fixed;z-index:500;width:min(380px,calc(100vw - 24px));padding:16px 18px;background:var(--panel);border:1px solid var(--line);box-shadow:5px 5px 0 rgba(0,0,0,.6);pointer-events:none;font:14px/1.5 var(--mono)}
-.tip-eyebrow{margin:0 0 8px;color:var(--mint);font:12px var(--mono);letter-spacing:.18em;text-transform:uppercase}
-.tip-title{margin:0 0 4px;color:var(--ink);font:18px/1.15 var(--mono)}
-.tip-artist{margin:0 0 10px;color:var(--muted);font:13px var(--mono);letter-spacing:.04em}
-.tip-description{margin:0 0 10px;color:#aaa6a0;font:13px/1.5 var(--mono)}
-.tip-row{display:grid;grid-template-columns:100px 1fr;gap:8px;border-top:1px solid var(--line);padding-top:7px;margin-top:7px}
-.tip-key{color:var(--muted);font:12px var(--mono);letter-spacing:.1em;text-transform:uppercase}
-.tip-value{color:#ccc8c0;font:13px var(--mono);overflow-wrap:anywhere}
-
-/* ══ Share toast ══ */
-.share-toast{position:fixed;bottom:calc(var(--np-offset) + 24px);left:50%;transform:translateX(-50%) translateY(8px);padding:12px 22px;background:var(--panel);border:1px solid var(--mint);color:var(--mint);font:13px var(--mono);letter-spacing:.12em;text-transform:uppercase;opacity:0;transition:opacity .15s,transform .15s;pointer-events:none;z-index:9999}
-.share-toast.is-visible{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ══ Responsive ══ */
-@media(max-width:1100px){
-  .np-time{display:none}
-  .vol-slider{width:72px}
-}
-@media(max-width:860px){
-  .brand-copy{display:none}
-  .stage-toolbar{padding:10px 18px;flex-wrap:wrap}
-  /* Narrow screens: equal-size covers in a swipeable carousel */
-  .album-list{padding:26px 18px 12px;--card-min:34vw}
-  .album-list .album-card,.album-list.has-active .album-card,.album-list.has-active .album-card.is-active{width:min(var(--card-min),calc(100cqh - var(--caption)))}
-  .detail,.detail.has-cover{grid-template-columns:1fr;gap:12px;padding:14px 18px}
-  .detail-cover{display:none}
-  .vol-ctrl{display:none}
-  .np-bar{gap:14px;padding:6px 16px 0}
-}
-@media(max-width:640px){
-  :root{--bar-h:80px}
-  .topbar{padding:0 16px;height:60px}
-  .brand-logo{height:34px}
-  .brand-copy{display:none}
-  .hdr-btn{padding:8px 8px;font-size:11px;letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
-  /* Five buttons do not fit beside the logo on a phone: they scroll sideways instead of wrapping over it */
-  .brand{flex-shrink:0}
-  .header-actions{gap:6px;min-width:0;margin-left:12px;overflow-x:auto;scrollbar-width:none}
-  .header-actions::-webkit-scrollbar{display:none}
-  .np-actions{gap:4px}
-  .np-btn{padding:10px 9px}
-  /* On phones the stage scrolls: a tall cover rail, then the details */
-  .stage{overflow-y:auto}
-  /* The rail is only as tall as a card needs (width + caption + padding), capped at 54vh, so ▶ PLAY ALBUM shows without scrolling */
-  .album-list{flex:0 0 min(54vh,calc(var(--card-min) + var(--caption) + 34px));--card-min:62vw;--caption:70px;padding:24px 16px 10px}
-  .list-footer{flex-basis:100%}
-  .status{text-align:left}
-  .tracklist-body{grid-auto-columns:minmax(200px,80%)}
-  .saved-view,.about-view,.recent-view,.app-view{padding:28px 18px}
-  .app-here{padding:18px}
-  .app-install{width:100%}
-  .saved-row{grid-template-columns:56px minmax(0,1fr);gap:12px}
-  .saved-row .row-actions{grid-column:1 / -1;justify-content:flex-start}
-  .saved-cover{width:56px;height:56px}
-  .recent-when{display:none}
-  .np-bar{grid-template-columns:auto minmax(0,1fr) auto auto;gap:10px;padding:6px 12px 0}
-  .np-cover{width:52px;height:52px}
-  .np-eyebrow{display:none}
-  .np-track{font-size:14px}
-  .np-prev{display:none}
-  .np-play{width:46px;height:46px}
-  .np-btn-label{display:none}
-  .np-close{display:none}
-  .np-panel{right:16px;left:16px;width:auto}
-}
-/* Four header buttons on a narrow phone */
-@media(max-width:480px){.header-actions{gap:4px}.hdr-btn{padding:7px 6px;font-size:11px;letter-spacing:0}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
-</style>
+<script>(function(){var t;try{t=localStorage.getItem('deep-cut-theme');}catch(_){}if(t!=='light'&&t!=='dark')t=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.dataset.theme=t;})();</script>
+<link rel="preload" href="./assets/fonts/inter-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="./assets/app.css?v=10">
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
-<body>
+<body data-view="home">
 
-<div class="bg-blur" id="bgBlur"></div>
-<canvas class="bg-pixels" id="bgPixels" aria-hidden="true"></canvas>
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.6v14.8a1 1 0 0 0 1.52.85l12-7.4a1 1 0 0 0 0-1.7l-12-7.4A1 1 0 0 0 7 4.6z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4.2" height="16" rx="1.2" fill="currentColor" stroke="none"/><rect x="13.8" y="4" width="4.2" height="16" rx="1.2" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><path d="M19 5.2v13.6a.8.8 0 0 1-1.25.66L8 12.66a.8.8 0 0 1 0-1.32l9.75-6.8A.8.8 0 0 1 19 5.2z" fill="currentColor" stroke="none"/><path d="M5 5v14"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M5 5.2v13.6a.8.8 0 0 0 1.25.66L16 12.66a.8.8 0 0 0 0-1.32L6.25 4.54A.8.8 0 0 0 5 5.2z" fill="currentColor" stroke="none"/><path d="M19 5v14"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4.2L5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1 7.8 7.7 7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.6 8.4-2 5.2-5.2 2 2-5.2z"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.8v.2"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V4"/><path d="m8 8 4-4 4 4"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></symbol>
+  <symbol id="i-tv" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="m20 4-9 9"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></symbol>
+</svg>
 
-<div class="app-shell">
+<!-- ══ SIDEBAR (desktop) / top bar, era chips and tab bar (mobile) ══ -->
+<aside class="side" aria-label="Navigation">
+  <a class="brand" href="#home" id="brandHome" aria-label="The Deep Cut, home">
+    <img class="brand-logo" src="./assets/logo.svg" alt="" width="28" height="28">
+    <span class="brand-name">THE DEEP CUT</span>
+  </a>
 
-  <!-- ══ HEADER ══ -->
-  <header class="topbar">
-    <a class="brand" href="#home" id="brandHome" aria-label="THE DEEP CUT — home">
-      <img class="brand-logo" src="./assets/logo.svg" alt="THE DEEP CUT">
-      <span class="brand-copy"><strong>THE DEEP CUT</strong><span>Internet Archive · Music</span></span>
-    </a>
-    <div class="mini-game"><canvas id="gameCanvas" tabindex="0" aria-label="Snake mini game: click it, then use the arrow keys to eat the squares."></canvas></div>
-    <nav class="header-actions" aria-label="Site navigation">
-      <button class="hdr-btn" id="appToggle" type="button" aria-label="Get the app" aria-pressed="false">[ APP ]</button>
-      <button class="hdr-btn" id="aboutToggle" type="button" aria-pressed="false">[ ABOUT ]</button>
-      <button class="hdr-btn" id="recentToggle" type="button" aria-label="Open recently played tracks" aria-pressed="false">[ RECENT ]</button>
-      <button class="hdr-btn" id="likedToggle" type="button" aria-label="Open liked tracks" aria-pressed="false">
-        [ TRACKS <span id="likedCount" class="hdr-saved-count">00</span> ]
-      </button>
-      <button class="hdr-btn" id="savedToggle" type="button" aria-label="Open saved albums" aria-pressed="false">
-        [ SAVED <span id="savedCount" class="hdr-saved-count">00</span> ]
-      </button>
-    </nav>
-  </header>
+  <div class="side-eras">
+    <p class="side-label" id="erasLabel">Browse by era</p>
+    <div class="decade-filter" id="decadeFilter" role="group" aria-labelledby="erasLabel">
+      <button class="decade-btn is-active" type="button" data-decade="">All</button>
+      <button class="decade-btn" type="button" data-decade="1960">60s</button>
+      <button class="decade-btn" type="button" data-decade="1970">70s</button>
+      <button class="decade-btn" type="button" data-decade="1980">80s</button>
+      <button class="decade-btn" type="button" data-decade="1990">90s</button>
+      <button class="decade-btn" type="button" data-decade="2000">00s</button>
+      <button class="decade-btn" type="button" data-decade="2010" data-range="2010–2024">10s+</button>
+      <button class="decade-btn" type="button" data-decade="2025" data-range="2025–2026">25–26</button>
+    </div>
+  </div>
 
-  <!-- ══ STAGE: toolbar / cover rail / detail strip ══ -->
-  <div class="stage">
+  <nav class="side-nav" aria-label="Sections">
+    <button class="nav-item" id="homeToggle" type="button" aria-pressed="true">
+      <svg class="ic"><use href="#i-compass"/></svg><span class="nav-text">Discover</span>
+    </button>
+    <button class="nav-item refresh-btn" id="refresh" type="button" data-state="idle" title="Draw five new albums for every era">
+      <span class="sm-ic" aria-hidden="true">
+        <svg class="ic sm-search"><use href="#i-search"/></svg>
+        <span class="sm-dots"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i></span>
+        <svg class="ic sm-check" viewBox="0 0 24 24"><path pathLength="1" d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+      </span><span class="nav-text">Search more</span>
+    </button>
+    <p class="side-label">Library</p>
+    <button class="nav-item" id="savedToggle" type="button" aria-label="Saved albums" aria-pressed="false">
+      <svg class="ic"><use href="#i-bookmark"/></svg><span class="nav-text">Saved</span><span class="nav-count" id="savedCount" hidden>0</span>
+    </button>
+    <button class="nav-item" id="likedToggle" type="button" aria-label="Liked tracks" aria-pressed="false">
+      <svg class="ic"><use href="#i-heart"/></svg><span class="nav-text">Liked</span><span class="nav-count" id="likedCount" hidden>0</span>
+    </button>
+    <button class="nav-item" id="recentToggle" type="button" aria-label="Recently played tracks" aria-pressed="false">
+      <svg class="ic"><use href="#i-clock"/></svg><span class="nav-text">Recent</span>
+    </button>
+  </nav>
 
-    <div class="stage-toolbar">
-      <div class="list-top">
-        <div class="decade-filter" id="decadeFilter" role="group" aria-label="Filter by decade">
-          <button class="decade-btn is-active" type="button" data-decade="">ALL</button>
-          <button class="decade-btn" type="button" data-decade="1960">60s</button>
-          <button class="decade-btn" type="button" data-decade="1970">70s</button>
-          <button class="decade-btn" type="button" data-decade="1980">80s</button>
-          <button class="decade-btn" type="button" data-decade="1990">90s</button>
-          <button class="decade-btn" type="button" data-decade="2000">00s</button>
-          <button class="decade-btn" type="button" data-decade="2010" data-range="2010–2024">10s+</button>
-          <button class="decade-btn is-new" type="button" data-decade="2025" data-range="2025–2026">25–26<span class="decade-new">NEW</span></button>
+  <div class="side-foot">
+    <button class="nav-item" id="appToggle" type="button" aria-label="Get the app" aria-pressed="false">
+      <svg class="ic"><use href="#i-download"/></svg><span class="nav-text">Get the app</span>
+    </button>
+    <button class="nav-item" id="aboutToggle" type="button" aria-label="About" aria-pressed="false">
+      <svg class="ic"><use href="#i-info"/></svg><span class="nav-text">About</span>
+    </button>
+    <button class="nav-item theme-toggle" id="themeToggle" type="button" aria-label="Switch to light theme">
+      <span class="theme-ic"><svg class="ic ic-sun"><use href="#i-sun"/></svg><svg class="ic ic-moon"><use href="#i-moon"/></svg></span><span class="nav-text" id="themeLabel">Light theme</span>
+    </button>
+  </div>
+</aside>
+
+<!-- ══ HOME ══ -->
+<main class="main" id="home">
+  <h1 class="sr-only">The Deep Cut: five random albums from the Internet Archive</h1>
+
+  <!-- Selected album -->
+  <section class="hero" id="detail" aria-label="Selected album">
+    <div class="hero-bg" aria-hidden="true"><canvas class="hero-bg-img" id="bgBlur" width="112" height="112"></canvas><canvas class="hero-bg-img" id="bgBlurB" width="112" height="112"></canvas></div>
+    <div class="featured-band" id="featuredBand" hidden>
+      <span class="featured-band-label">Shared with you</span>
+      <a class="featured-band-link" id="featuredLink" href="#" target="_blank" rel="noopener noreferrer"></a>
+      <button class="featured-band-dismiss" id="featuredDismiss" type="button" aria-label="Dismiss"><svg class="ic"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="hero-inner">
+      <div class="hero-cover" id="heroCover">
+        <img class="detail-cover" id="detailCover" src="" alt="" hidden>
+      </div>
+      <div class="hero-meta">
+        <p class="hero-index" id="featureIndex"></p>
+        <h2 class="hero-title" id="featureTitle">
+          <a id="featureTitleLink" href="#" target="_blank" rel="noopener noreferrer" title="Open on archive.org"></a>
+        </h2>
+        <p class="hero-artist" id="featureArtist"></p>
+        <p class="hero-tags"><span id="featureGenre"></span><span id="featureYear"></span></p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="featPlayBtn" type="button" disabled>
+            <svg class="ic ic-play"><use href="#i-play"/></svg><svg class="ic ic-pause"><use href="#i-pause"/></svg><span class="btn-label">Play album</span>
+          </button>
+          <button class="btn" id="featSaveBtn" type="button" aria-label="Save album" aria-pressed="false">
+            <svg class="ic"><use href="#i-bookmark"/></svg><span class="btn-label">Save</span>
+          </button>
+          <button class="btn btn-icon" id="featShareBtn" type="button" aria-label="Copy a link to this album" title="Copy a link to this album">
+            <svg class="ic"><use href="#i-share"/></svg>
+          </button>
         </div>
-      </div>
-      <div class="featured-band" id="featuredBand" hidden>
-        <span class="featured-band-label">↗ SHARED</span>
-        <a class="featured-band-link" id="featuredLink" href="#" target="_blank" rel="noopener noreferrer"></a>
-        <button class="featured-band-dismiss" id="featuredDismiss" type="button">✕</button>
-      </div>
-      <div class="list-footer" id="listFooter">
-        <p class="status" id="status" role="status" aria-live="polite" hidden></p>
-        <button class="refresh-btn" id="refresh" type="button">
-          <span class="refresh-ico">↻</span> SEARCH MORE
-        </button>
-      </div>
-      <div class="refresh-progress" id="refreshProgress" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden>
-        <span class="refresh-progress-fill" id="refreshProgressFill"></span>
       </div>
     </div>
+  </section>
 
-    <!-- Six covers, side by side -->
-    <div class="album-list" id="albumList" aria-label="Six random albums" role="list"></div>
-
-    <!-- Selected album: info + compact tracklist -->
-    <section class="detail" id="detail" aria-label="Selected album">
-      <img class="detail-cover" id="detailCover" src="" alt="" hidden>
-      <div class="feature-meta">
-        <p class="feature-index" id="featureIndex">— / ALBUM</p>
-        <h2 class="feature-title" id="featureTitle">
-          <a id="featureTitleLink" href="#" target="_blank" rel="noopener noreferrer"></a>
-        </h2>
-        <p class="feature-artist" id="featureArtist"></p>
-        <div class="feature-tags">
-          <span class="feature-genre" id="featureGenre"></span>
-          <span class="feature-year" id="featureYear"></span>
-        </div>
-        <div class="feature-actions">
-          <button class="feat-action-btn feat-play-btn" id="featPlayBtn" type="button" disabled>▶ PLAY ALBUM</button>
-          <button class="feat-action-btn feat-save-btn" id="featSaveBtn" type="button" aria-label="Save album" aria-pressed="false">♡ SAVE</button>
-        </div>
+  <!-- The five albums of this draw -->
+  <section class="draw" aria-labelledby="drawLabel">
+    <header class="section-head">
+      <h2 class="section-title" id="drawLabel">This draw</h2>
+      <div class="list-footer" id="listFooter">
+        <p class="status" id="status" role="status" aria-live="polite" hidden></p>
       </div>
-      <div class="tracklist" id="tracklist">
-        <div class="tracklist-head">
-          <span class="tracklist-label">TRACKLIST</span>
-          <span class="tracklist-count" id="tracklistCount">—</span>
-        </div>
-        <div class="tracklist-body" id="tracklistBody">
-          <p class="tracklist-empty">Select an album to see tracks.</p>
-        </div>
+      <div class="draw-actions">
+        <button class="btn-round" id="drawPrev" type="button" aria-label="Previous album"><svg class="ic"><use href="#i-left"/></svg></button>
+        <button class="btn-round" id="drawNext" type="button" aria-label="Next album"><svg class="ic"><use href="#i-right"/></svg></button>
+      </div>
+    </header>
+    <div class="refresh-progress" id="refreshProgress" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden>
+      <span class="refresh-progress-fill" id="refreshProgressFill"></span>
+    </div>
+    <div class="album-list" id="albumList" aria-label="Five random albums" role="list"></div>
+  </section>
+
+  <div class="lists">
+    <section class="tracklist" id="tracklist" aria-labelledby="tracklistLabel">
+      <header class="section-head">
+        <h2 class="section-title" id="tracklistLabel">Tracklist</h2>
+        <span class="section-note" id="tracklistCount"></span>
+      </header>
+      <div class="tracklist-body" id="tracklistBody">
+        <p class="tracklist-empty">Pick an album to see its tracks.</p>
       </div>
     </section>
+  </div>
+</main>
 
-  </div><!-- /stage -->
-
-  <div class="spectrum" aria-hidden="true"></div>
-</div><!-- /app-shell -->
-
-<!-- Saved overlay -->
-<div class="saved-view" id="savedView" hidden>
-  <section class="saved-heading">
-    <div><p class="eyebrow">// PERSONAL RECORD SHELF</p><h1>Saved albums.</h1></div>
-    <p class="saved-note">Your saved finds stay in this browser for 14 days.</p>
-  </section>
-  <div class="saved-list" id="savedList"></div>
-  <div class="saved-actions">
-    <button class="back-home" id="backHome" type="button">← BACK TO THE ARCHIVE</button>
-    <button class="export-saves" id="exportSaves" type="button" title="Downloads your saved albums as a .json file">↓ DOWNLOAD LIST</button>
+<!-- Saved albums -->
+<div class="view saved-view" id="savedView" hidden>
+  <div class="view-inner">
+    <header class="view-head">
+      <h1>Saved albums</h1>
+      <p class="view-note">Kept in this browser for 14 days.</p>
+    </header>
+    <div class="saved-list" id="savedList"></div>
+    <div class="view-actions">
+      <button class="btn btn-small" id="backHome" type="button"><svg class="ic"><use href="#i-left"/></svg><span class="btn-label">Back to Discover</span></button>
+      <button class="btn btn-small" id="exportSaves" type="button" title="Downloads your saved albums as a .json file"><svg class="ic"><use href="#i-download"/></svg><span class="btn-label">Download list</span></button>
+    </div>
   </div>
 </div>
 
-<!-- Recently played overlay: individual tracks, not whole albums -->
-<div class="recent-view" id="recentView" hidden>
-  <section class="saved-heading">
-    <div><p class="eyebrow">// LISTENING HISTORY</p><h1>Recently played.</h1></div>
-    <p class="saved-note">The last 50 tracks you played, newest first. Kept only in this browser.</p>
-  </section>
-  <div class="saved-list" id="recentList"></div>
-  <div class="saved-actions">
-    <button class="back-home" id="recentBack" type="button">← BACK TO THE ARCHIVE</button>
-    <button class="export-saves" id="clearRecent" type="button">✕ CLEAR HISTORY</button>
+<!-- Recently played: individual tracks, not whole albums -->
+<div class="view recent-view" id="recentView" hidden>
+  <div class="view-inner">
+    <header class="view-head">
+      <h1>Recently played</h1>
+      <p class="view-note">The last 50 tracks you played, newest first. Kept only in this browser.</p>
+    </header>
+    <div class="saved-list" id="recentList"></div>
+    <div class="view-actions">
+      <button class="btn btn-small" id="recentBack" type="button"><svg class="ic"><use href="#i-left"/></svg><span class="btn-label">Back to Discover</span></button>
+      <button class="btn btn-small" id="clearRecent" type="button"><svg class="ic"><use href="#i-x"/></svg><span class="btn-label">Clear history</span></button>
+    </div>
   </div>
 </div>
 
-<!-- Liked tracks overlay: single songs, kept until removed -->
-<div class="recent-view" id="likedView" hidden>
-  <section class="saved-heading">
-    <div><p class="eyebrow">// FAVOURITE SONGS</p><h1>Liked tracks.</h1></div>
-    <p class="saved-note">Every track you gave a ♥, newest first. Kept only in this browser.</p>
-  </section>
-  <div class="saved-list" id="likedList"></div>
-  <div class="saved-actions">
-    <button class="back-home" id="likedBack" type="button">← BACK TO THE ARCHIVE</button>
+<!-- Liked tracks: single songs, kept until removed -->
+<div class="view recent-view" id="likedView" hidden>
+  <div class="view-inner">
+    <header class="view-head">
+      <h1>Liked tracks</h1>
+      <p class="view-note">Every track you liked, newest first. Kept only in this browser.</p>
+    </header>
+    <div class="saved-list" id="likedList"></div>
+    <div class="view-actions">
+      <button class="btn btn-small" id="likedBack" type="button"><svg class="ic"><use href="#i-left"/></svg><span class="btn-label">Back to Discover</span></button>
+    </div>
   </div>
 </div>
 
-<!-- About overlay -->
-<div class="about-view" id="aboutView" hidden>
-  <div class="about-inner">
-    <p class="eyebrow">// THE PROJECT</p>
-    <h1>About the archive.</h1>
-    <p>The Deep Cut is a small window into the Internet Archive's music collection. Each Search More brings six albums at random, each in a different style, leaving room for unexpected discoveries beyond recommendation feeds.</p>
+<!-- About -->
+<div class="view about-view" id="aboutView" hidden>
+  <div class="view-inner prose">
+    <header class="view-head"><h1>About the archive</h1></header>
+    <p>The Deep Cut is a small window into the Internet Archive's music collection. Each search brings five albums at random, each in a different style, leaving room for unexpected discoveries beyond recommendation feeds.</p>
     <p>Albums come from across the archive's music collections: Jamendo, Netlabels, the Free Music Archive, Unlocked Recordings, digitized LPs, open source releases, hip-hop mixtapes, and Brazilian, Latin American and Colombian campesino music. Classical recordings are left out.</p>
     <p>Every pick is random. Each search samples a different slice of the archive and shuffles it, so nothing is ranked by plays or by what you listened to before. The one exception is hip-hop mixtapes, which need at least 1,000 downloads to keep out anonymous DJ compilations.</p>
     <p>Each album is checked before it reaches you: at least four tracks, an original cover, and no podcasts, radio or lectures. Releases from 2025 on also leave out albums that say they were made with AI tools such as Suno or Udio. Artist, year and region appear only when the record states them.</p>
     <p class="about-note">Your saved albums, liked tracks and listening history are kept in this browser, with no account. Visits are counted with Vercel Web Analytics, which sets no cookies.</p>
     <p class="about-note">The code is open source under the MIT License: <a href="https://github.com/mizerrrr/the-deep-cut" target="_blank" rel="noopener">github.com/mizerrrr/the-deep-cut</a>.</p>
     <p class="about-note">Contact: <a href="mailto:ethedeepcut@gmail.com">ethedeepcut@gmail.com</a>.</p>
-    <a class="about-follow" href="https://www.instagram.com/ethedeepcut/" target="_blank" rel="noopener" aria-label="Follow The Deep Cut on Instagram, @ethedeepcut">
-      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.3" fill="currentColor"/></svg>
-      FOLLOW @ETHEDEEPCUT
+    <a class="btn btn-small about-follow" href="https://www.instagram.com/ethedeepcut/" target="_blank" rel="noopener" aria-label="Follow The Deep Cut on Instagram, @ethedeepcut">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg>
+      <span class="btn-label">Follow @ethedeepcut</span>
     </a>
-    <p class="about-note">Guides:<a href="/about">how The Deep Cut works (FAQ)</a> · <a href="/guides/how-to-find-new-music">how to find new music without algorithms</a> · <a href="/guides/free-legal-music-internet-archive">free, legal music on the Internet Archive</a> · <a href="/guides/what-is-a-netlabel">what is a netlabel?</a> · <a href="/guias/como-descobrir-musica-nova" hreflang="pt-BR">como descobrir música nova (pt-BR)</a></p>
-    <button class="about-back" id="aboutBack" type="button">← BACK TO THE ARCHIVE</button>
+    <p class="about-note">Guides: <a href="/about">how The Deep Cut works (FAQ)</a>, <a href="/guides/how-to-find-new-music">how to find new music without algorithms</a>, <a href="/guides/free-legal-music-internet-archive">free, legal music on the Internet Archive</a>, <a href="/guides/what-is-a-netlabel">what is a netlabel?</a>, <a href="/guias/como-descobrir-musica-nova" hreflang="pt-BR">como descobrir música nova (pt-BR)</a></p>
+    <div class="view-actions">
+      <button class="btn btn-small" id="aboutBack" type="button"><svg class="ic"><use href="#i-left"/></svg><span class="btn-label">Back to Discover</span></button>
+    </div>
   </div>
 </div>
 
 <!-- Get the app: install on this device, or play on a TV -->
-<div class="app-view" id="appView" hidden>
-  <div class="app-inner">
-    <p class="eyebrow">// TAKE IT WITH YOU</p>
-    <h1>Get the app.</h1>
+<div class="view app-view" id="appView" hidden>
+  <div class="view-inner">
+    <header class="view-head"><h1>Get the app</h1></header>
     <p class="app-lead">Install The Deep Cut on your phone or computer. It opens full screen from its own icon and shows the track and cover on your lock screen and media keys. Free, no store, no account. Updates arrive on their own.</p>
     <div class="app-here">
       <p class="app-here-text" id="appHereText"></p>
-      <button class="app-install" id="appInstall" type="button" hidden>↓ INSTALL APP</button>
+      <button class="btn btn-primary btn-small app-install" id="appInstall" type="button" hidden><svg class="ic"><use href="#i-download"/></svg><span class="btn-label">Install app</span></button>
     </div>
     <div class="app-grid">
       <section class="app-card" data-platform="ios">
-        <h2>iPhone · iPad <span>THIS DEVICE</span></h2>
+        <h2>iPhone and iPad <span>This device</span></h2>
         <ol>
           <li>Open <span class="app-url">thedeepcut.vercel.app</span> in Safari.</li>
           <li>Tap Share <kbd>⬆</kbd> (bottom of the screen on iPhone, top on iPad).</li>
@@ -658,62 +279,63 @@ button.saved-link:hover .saved-title{color:var(--mint)}
         <p>Apple does not let websites install themselves, so these taps are needed once.</p>
       </section>
       <section class="app-card" data-platform="android">
-        <h2>Android <span>THIS DEVICE</span></h2>
+        <h2>Android <span>This device</span></h2>
         <ol>
           <li>Open the site in Chrome.</li>
-          <li>Tap <kbd>↓ INSTALL APP</kbd> above, or menu <kbd>⋮</kbd> → <kbd>Install app</kbd>.</li>
+          <li>Tap <kbd>Install app</kbd> above, or menu <kbd>⋮</kbd> → <kbd>Install app</kbd>.</li>
         </ol>
         <p>Samsung Internet and Edge work too: look for “Install” or “Add to home screen”.</p>
       </section>
       <section class="app-card" data-platform="desktop">
-        <h2>Computer <span>THIS DEVICE</span></h2>
+        <h2>Computer <span>This device</span></h2>
         <ol>
           <li>Windows, Mac or Linux: open the site in Chrome or Edge.</li>
-          <li>Click <kbd>↓ INSTALL APP</kbd> above, or the install icon at the right of the address bar.</li>
+          <li>Click <kbd>Install app</kbd> above, or the install icon at the right of the address bar.</li>
           <li>Mac with Safari: <kbd>File</kbd> → <kbd>Add to Dock</kbd>.</li>
         </ol>
         <p>Firefox cannot install sites as apps: use Chrome, Edge or Safari for this step.</p>
       </section>
       <section class="app-card" data-platform="tv" id="appTvCard">
-        <h2>TV <span>THIS DEVICE</span></h2>
-        <button class="app-install" id="appCast" type="button">▭ PLAY ON TV</button>
+        <h2>TV <span>This device</span></h2>
+        <button class="btn btn-small app-install" id="appCast" type="button"><svg class="ic"><use href="#i-tv"/></svg><span class="btn-label">Play on TV</span></button>
         <ol>
-          <li>Chromecast or Google TV: on Android, tap <kbd>▭ PLAY ON TV</kbd> here or <kbd>▭ TV</kbd> in the player.</li>
-          <li>Apple TV or AirPlay speaker: on iPhone or Mac, tap <kbd>▭ TV</kbd> in the player, or pick AirPlay in Control Center.</li>
+          <li>Chromecast or Google TV: on Android, tap <kbd>Play on TV</kbd> here or the TV button in the player.</li>
+          <li>Apple TV or AirPlay speaker: on iPhone or Mac, tap the TV button in the player, or pick AirPlay in Control Center.</li>
           <li>From a computer: Chrome menu <kbd>⋮</kbd> → <kbd>Cast…</kbd> → choose your TV. This mirrors the whole page.</li>
           <li>Smart TV with a browser (Samsung, LG, Android TV, Fire TV): open <span class="app-url">thedeepcut.vercel.app</span> on the TV itself and browse with the remote: arrows move, OK selects, Back returns, play/pause and skip keys control the music.</li>
         </ol>
         <p>Sending from a phone plays only the music on the TV; the page stays on the phone, which works as the remote.</p>
       </section>
     </div>
-    <button class="about-back" id="appBack" type="button">← BACK TO THE ARCHIVE</button>
+    <div class="view-actions">
+      <button class="btn btn-small" id="appBack" type="button"><svg class="ic"><use href="#i-left"/></svg><span class="btn-label">Back to Discover</span></button>
+    </div>
   </div>
 </div>
 
 <!-- Now playing: persists while browsing, refreshing the selection and reloading the page -->
 <div class="np-bar" id="npBar" role="region" aria-label="Now playing" hidden>
-  <div class="np-seek" id="npSeek" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="np-seek-fill" id="npSeekFill"></span></div>
-  <button class="np-cover" id="npCover" type="button" aria-label="Show tracklist">◫</button>
+  <button class="np-cover" id="npCover" type="button" aria-label="Show tracklist"></button>
   <div class="np-info">
-    <span class="np-eyebrow">♪ NOW PLAYING</span>
     <span class="np-track" id="npTrack"></span>
     <button class="np-album" id="npAlbum" type="button" title="Go to this album"></button>
   </div>
   <div class="np-controls">
-    <button class="np-ctl np-prev" id="npPrev" type="button" aria-label="Previous track">|◀</button>
-    <button class="np-ctl np-play" id="npPlay" type="button" aria-label="Play"><span class="np-disc" aria-hidden="true"></span></button>
-    <button class="np-ctl np-next" id="npNext" type="button" aria-label="Next track">▶|</button>
+    <button class="np-ctl np-prev" id="npPrev" type="button" aria-label="Previous track"><svg class="ic"><use href="#i-prev"/></svg></button>
+    <button class="np-ctl np-play" id="npPlay" type="button" aria-label="Play"><svg class="ic ic-play"><use href="#i-play"/></svg><svg class="ic ic-pause"><use href="#i-pause"/></svg></button>
+    <button class="np-ctl np-next" id="npNext" type="button" aria-label="Next track"><svg class="ic"><use href="#i-next"/></svg></button>
   </div>
+  <div class="np-seek" id="npSeek" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="np-seek-fill" id="npSeekFill"></span></div>
   <span class="np-time" id="npTime">0:00</span>
   <div class="vol-ctrl">
-    <span class="vol-icon" id="volIcon">▒)))</span>
+    <span class="vol-icon" id="volIcon" data-level="2"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path class="vol-wave-1" d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path class="vol-wave-2" d="M18.2 6.6a7.8 7.8 0 0 1 0 10.8"/></svg></span>
     <input type="range" class="vol-slider" id="volSlider" min="0" max="100" step="5" value="100" aria-label="Volume">
   </div>
   <div class="np-actions">
-    <button class="np-btn np-like" id="npLike" type="button" aria-pressed="false" aria-label="Like this track" title="Like this track">♡<span class="np-btn-label"> LIKE</span></button>
-    <button class="np-btn np-cast" id="npCast" type="button" aria-label="Play on TV or speaker" title="Play on TV or speaker">▭<span class="np-btn-label"> TV</span></button>
-    <button class="np-btn" id="npListToggle" type="button" aria-expanded="false" aria-controls="npPanel">≡<span class="np-btn-label"> TRACKLIST</span></button>
-    <button class="np-btn np-close" id="npClose" type="button" aria-label="Stop and close player">✕</button>
+    <button class="np-btn np-like" id="npLike" type="button" aria-pressed="false" aria-label="Like this track" title="Like this track"><svg class="ic"><use href="#i-heart"/></svg></button>
+    <button class="np-btn np-cast" id="npCast" type="button" aria-label="Play on TV or speaker" title="Play on TV or speaker"><svg class="ic"><use href="#i-tv"/></svg></button>
+    <button class="np-btn" id="npListToggle" type="button" aria-label="Tracklist of what is playing" title="Tracklist" aria-expanded="false" aria-controls="npPanel"><svg class="ic"><use href="#i-list"/></svg></button>
+    <button class="np-btn np-close" id="npClose" type="button" aria-label="Stop and close player" title="Stop and close player"><svg class="ic"><use href="#i-x"/></svg></button>
   </div>
 </div>
 
@@ -721,11 +343,11 @@ button.saved-link:hover .saved-title{color:var(--mint)}
   <div class="np-panel-head">
     <img class="np-panel-cover" id="npPanelCover" src="" alt="">
     <div class="np-panel-meta">
-      <span class="np-eyebrow">♪ NOW PLAYING</span>
+      <span class="np-eyebrow">Now playing</span>
       <h2 class="np-panel-title" id="npPanelTitle"></h2>
       <span class="np-panel-sub" id="npPanelSub"></span>
     </div>
-    <button class="np-panel-close" id="npPanelClose" type="button" aria-label="Close tracklist">✕</button>
+    <button class="btn-round np-panel-close" id="npPanelClose" type="button" aria-label="Close tracklist"><svg class="ic"><use href="#i-x"/></svg></button>
   </div>
   <div class="np-panel-body" id="npPanelBody"></div>
 </div>
@@ -742,12 +364,22 @@ try{['deep-cuts-platform-links-v2','deep-cuts-youtube-music-link-v1'].forEach(k=
 const CURRENT_KEY='deep-cuts-last-selection-v4';
 const SAVED_TTL=14*24*60*60*1000,CURRENT_TTL=7*24*60*60*1000;
 
-const currentAlbums=Array(6).fill(null);
+const DRAW=5; // albums per draw
+const currentAlbums=Array(DRAW).fill(null);
 const NOW_KEY='deep-cuts-now-playing-v1',VOLUME_KEY='deep-cuts-volume-v1';
 const previewAudio=new Audio();previewAudio.preload='metadata';
 let busy=false,edition=0,activeIndex=0,activeDecade=null,tipTimer=0,progressHideTimer=0;
-let viewedItem=null,previewPlaying=false,previewItem=null,tipVisibleFor=null,pendingSeek=0,lastPersist=0;
+let viewedItem=null,previewPlaying=false,previewItem=null,tipVisibleFor=null,tipX=0,tipY=0,pendingSeek=0,lastPersist=0;
 const $=id=>document.getElementById(id);
+const SVG_NS='http://www.w3.org/2000/svg';
+function svgIcon(name,cls){
+  const svg=document.createElementNS(SVG_NS,'svg'),use=document.createElementNS(SVG_NS,'use');
+  svg.setAttribute('class','ic'+(cls?' '+cls:''));svg.setAttribute('aria-hidden','true');use.setAttribute('href','#i-'+name);
+  svg.appendChild(use);return svg;
+}
+/* Three bars that dance while audio plays (CSS drives them from body.audio-playing) */
+function eqBars(){const eq=document.createElement('span');eq.className='eq';eq.setAttribute('aria-hidden','true');for(let i=0;i<3;i++)eq.appendChild(document.createElement('i'));return eq;}
+function setCount(id,n){const el=$(id);el.textContent=String(n);el.hidden=!n;}
 
 /* ── Utilities ── */
 function fmtTime(s){if(!isFinite(s)||s<0)return '—';const m=Math.floor(s/60),ss=String(Math.floor(s%60)).padStart(2,'0');return m+':'+ss;}
@@ -769,28 +401,42 @@ function getSaved(){
     if(kept.length!==v.length)localStorage.setItem(SAVED_KEY,JSON.stringify(kept));return kept.map(dedupeTracks);
   }catch(_){return [];}
 }
-function updateSavedCount(){$('savedCount').textContent=String(getSaved().length).padStart(2,'0');}
+function updateSavedCount(){setCount('savedCount',getSaved().length);}
 
-/* ── Background ── */
-function setBlur(url){if(!url)return;$('bgBlur').style.backgroundImage='url('+JSON.stringify(url)+')';}
-
-/* ── Pixel ambient ──
-   The selected album's tile is shrunk to 32×32 and its colours bucketed; the
-   most common vivid buckets become a 4-colour palette. A low-res canvas (one
-   cell = PIX_CELL css px, scaled up with image-rendering:pixelated) draws a
-   slow sine plasma, Bayer-dithered into that palette at ~8 fps so it moves in
-   stepped, retro frames. Colours ease into a new palette when the album changes.
+/* ── Hero backdrop and tint ──
+   The selected album's cover fills the hero as a dim mosaic: its centre is drawn,
+   zoomed in, onto a 112px canvas that CSS scales up with hard pixels and a light
+   blur. Two layers crossfade when the album changes. The tile is also shrunk to 32×32 and its
+   most common vivid colour becomes --tint, which washes the hero.
    Pixels are read from the cover blob the site already cached (works without
    the server); /api/thumb is the fallback, since archive.org tiles send no CORS header. */
-// PIX_SPEED slows the plasma's drift, PIX_DIM darkens the palette, PIX_GAPS is how many empty bands sit below the colours
-const PIX_CELL=12,PIX_FPS=8,PIX_FADE=2400,PIX_SPEED=.3,PIX_DIM=.6,PIX_GAPS=4;
-const PIX_DEFAULT=[[126,200,164],[200,168,64],[122,176,208],[200,72,72]]; // --mint --amber --blue --red
-const BAYER4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v=>v/16-.5);
-const pixState={from:PIX_DEFAULT,to:PIX_DEFAULT,fadeStart:0,id:'',raf:0,last:0,t:0,cols:0,rows:0,img:null};
-const pixReduced=matchMedia('(prefers-reduced-motion: reduce)');
-const paletteCache=new Map();
-
-function extractPalette(img){
+const BACKDROP_ZOOM=1.7;
+let blurFront=false,blurUrl='',tintId='';
+function setBlur(url){
+  if(!url||url===blurUrl)return;blurUrl=url;
+  const a=$('bgBlur'),b=$('bgBlurB'),next=blurFront?b:a,prev=blurFront?a:b;blurFront=!blurFront;
+  const img=new Image();
+  img.onload=()=>{
+    if(url!==blurUrl)return; // a newer cover was asked for while this one loaded
+    const w=img.naturalWidth,h=img.naturalHeight,side=Math.min(w,h)/BACKDROP_ZOOM;
+    const ctx=next.getContext('2d');ctx.imageSmoothingQuality='high';
+    ctx.clearRect(0,0,next.width,next.height);
+    ctx.drawImage(img,(w-side)/2,(h-side)/2,side,side,0,0,next.width,next.height);
+    next.classList.add('is-on');prev.classList.remove('is-on');
+  };
+  img.src=url;
+}
+/* The hero backdrop follows the selected album (the playing one only when nothing is selected yet) */
+function updateBackdrop(){
+  const it=viewedItem||previewItem;if(!it)return;
+  const known=coverUrls.get(it.identifier);
+  if(known){setBlur(known);return;}
+  // The 180px tile is too small to show at this size: swap in the full cover as soon as it arrives
+  setBlur(thumbUrl(it.identifier));
+  resolveCover(it).then(url=>{const now=viewedItem||previewItem;if(url&&now&&now.identifier===it.identifier)setBlur(url);});
+}
+const tintCache=new Map();
+function extractTint(img){
   const c=document.createElement('canvas');c.width=c.height=32;
   const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,32,32);
   const data=ctx.getImageData(0,0,32,32).data,buckets=new Map();
@@ -799,87 +445,41 @@ function extractPalette(img){
     const r=data[i],g=data[i+1],b=data[i+2],key=(r>>5)<<6|(g>>5)<<3|(b>>5);
     const bk=buckets.get(key)||{n:0,r:0,g:0,b:0};bk.n++;bk.r+=r;bk.g+=g;bk.b+=b;buckets.set(key,bk);
   }
-  // Weight by frequency, favour saturated mid-tones so near-black/white borders don't dominate
-  const ranked=[...buckets.values()].map(bk=>{
+  // Weight by frequency, favour saturated mid-tones so near-black/white borders don't win
+  let best=null,bestScore=0;
+  buckets.forEach(bk=>{
     const rgb=[bk.r/bk.n,bk.g/bk.n,bk.b/bk.n],mx=Math.max(...rgb),mn=Math.min(...rgb),l=(mx+mn)/510;
-    const s=mx===mn?0:(mx-mn)/(255-Math.abs(mx+mn-255));
-    return {rgb,score:bk.n*(.25+s)*(l<.08||l>.94?.2:1)};
-  }).sort((a,b)=>b.score-a.score);
-  const picked=[];
-  for(const c of ranked){
-    if(picked.every(p=>Math.hypot(p[0]-c.rgb[0],p[1]-c.rgb[1],p[2]-c.rgb[2])>56))picked.push(c.rgb);
-    if(picked.length===4)break;
-  }
-  if(!picked.length)return PIX_DEFAULT;
-  // Monochrome covers: pad with lighter/darker shades of what was found
-  for(let k=0;picked.length<4;k++){const base=picked[k%picked.length],f=k%2?.55:1.5;picked.push(base.map(v=>Math.min(255,v*f+(f>1?24:0))));}
-  // Lift very dark colours so the pattern stays visible on the near-black page
-  return picked.map(rgb=>{const mx=Math.max(...rgb);return mx<90?rgb.map(v=>v*(90/Math.max(mx,1))+12):rgb;});
+    const s=mx===mn?0:(mx-mn)/(255-Math.abs(mx+mn-255)),score=bk.n*(.25+s)*(l<.08||l>.94?.2:1);
+    if(score>bestScore){bestScore=score;best=rgb;}
+  });
+  return best?best.map(Math.round):null;
 }
-function paletteFrom(src){
+function tintFrom(src){
   return new Promise(resolve=>{
     if(!src){resolve(null);return;}
     const img=new Image();
-    img.onload=()=>{try{resolve(extractPalette(img));}catch(_){resolve(null);}}; // a tainted canvas throws: try the next source
+    img.onload=()=>{try{resolve(extractTint(img));}catch(_){resolve(null);}}; // a tainted canvas throws: try the next source
     img.onerror=()=>resolve(null);
     img.src=src;
   });
 }
-async function loadPalette(item){
+async function loadTint(item){
   const id=item.identifier;
-  if(paletteCache.has(id))return paletteCache.get(id);
-  let p=await paletteFrom(coverUrls.get(id));
-  if(!p&&/^https?:$/.test(location.protocol))p=await paletteFrom('/api/thumb?id='+encodeURIComponent(id));
-  if(!p&&item.imageUrl)p=await paletteFrom(await resolveCover(item));
-  if(p)paletteCache.set(id,p);
-  return p;
-}
-function currentPixPalette(now){
-  const k=Math.min(1,(now-pixState.fadeStart)/PIX_FADE),e=k*k*(3-2*k);
-  return pixState.to.map((c,i)=>c.map((v,j)=>pixState.from[i][j]+(v-pixState.from[i][j])*e));
+  if(tintCache.has(id))return tintCache.get(id);
+  let t=await tintFrom(coverUrls.get(id));
+  if(!t&&/^https?:$/.test(location.protocol))t=await tintFrom('/api/thumb?id='+encodeURIComponent(id));
+  if(!t&&item.imageUrl)t=await tintFrom(await resolveCover(item));
+  if(t)tintCache.set(id,t);
+  return t;
 }
 async function setAmbient(item){
   const identifier=item&&item.identifier;
-  if(!identifier||identifier===pixState.id)return;
-  pixState.id=identifier;
-  const palette=await loadPalette(item);
-  if(pixState.id!==identifier||!palette)return; // another album was picked meanwhile, or no readable cover
-  const now=performance.now(),cv=$('bgPixels');
-  // The first album starts directly in its own colours (the canvas is still fading in)
-  pixState.from=cv.classList.contains('is-on')?currentPixPalette(now):palette;pixState.to=palette;pixState.fadeStart=now;
-  cv.classList.add('is-on');
-  startPixels();
+  if(!identifier||identifier===tintId)return;
+  tintId=identifier;
+  const tint=await loadTint(item);
+  if(tintId!==identifier||!tint)return; // another album was picked meanwhile, or no readable cover
+  document.documentElement.style.setProperty('--tint',tint.join(' '));
 }
-function resizePixels(){
-  const cv=$('bgPixels'),cols=Math.ceil(innerWidth/PIX_CELL),rows=Math.ceil(innerHeight/PIX_CELL);
-  if(cols===pixState.cols&&rows===pixState.rows)return;
-  cv.width=pixState.cols=cols;cv.height=pixState.rows=rows;
-  pixState.img=cv.getContext('2d').createImageData(cols,rows);
-}
-function drawPixels(now){
-  resizePixels();
-  const {cols,rows,img}=pixState,px=img.data,pal=currentPixPalette(now),t=pixState.t,n=pal.length;
-  const cx=cols*(.5+.3*Math.sin(t*.13)),cy=rows*(.5+.3*Math.cos(t*.17));
-  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
-    let v=Math.sin(x*.07+t*.5)+Math.sin(y*.09-t*.4)+Math.sin((x+y)*.05+t*.3)+Math.sin(Math.hypot(x-cx,y-cy)*.11-t*.6);
-    v=(v+4)/8; // 0..1
-    // n colour bands plus PIX_GAPS empty ones, so the pattern stays sparse instead of filling the screen
-    const level=Math.floor(v*(n+PIX_GAPS)+BAYER4[(y&3)*4+(x&3)]*.9)-PIX_GAPS,o=(y*cols+x)*4;
-    if(level<0){px[o+3]=0;continue;}
-    const c=pal[Math.min(n-1,level)];px[o]=c[0]*PIX_DIM;px[o+1]=c[1]*PIX_DIM;px[o+2]=c[2]*PIX_DIM;px[o+3]=255;
-  }
-  $('bgPixels').getContext('2d').putImageData(img,0,0);
-}
-function pixelFrame(now){
-  pixState.raf=0;
-  if(document.hidden)return;
-  if(now-pixState.last>=1000/PIX_FPS){pixState.t+=PIX_SPEED/PIX_FPS;pixState.last=now;drawPixels(now);}
-  // Reduced motion: hold a still frame once the palette fade is done
-  if(!pixReduced.matches||now-pixState.fadeStart<PIX_FADE)pixState.raf=requestAnimationFrame(pixelFrame);
-}
-function startPixels(){if(!pixState.raf&&pixState.id)pixState.raf=requestAnimationFrame(pixelFrame);}
-document.addEventListener('visibilitychange',startPixels);
-addEventListener('resize',()=>{if(pixReduced.matches&&pixState.id)drawPixels(performance.now());});
 
 /* ── Covers ──
    Original cover files on archive.org/download often take 2–30 s and are not
@@ -991,7 +591,7 @@ function setSmallCover(img,identifier,fallback,onFail){
 /* ── Volume ── */
 function updateVolIcon(vol){
   const icon=$('volIcon');if(!icon)return;
-  icon.textContent=vol<=0?'▒x':vol<0.35?'▒)':vol<0.7?'▒))':'▒)))';
+  icon.dataset.level=vol<=0?'0':vol<0.5?'1':'2';
 }
 
 /* ── Tracklist ── */
@@ -1005,16 +605,19 @@ function fillTrackRows(body,item){
   item.tracks.forEach((track,idx)=>{
     const row=document.createElement('div');
     row.className='track-row';row.dataset.trackIdx=String(idx);row.dataset.likeKey=likeKey(item.identifier,track.url);
-    const num=document.createElement('span');num.className='track-num';num.textContent=String(idx+1).padStart(2,'0');
+    row.tabIndex=0;
+    const num=document.createElement('span');num.className='track-num';
+    const n=document.createElement('span');n.className='track-n';n.textContent=String(idx+1).padStart(2,'0');
+    num.append(n,svgIcon('play'),eqBars());
     const name=document.createElement('span');name.className='track-name';name.textContent=trackDisplayName(track.name);
-    const like=document.createElement('button');like.type='button';like.className='track-like';
+    const like=document.createElement('button');like.type='button';like.className='track-like';like.appendChild(svgIcon('heart'));
     row.append(num,name,like);body.appendChild(row);
   });
   syncLikes();
 }
 function renderTracklist(item){
   fillTrackRows($('tracklistBody'),item);
-  $('tracklistCount').textContent=item&&item.tracks&&item.tracks.length?item.tracks.length+' track'+(item.tracks.length!==1?'s':''):'—';
+  $('tracklistCount').textContent=item&&item.tracks&&item.tracks.length?item.tracks.length+' track'+(item.tracks.length!==1?'s':''):'';
   syncActiveTrack();
 }
 function renderNowPlayingPanel(){
@@ -1026,7 +629,7 @@ function renderNowPlayingPanel(){
   $('npPanelSub').textContent=[item.creator,item.year,item.isSingle?'Single track from Recent':n+' track'+(n!==1?'s':'')].filter(Boolean).join(' · ');
   const npCover=$('npCover');npCover.replaceChildren();
   const npImg=document.createElement('img');npImg.alt='';npCover.appendChild(npImg);
-  setSmallCover(npImg,item.identifier,item.imageUrl,()=>{npImg.remove();npCover.textContent='◫';});
+  setSmallCover(npImg,item.identifier,item.imageUrl,()=>npImg.remove());
   syncActiveTrack();
 }
 function syncActiveTrack(){
@@ -1049,6 +652,7 @@ function syncPlayerUI(){
   const item=previewItem;
   document.body.classList.toggle('has-player',!!item);
   document.body.classList.toggle('audio-playing',!!item&&previewPlaying);
+  updateBackdrop();
   $('npBar').hidden=!item;
   if(!item)$('npPanel').hidden=true;
   const tidx=item&&typeof item.trackIndex==='number'?item.trackIndex:0;
@@ -1056,13 +660,13 @@ function syncPlayerUI(){
   $('npPlay').setAttribute('aria-label',previewPlaying?'Pause':'Play');
   syncProgressUI();
   if(item){
-    const total=tracks?tracks.length:0,name=tracks&&tracks[tidx]?trackDisplayName(tracks[tidx].name):item.title;
-    $('npTrack').textContent=total>1?String(tidx+1).padStart(2,'0')+'/'+String(total).padStart(2,'0')+'  '+name:name;
+    const name=tracks&&tracks[tidx]?trackDisplayName(tracks[tidx].name):item.title;
+    $('npTrack').textContent=name;
     $('npAlbum').textContent=item.title+(item.creator?' — '+item.creator:'');
   }
   syncLikes();
   $('npPrev').disabled=!item;
-  // On the last track, Next moves on to the next album of the six (radio)
+  // On the last track, Next moves on to the next album of the five (radio)
   const lastTrack=!tracks||tidx>=tracks.length-1;
   $('npNext').disabled=lastTrack&&!(item&&!item.isSingle&&currentAlbums.some(a=>sameAlbum(a,item)));
   $('npNext').setAttribute('aria-label',lastTrack?'Next album':'Next track');
@@ -1070,7 +674,7 @@ function syncPlayerUI(){
   if(viewed){
     const isThis=sameAlbum(viewed,item);
     btn.disabled=!viewed.previewUrl;
-    btn.textContent=isThis?(previewPlaying?'‖ PAUSE':'▶ RESUME'):'▶ PLAY ALBUM';
+    btn.querySelector('.btn-label').textContent=isThis?(previewPlaying?'Pause':'Resume'):'Play album';
     btn.classList.toggle('is-playing',isThis&&previewPlaying);
   }
   document.querySelectorAll('.album-card').forEach(row=>{
@@ -1085,7 +689,8 @@ function syncFeatureSave(item){
   const saved=getSaved().some(e=>e.identifier===item.identifier);
   $('featSaveBtn').classList.toggle('is-saved',saved);
   $('featSaveBtn').setAttribute('aria-pressed',String(saved));
-  $('featSaveBtn').textContent=saved?'♥ SAVED':'♡ SAVE';
+  $('featSaveBtn').querySelector('.btn-label').textContent=saved?'Saved':'Save';
+  $('featSaveBtn').setAttribute('aria-label',saved?'Remove from saved albums':'Save album');
 }
 function showFeatured(index){
   const item=currentAlbums[index];if(!item)return;
@@ -1101,32 +706,34 @@ function showFeaturedItem(item,index){
     const on=i===index;card.classList.toggle('is-active',on);card.setAttribute('aria-current',String(on));
     if(!on)card.classList.remove('is-popping');else if(changed)popCard(card);
   });
-  setBlur(thumbUrl(item.identifier)); // blurred to 80px anyway: the small tile is plenty
+  updateBackdrop();
   setAmbient(item);
-  // The rail already shows the cover; the strip only needs one for albums opened from Saved/Recent
-  const cover=$('detailCover'),showCover=index<0&&!!item.imageUrl;
-  cover.hidden=!showCover;$('detail').classList.toggle('has-cover',showCover);
-  if(showCover){
-    cover.alt=item.title+' album cover';
-    cover.onerror=()=>{cover.hidden=true;$('detail').classList.remove('has-cover');};
-    cover.src=coverUrls.get(item.identifier)||thumbUrl(item.identifier);
-    resolveCover(item).then(url=>{if(url&&viewedItem===item)cover.src=url;});
-  }
-  $('featureIndex').textContent=index>=0?String(index+1).padStart(2,'0')+' / ALBUM':'LIBRARY / ALBUM';
+  // The hero shows the selected cover: the small tile at once, the full cover when it arrives
+  const cover=$('detailCover'),hero=$('detail'),known=coverUrls.get(item.identifier);
+  if(changed){hero.classList.remove('is-swapping');void hero.offsetWidth;hero.classList.add('is-swapping');}
+  hero.classList.add('has-cover');cover.hidden=false;cover.alt=item.title+' album cover';
+  cover.onerror=()=>{cover.hidden=true;hero.classList.remove('has-cover');};
+  if(known||cover.dataset.for!==item.identifier)cover.src=known||thumbUrl(item.identifier);
+  cover.dataset.for=item.identifier;
+  if(!known)resolveCover(item).then(url=>{if(url&&viewedItem===item)cover.src=url;});
+  const total=currentAlbums.filter(Boolean).length;
+  $('featureIndex').textContent=index>=0?String(index+1).padStart(2,'0')+' / '+String(total).padStart(2,'0'):'From your library';
   const tl=$('featureTitleLink');tl.textContent=item.title;tl.href=archiveUrl(item);
   $('featureArtist').textContent=item.creator||'Artist not listed';
   $('featureGenre').textContent=item.genre||'Archive album';
-  $('featureYear').textContent=item.year?'· '+item.year:'';
+  $('featureYear').textContent=item.year||'';
   $('featPlayBtn').disabled=!item.previewUrl;
   syncPlayerUI();syncFeatureSave(item);renderTracklist(item);
 }
 
 /* ── Rendering ── */
-function makePhEl(loading){const el=document.createElement('div');el.className='card-ph';el.textContent=loading?'░▒▓':'◫';return el;}
+function makePhEl(loading){const el=document.createElement('div');el.className='card-ph';return el;}
 /* Restarts the selection micro-animation even when the same card is picked again */
 function popCard(card){
   card.classList.remove('is-popping');void card.offsetWidth;card.classList.add('is-popping');
-  card.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});
+  // Sideways only (the rail scrolls on small screens): scrollIntoView would also drag the page down on load
+  const list=$('albumList');
+  if(list.scrollWidth>list.clientWidth)list.scrollTo({left:card.offsetLeft-(list.clientWidth-card.offsetWidth)/2,behavior:'smooth'});
 }
 /* Three stages, each with its own micro-animation:
    is-waiting  → pixel shimmer while nothing has arrived
@@ -1179,14 +786,15 @@ function renderListRow(item,index,loading,total){
   for(let i=0;i<4;i++)eq.appendChild(document.createElement('i'));
   cover.append(tag,eq);
   const caption=document.createElement('div');caption.className='card-caption';
-  const num=document.createElement('span');num.className='album-card-num';num.textContent=String(index+1).padStart(2,'0')+(loading?'':' / '+String(total||6).padStart(2,'0'));
-  const title=document.createElement('span');title.className='album-card-title';title.textContent=loading?'SCANNING':item.title;
-  const sub=document.createElement('span');sub.className='album-card-sub';sub.textContent=loading?'':([item&&item.creator,item&&item.year].filter(Boolean).join(' · ')||'Internet Archive');
+  const num=document.createElement('span');num.className='album-card-num';num.textContent=String(index+1).padStart(2,'0')+(loading?'':' / '+String(total||DRAW).padStart(2,'0'));
+  const title=document.createElement('span');title.className='album-card-title';title.textContent=loading?'':item.title;
+  const sub=document.createElement('span');sub.className='album-card-sub';sub.textContent=loading?'':([item&&item.creator,item&&item.year].filter(Boolean).join(', ')||'Internet Archive');
   caption.append(num,title,sub);
   card.append(cover,caption);
   return card;
 }
 function renderSelection(items){
+  items=items.slice(0,DRAW);
   $('albumList').classList.remove('is-scanning');
   currentAlbums.splice(0,currentAlbums.length,...items);
   const list=$('albumList');list.replaceChildren();
@@ -1197,7 +805,7 @@ function renderSelection(items){
 function initLoadingRows(){
   currentAlbums.splice(0,currentAlbums.length);
   const list=$('albumList');list.replaceChildren();list.classList.remove('has-active');list.classList.add('is-scanning');
-  for(let i=0;i<6;i++)list.appendChild(renderListRow(null,i,true,6));
+  for(let i=0;i<DRAW;i++)list.appendChild(renderListRow(null,i,true,DRAW));
   // The first skeleton takes the selected cover's place and carries the live search status
   const lead=list.firstElementChild,status=document.createElement('p');
   lead.classList.add('is-lead');status.className='rail-status';status.id='railStatus';status.textContent=$('status').hidden?'':$('status').textContent;
@@ -1208,13 +816,13 @@ function renderEmptyPool(key){
   const list=$('albumList');list.replaceChildren();list.classList.remove('has-active','is-scanning');
   const p=document.createElement('p');p.className='rail-empty';
   p.textContent=poolStatus[key]==='error'
-    ?'// Could not load '+decadeLabel(key)+' albums. Press SEARCH MORE to try again.'
-    :'// No playable '+decadeLabel(key)+' albums turned up in this sample. Press SEARCH MORE to draw again.';
+    ?'Could not load '+decadeLabel(key)+' albums. Press Search more to try again.'
+    :'No playable '+decadeLabel(key)+' albums turned up in this sample. Press Search more to draw again.';
   list.appendChild(p);
 }
 
 /* ── Decade pools ──
-   REFRESH fills a pool of up to six albums for every filter at once (tracks
+   REFRESH fills a pool of up to five albums for every filter at once (tracks
    included), so switching decades is instant and never triggers a new search.
    Pools persist in localStorage and only change when REFRESH is pressed. */
 const POOLS_KEY='deep-cuts-decade-pools-v1';
@@ -1269,7 +877,7 @@ function restorePools(){
         &&!isClassical({title:x.title,creator:x.creator||'',genre:x.genre||'',publisher:x.publisher||'',subjects:String(x.subjects||'').split(/\s*,\s*/).filter(Boolean)})
         &&!isSpokenText([x.title,x.genre,x.subjects].join(' '))
         &&!(Number(x.year)>=2025&&aiSlopReason({title:x.title,creator:x.creator||'',description:x.description||'',subjects:String(x.subjects||'').split(/\s*,\s*/).filter(Boolean),coverName:x.coverName}))):[];
-      if(items.length){pools[key]=distinctArtists(items).map(dedupeTracks);poolStatus[key]='ready';}
+      if(items.length){pools[key]=distinctArtists(items).map(dedupeTracks).slice(0,DRAW);poolStatus[key]='ready';}
       else if(Array.isArray(data.empty)&&data.empty.includes(key))poolStatus[key]='empty';
     });
     // Pools saved before the Brazilian/Latin quota keep only its first albums; an emptied pool is drawn again
@@ -1353,11 +961,11 @@ function nextTrack(){
   if(!item.tracks||item.trackIndex>=item.tracks.length-1){playNextAlbum();return;}
   loadTrack(item.trackIndex+1,true);
 }
-/* Radio: after the last track of an album from the current six, the next of
-   the six starts; after the sixth, a new selection is drawn and its first album
+/* Radio: after the last track of an album from the current five, the next of
+   the five starts; after the fifth, a new selection is drawn and its first album
    plays. The screen follows only when it was showing the album that ended, so
    someone browsing another album is not moved. Albums played from Saved or
-   Recent, and single tracks, are not part of the six and just stop.
+   Recent, and single tracks, are not part of the five and just stop.
    Resolves to false when nothing new could start. */
 async function playNextAlbum(){
   const item=previewItem;if(!item||item.isSingle)return false;
@@ -1373,7 +981,7 @@ async function playNextAlbum(){
   if(!next||sameAlbum(next,item))return false;
   startAlbum(next,0);
   if(follow){const i=currentAlbums.indexOf(next);if(i>=0)showFeatured(i);}
-  showShareToast('[ NEXT ALBUM: '+clean(next.title,40).toUpperCase()+' ]');
+  showShareToast('Next album: '+clean(next.title,40));
   return true;
 }
 function prevTrack(){
@@ -1404,6 +1012,7 @@ function goToPlayingAlbum(){
   const idx=currentAlbums.findIndex(a=>sameAlbum(a,previewItem));
   setHomeView();
   if(idx>=0)showFeatured(idx);else showFeaturedItem(previewItem,-1);
+  revealHero();
 }
 function restoreNowPlaying(){
   try{
@@ -1411,7 +1020,7 @@ function restoreNowPlaying(){
     if(!data||!data.item||!data.item.identifier||Date.now()-Number(data.savedAt)>CURRENT_TTL)return;
     previewItem=dedupeTracks(data.item);renderNowPlayingPanel();
     loadTrack(Number(previewItem.trackIndex)||0,false,Number(data.time)||0);
-    if(data.playing)previewAudio.play().then(()=>{previewPlaying=true;syncPlayerUI();}).catch(()=>{previewPlaying=false;syncPlayerUI();showShareToast('[ PRESS ▶ TO RESUME ]');});
+    if(data.playing)previewAudio.play().then(()=>{previewPlaying=true;syncPlayerUI();}).catch(()=>{previewPlaying=false;syncPlayerUI();showShareToast('Press play to resume');});
   }catch(_){}
 }
 function bindPreviewAudio(){
@@ -1503,14 +1112,15 @@ async function openAlbum(entry){
     setHomeView();
     const idx=currentAlbums.findIndex(a=>sameAlbum(a,item));
     if(idx>=0)showFeatured(idx);else showFeaturedItem(item,-1);
-  }catch(_){showShareToast('[ COULD NOT LOAD ALBUM ]');}
+    revealHero();
+  }catch(_){showShareToast('Could not load that album');}
 }
 async function playSavedAlbum(identifier,btn){
   if(previewItem&&!previewItem.isSingle&&previewItem.identifier===identifier){togglePlayPause();return;}
   const entry=getSaved().find(e=>e.identifier===identifier);if(!entry)return;
-  if(btn){btn.disabled=true;btn.textContent='… LOADING';}
+  if(btn){btn.disabled=true;btn.textContent='Loading…';}
   try{startAlbum(await loadAlbum(entry),0);}
-  catch(_){showShareToast('[ COULD NOT LOAD ALBUM ]');}
+  catch(_){showShareToast('Could not load that album');}
   finally{if(btn)btn.disabled=false;syncPlayerUI();}
 }
 
@@ -1545,7 +1155,7 @@ function playRecentTrack(key){playSingleTrack(getRecent().find(e=>e.key===key));
 const LIKED_KEY='deep-cuts-liked-tracks-v1';
 function likeKey(albumId,url){return albumId+'|'+url;}
 function getLiked(){try{const v=JSON.parse(localStorage.getItem(LIKED_KEY)||'[]');return Array.isArray(v)?v.filter(e=>e&&e.url&&e.albumId&&e.key):[];}catch(_){return [];}}
-function setLiked(list){try{localStorage.setItem(LIKED_KEY,JSON.stringify(list));}catch(_){showShareToast('[ COULD NOT SAVE LIKE ]');}}
+function setLiked(list){try{localStorage.setItem(LIKED_KEY,JSON.stringify(list));}catch(_){showShareToast('Could not save that like');}}
 function toggleLike(item,idx){
   const track=item&&item.tracks&&item.tracks[idx];if(!track)return;
   const key=likeKey(item.identifier,track.url),list=getLiked(),at=list.findIndex(e=>e.key===key);
@@ -1558,32 +1168,32 @@ function toggleLike(item,idx){
 /* Paints every heart, the player's LIKE button and the header count */
 function syncLikes(){
   const keys=new Set(getLiked().map(e=>e.key));
-  $('likedCount').textContent=String(keys.size).padStart(2,'0');
+  setCount('likedCount',keys.size);
   document.querySelectorAll('.track-row[data-like-key]').forEach(row=>{
     const on=keys.has(row.dataset.likeKey),btn=row.querySelector('.track-like');if(!btn)return;
-    btn.textContent=on?'♥':'♡';btn.classList.toggle('is-liked',on);btn.setAttribute('aria-pressed',String(on));
+    btn.classList.toggle('is-liked',on);btn.setAttribute('aria-pressed',String(on));
     btn.setAttribute('aria-label',on?'Remove from liked tracks':'Like this track');btn.title=on?'Unlike':'Like this track';
   });
   const it=previewItem,track=it&&it.tracks&&it.tracks[it.trackIndex||0],on=!!track&&keys.has(likeKey(it.identifier,track.url)),np=$('npLike');
-  np.firstChild.textContent=on?'♥':'♡';np.classList.toggle('is-liked',on);np.setAttribute('aria-pressed',String(on));
+  np.classList.toggle('is-liked',on);np.setAttribute('aria-pressed',String(on));
   np.setAttribute('aria-label',on?'Remove from liked tracks':'Like this track');np.title=on?'Unlike':'Like this track';
 }
 function renderLiked(){
   const list=$('likedList');list.replaceChildren();const entries=getLiked();
-  if(!entries.length){const p=document.createElement('p');p.className='saved-empty';p.textContent='// No liked tracks yet. Tap ♡ next to any song to keep it here.';list.appendChild(p);return;}
+  if(!entries.length){const p=document.createElement('p');p.className='saved-empty';p.textContent='No liked tracks yet. Tap the heart next to any song to keep it here.';list.appendChild(p);return;}
   entries.forEach(entry=>{
     const row=document.createElement('div');row.className='saved-row recent-row';row.dataset.key=entry.key;row.dataset.url=entry.url;
     const info=document.createElement('button');info.type='button';info.className='saved-link';info.dataset.likedPlay=entry.key;info.title='Play this track';
     const line=document.createElement('span');line.className='recent-track';
-    const num=document.createElement('span');num.className='recent-num';num.textContent='♥';
+    const num=document.createElement('span');num.className='recent-num is-liked';num.appendChild(svgIcon('heart'));
     const title=document.createElement('span');title.className='saved-title';title.textContent=trackDisplayName(entry.name);
     line.append(num,title);
     const meta=document.createElement('span');meta.className='saved-meta';meta.textContent=[entry.albumTitle,entry.creator].filter(Boolean).join(' — ');
     info.append(line,meta);
     const actions=document.createElement('div');actions.className='row-actions';
-    const play=document.createElement('button');play.type='button';play.className='row-play';play.dataset.likedPlay=entry.key;play.textContent='▶ PLAY';
-    const album=document.createElement('button');album.type='button';album.className='row-btn';album.dataset.likedAlbum=entry.key;album.textContent='ALBUM';album.title='Open the full album';
-    const remove=document.createElement('button');remove.type='button';remove.className='remove-save';remove.dataset.likedRemove=entry.key;remove.textContent='[ REMOVE ]';
+    const play=document.createElement('button');play.type='button';play.className='row-play';play.dataset.likedPlay=entry.key;play.textContent='Play';
+    const album=document.createElement('button');album.type='button';album.className='row-btn';album.dataset.likedAlbum=entry.key;album.textContent='Album';album.title='Open the full album';
+    const remove=document.createElement('button');remove.type='button';remove.className='remove-save';remove.dataset.likedRemove=entry.key;remove.textContent='Remove';
     actions.append(play,album,remove);
     row.append(makeCover(entry.albumId,entry.imageUrl),info,actions);list.appendChild(row);
   });
@@ -1602,7 +1212,7 @@ function makeCover(identifier,fallback){
 }
 function renderRecent(){
   const list=$('recentList');list.replaceChildren();const entries=getRecent();
-  if(!entries.length){const p=document.createElement('p');p.className='saved-empty';p.textContent='// Nothing played yet. Tracks show up here as soon as they start.';list.appendChild(p);return;}
+  if(!entries.length){const p=document.createElement('p');p.className='saved-empty';p.textContent='Nothing played yet. Tracks show up here as soon as they start.';list.appendChild(p);return;}
   entries.forEach(entry=>{
     const row=document.createElement('div');row.className='saved-row recent-row';row.dataset.key=entry.key;row.dataset.url=entry.url;
     const info=document.createElement('button');info.type='button';info.className='saved-link';info.dataset.recentPlay=entry.key;info.title='Play this track';
@@ -1614,8 +1224,8 @@ function renderRecent(){
     info.append(line,meta);
     const actions=document.createElement('div');actions.className='row-actions';
     const when=document.createElement('span');when.className='recent-when';when.textContent=timeAgo(entry.playedAt);
-    const play=document.createElement('button');play.type='button';play.className='row-play';play.dataset.recentPlay=entry.key;play.textContent='▶ PLAY';
-    const album=document.createElement('button');album.type='button';album.className='row-btn';album.dataset.recentAlbum=entry.key;album.textContent='ALBUM';album.title='Open the full album';
+    const play=document.createElement('button');play.type='button';play.className='row-play';play.dataset.recentPlay=entry.key;play.textContent='Play';
+    const album=document.createElement('button');album.type='button';album.className='row-btn';album.dataset.recentAlbum=entry.key;album.textContent='Album';album.title='Open the full album';
     actions.append(when,play,album);
     row.append(makeCover(entry.albumId,entry.imageUrl),info,actions);list.appendChild(row);
   });
@@ -1625,16 +1235,16 @@ function renderRecent(){
 /* ── Saved view ── */
 function renderSaved(){
   const list=$('savedList');list.replaceChildren();const entries=getSaved();updateSavedCount();
-  if(!entries.length){const p=document.createElement('p');p.className='saved-empty';p.textContent='// No saved albums yet.';list.appendChild(p);return;}
+  if(!entries.length){const p=document.createElement('p');p.className='saved-empty';p.textContent='No saved albums yet. Press Save on any album to keep it here.';list.appendChild(p);return;}
   entries.forEach(entry=>{
     const row=document.createElement('div');row.className='saved-row';row.dataset.id=entry.identifier;
     const link=document.createElement('button');link.type='button';link.className='saved-link';link.dataset.open=entry.identifier;link.title='Open album';
     const title=document.createElement('span');title.className='saved-title';title.textContent=entry.title;
     const meta=document.createElement('span');meta.className='saved-meta';meta.textContent=[entry.creator,entry.year].filter(Boolean).join(' / ')||'Internet Archive';link.append(title,meta);
     const actions=document.createElement('div');actions.className='row-actions';
-    const play=document.createElement('button');play.type='button';play.className='row-play';play.dataset.play=entry.identifier;play.textContent='▶ PLAY';
-    const archive=document.createElement('a');archive.className='row-btn';archive.href=entry.url||archiveUrl(entry);archive.target='_blank';archive.rel='noopener noreferrer';archive.textContent='↗ ARCHIVE';archive.title='Open on archive.org';
-    const remove=document.createElement('button');remove.type='button';remove.className='remove-save';remove.dataset.remove=entry.identifier;remove.textContent='[ REMOVE ]';
+    const play=document.createElement('button');play.type='button';play.className='row-play';play.dataset.play=entry.identifier;play.textContent='Play';
+    const archive=document.createElement('a');archive.className='row-btn';archive.href=entry.url||archiveUrl(entry);archive.target='_blank';archive.rel='noopener noreferrer';archive.textContent='Archive';archive.title='Open on archive.org';
+    const remove=document.createElement('button');remove.type='button';remove.className='remove-save';remove.dataset.remove=entry.identifier;remove.textContent='Remove';
     actions.append(play,archive,remove);
     row.append(makeCover(entry.identifier,entry.coverUrl),link,actions);list.appendChild(row);
   });
@@ -1646,13 +1256,13 @@ function syncLibraryRows(){
   document.querySelectorAll('#savedList .saved-row[data-id]').forEach(row=>{
     const on=!!item&&!item.isSingle&&item.identifier===row.dataset.id,btn=row.querySelector('.row-play');
     row.classList.toggle('is-playing',on);
-    if(btn&&!btn.disabled){btn.textContent=on?(previewPlaying?'‖ PAUSE':'▶ RESUME'):'▶ PLAY';btn.classList.toggle('is-playing',on&&previewPlaying);}
+    if(btn&&!btn.disabled){btn.textContent=on?(previewPlaying?'Pause':'Resume'):'Play';btn.classList.toggle('is-playing',on&&previewPlaying);}
   });
   const url=item&&item.tracks&&item.tracks[item.trackIndex||0]?item.tracks[item.trackIndex||0].url:'';
   document.querySelectorAll('#recentList .recent-row,#likedList .recent-row').forEach(row=>{
     const on=!!url&&row.dataset.url===url,btn=row.querySelector('.row-play');
     row.classList.toggle('is-playing',on);
-    if(btn){btn.textContent=on?(previewPlaying?'‖ PAUSE':'▶ RESUME'):'▶ PLAY';btn.classList.toggle('is-playing',on&&previewPlaying);}
+    if(btn){btn.textContent=on?(previewPlaying?'Pause':'Resume'):'Play';btn.classList.toggle('is-playing',on&&previewPlaying);}
   });
 }
 
@@ -1670,7 +1280,9 @@ function trackView(path){
 }
 function setView(name){
   Object.keys(VIEWS).forEach(key=>{const [view,toggle]=VIEWS[key];$(view).hidden=key!==name;$(toggle).setAttribute('aria-pressed',String(key===name));});
-  if(name)trackView('/view/'+name);
+  document.body.dataset.view=name||'home';
+  $('homeToggle').setAttribute('aria-pressed',String(!name));
+  if(name){$(VIEWS[name][0]).scrollTop=0;trackView('/view/'+name);}
   if(name==='saved')renderSaved();
   if(name==='recent')renderRecent();
   if(name==='liked')renderLiked();
@@ -1716,7 +1328,7 @@ async function installApp(){
   renderAppView();
 }
 addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;if(!$('appView').hidden)renderAppView();});
-addEventListener('appinstalled',()=>{installPrompt=null;showShareToast('[ APP INSTALLED ]');if(!$('appView').hidden)renderAppView();});
+addEventListener('appinstalled',()=>{installPrompt=null;showShareToast('App installed');if(!$('appView').hidden)renderAppView();});
 
 /* ── Play on TV ──
    Remote Playback (Chromecast / Google TV, mainly Chrome on Android) and
@@ -1726,7 +1338,7 @@ addEventListener('appinstalled',()=>{installPrompt=null;showShareToast('[ APP IN
 function openCast(){
   const remote=previewAudio.remote;
   if(!previewItem&&viewedItem)startAlbum(viewedItem,0); // the picker needs something loaded
-  const fallback=()=>{showShareToast('[ NO TV FOUND · SEE TV STEPS ]');setAppView(true);$('appTvCard').scrollIntoView({block:'center',behavior:'smooth'});};
+  const fallback=()=>{showShareToast('No TV found. See the TV steps.');setAppView(true);$('appTvCard').scrollIntoView({block:'center',behavior:'smooth'});};
   if(remote&&remote.prompt)remote.prompt().catch(err=>{if(!err||err.name!=='AbortError')fallback();});
   else if(previewAudio.webkitShowPlaybackTargetPicker)previewAudio.webkitShowPlaybackTargetPicker();
   else fallback();
@@ -1753,7 +1365,7 @@ const MEDIA_CODES={10252:'MediaPlayPause',415:'MediaPlay',19:'MediaPause',417:'M
 function navScopes(){
   const open=Object.values(VIEWS).map(([view])=>$(view)).find(el=>!el.hidden);
   const main=open||(!$('npPanel').hidden?$('npPanel'):document.body);
-  return main===document.body?[main]:[main,$('npBar')];
+  return main===document.body?[main]:[main,document.querySelector('.side'),$('npBar')];
 }
 function navTargets(){
   return navScopes().flatMap(scope=>[...scope.querySelectorAll(FOCUSABLE)]).filter(el=>{
@@ -1840,7 +1452,7 @@ function moveTip(x,y){
 }
 function showTip(item,event){
   if(!item)return;clearTimeout(tipTimer);const tip=$('materialTip');tip.replaceChildren();
-  const eyebrow=document.createElement('p');eyebrow.className='tip-eyebrow';eyebrow.textContent='// INTERNET ARCHIVE';tip.appendChild(eyebrow);
+  const eyebrow=document.createElement('p');eyebrow.className='tip-eyebrow';eyebrow.textContent='Internet Archive';tip.appendChild(eyebrow);
   const title=document.createElement('h2');title.className='tip-title';title.textContent=item.title;tip.appendChild(title);
   if(item.creator){const a=document.createElement('p');a.className='tip-artist';a.textContent=item.creator;tip.appendChild(a);}
   const desc=document.createElement('p');desc.className='tip-description';desc.textContent=item.description||'No description in the archive record.';tip.appendChild(desc);
@@ -1895,12 +1507,23 @@ function withinQuota(items,spares,quota,exclude){
   return out;
 }
 function regionalCount(keys){return keys.reduce((n,k)=>n+(pools[k]||[]).filter(isRegional).length,0);}
+/* Search more button: magnifier → ring of spinning dots while the albums on screen are
+   being drawn → check when they land → magnifier again. The other eras keep loading in
+   the background; a click during that time is queued and runs as soon as they finish. */
+let searchTimer=0,searchQueued=false;
+function setSearchState(state){
+  clearTimeout(searchTimer);
+  const btn=$('refresh');btn.dataset.state=state;btn.setAttribute('aria-busy',String(state==='loading'));
+  if(state==='done')searchTimer=setTimeout(()=>setSearchState('idle'),1600);
+}
 async function refreshAll(onlyMissing){
   if(busy)return;
   const first=activeKey();
   const keys=[first].concat(DECADES.map(d=>d.key).filter(k=>k!==first)).filter(k=>!onlyMissing||!(pools[k]&&pools[k].length)&&poolStatus[k]!=='empty');
   if(!keys.length)return;
-  busy=true;$('refresh').disabled=true;$('refreshProgress').classList.add('is-indeterminate');
+  busy=true;$('refreshProgress').classList.add('is-indeterminate');
+  const searching=keys.includes(first)&&(!onlyMissing||!(pools[first]&&pools[first].length));
+  if(searching)setSearchState('loading');
   const exclude=new Set(),progress={};let done=0,succeeded=0;
   // Pools kept from before still count against the Brazilian/Latin quota
   const quota={left:Math.max(0,REGIONAL_QUOTA-regionalCount(DECADES.map(d=>d.key).filter(k=>!keys.includes(k))))};
@@ -1914,20 +1537,23 @@ async function refreshAll(onlyMissing){
   };
   report();
   async function load(key){
+    let found=false;
     try{
       // A first visit takes the server's ready-made pool; REFRESH always draws a fresh one here
       const ready=onlyMissing?await serverPool(key):null;
       // Two pools load at once, so drop any album the other one claimed while this one was searching
       let items=ready?withinQuota(ready.items.filter(item=>!exclude.has(item.identifier)),ready.spares,quota,exclude):null;
       if(!items||!items.length)items=(await findAlbums(decadeOf(key),exclude,f=>{progress[key]=f;$('refreshProgress').classList.remove('is-indeterminate');report();},{quota})).filter(item=>!exclude.has(item.identifier));
+      items=items.slice(0,DRAW); // ready-made sets built before the draw went from six to five carry one extra
       items.forEach(item=>exclude.add(item.identifier));
-      if(items.length){pools[key]=items;succeeded++;preloadCovers(items);}
+      if(items.length){pools[key]=items;succeeded++;found=true;preloadCovers(items);}
       poolStatus[key]=items.length||pools[key]?'ready':'empty';
       if(items.length){items.forEach(item=>{if(!recentIds.includes(item.identifier))recentIds.push(item.identifier);});noteStyles(items);}
     }catch(_){poolStatus[key]=pools[key]&&pools[key].length?'ready':'error';}
     progress[key]=1;done++;
     savePools();syncDecadeButtons();report();
     if(key===activeKey())showPool(key);
+    if(key===first&&searching&&!searchQueued)setSearchState(found?'done':'idle');
   }
   const queue=keys.slice();
   const worker=async()=>{while(queue.length)await load(queue.shift());};
@@ -1941,8 +1567,72 @@ async function refreshAll(onlyMissing){
     const failed=keys.filter(k=>poolStatus[k]==='error').length;
     updateProgress(100,succeeded?'Ready. Edition '+String(edition).padStart(3,'0')+' · '+succeeded+'/'+keys.length+' filters'+(failed?' · '+failed+' kept previous':'')+'.':'Could not reach Internet Archive. Previous albums kept.');
     hideProgressAfter(succeeded?2400:5000);
-    busy=false;$('refresh').disabled=false;
+    busy=false;
+    if(searchQueued){searchQueued=false;refreshAll(false);}
+    else if($('refresh').dataset.state==='loading')setSearchState('idle');
   }
+}
+
+/* ── Draw navigation, sharing ── */
+function stepDraw(dir){
+  const n=currentAlbums.filter(Boolean).length;if(!n)return;
+  showFeatured(activeIndex<0?0:(activeIndex+dir+n)%n);
+}
+/* Brings the hero back when a pick was made further down the page */
+function revealHero(){
+  const hero=$('detail');
+  if(hero.getBoundingClientRect().bottom<160)hero.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+}
+async function shareViewed(){
+  const item=viewedItem;if(!item)return;
+  const url=location.origin+location.pathname+'?album='+encodeURIComponent(item.identifier);
+  try{
+    if(navigator.share&&matchMedia('(pointer: coarse)').matches){await navigator.share({title:item.title,text:item.title+(item.creator?' — '+item.creator:''),url});return;}
+    await navigator.clipboard.writeText(url);showShareToast('Link copied');
+  }catch(err){if(!err||err.name!=='AbortError')showShareToast('Could not copy the link');}
+}
+/* The hero cover leans a few degrees toward the pointer (mouse only) */
+function bindHeroTilt(){
+  const box=$('heroCover');
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  box.addEventListener('pointermove',event=>{
+    if(event.pointerType!=='mouse')return;
+    const r=box.getBoundingClientRect(),x=(event.clientX-r.left)/r.width-.5,y=(event.clientY-r.top)/r.height-.5;
+    box.style.setProperty('--rx',(-y*8).toFixed(2)+'deg');box.style.setProperty('--ry',(x*8).toFixed(2)+'deg');
+  });
+  box.addEventListener('pointerleave',()=>{box.style.setProperty('--rx','0deg');box.style.setProperty('--ry','0deg');});
+}
+
+/* ── Theme ──
+   The inline script in <head> applies the stored choice, or the system's,
+   before first paint. The toggle stores the choice; where View Transitions
+   exist the new theme opens as a circle growing from the button. */
+const THEME_KEY='deep-cut-theme';
+const currentTheme=()=>document.documentElement.dataset.theme==='light'?'light':'dark';
+function syncTheme(){
+  const light=currentTheme()==='light';
+  $('themeLabel').textContent=light?'Dark theme':'Light theme';
+  $('themeToggle').setAttribute('aria-label','Switch to '+(light?'dark':'light')+' theme');
+  const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=light?'#f3f2ef':'#1b1a1a';
+}
+function toggleTheme(){
+  const next=currentTheme()==='light'?'dark':'light';
+  const apply=()=>{document.documentElement.dataset.theme=next;syncTheme();};
+  try{localStorage.setItem(THEME_KEY,next);}catch(_){}
+  if(!document.startViewTransition||matchMedia('(prefers-reduced-motion: reduce)').matches){apply();return;}
+  const r=$('themeToggle').getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+  const radius=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
+  const transition=document.startViewTransition(apply);
+  transition.ready.then(()=>{
+    document.documentElement.animate({clipPath:['circle(0px at '+x+'px '+y+'px)','circle('+radius+'px at '+x+'px '+y+'px)']},
+      {duration:520,easing:'cubic-bezier(.4,0,.2,1)',pseudoElement:'::view-transition-new(root)'});
+  }).catch(()=>{});
+}
+/* Until a choice is stored, the site follows the system when it switches */
+function bindThemeFollow(){
+  const mq=matchMedia('(prefers-color-scheme: light)');
+  const follow=()=>{let stored=null;try{stored=localStorage.getItem(THEME_KEY);}catch(_){}if(stored)return;document.documentElement.dataset.theme=mq.matches?'light':'dark';syncTheme();};
+  if(mq.addEventListener)mq.addEventListener('change',follow);
 }
 
 /* ── Bind ── */
@@ -1951,7 +1641,7 @@ function bind(){
   $('albumList').addEventListener('click',event=>{
     const row=event.target.closest('.album-card');if(!row||row.classList.contains('is-loading'))return;
     const index=Number(row.dataset.index);if(isNaN(index))return;
-    showFeatured(index);
+    showFeatured(index);revealHero();
   });
   $('albumList').addEventListener('keydown',event=>{
     if(event.key==='Enter'||event.key===' '){const row=event.target.closest('.album-card');if(!row)return;event.preventDefault();row.click();}
@@ -1960,11 +1650,14 @@ function bind(){
     if(event.pointerType==='touch')return;
     const row=event.target.closest('.album-card');if(!row){hideTip();return;}
     const index=Number(row.dataset.index);const item=currentAlbums[index];if(!item)return;
-    if(tipVisibleFor!==item){tipVisibleFor=item;showTip(item,event);}else moveTip(event.clientX,event.clientY);
+    // The record's details open after the pointer rests on a cover, so crossing the rail stays quiet
+    tipX=event.clientX;tipY=event.clientY;
+    if(tipVisibleFor!==item){tipVisibleFor=item;$('materialTip').hidden=true;clearTimeout(tipTimer);tipTimer=setTimeout(()=>showTip(item,{clientX:tipX,clientY:tipY}),650);}
+    else if(!$('materialTip').hidden)moveTip(tipX,tipY);
   });
   $('albumList').addEventListener('pointerleave',hideTip);
-  // Both strips scroll sideways; let a regular mouse wheel drive them
-  ['albumList','tracklistBody'].forEach(id=>$(id).addEventListener('wheel',event=>{
+  // On small screens the rail scrolls sideways; let a regular mouse wheel drive it
+  ['albumList'].forEach(id=>$(id).addEventListener('wheel',event=>{
     const el=event.currentTarget;
     if(el.scrollWidth<=el.clientWidth||Math.abs(event.deltaX)>Math.abs(event.deltaY))return;
     event.preventDefault();el.scrollLeft+=event.deltaY;
@@ -2011,7 +1704,12 @@ function bind(){
     try{localStorage.setItem(VOLUME_KEY,String(vol));}catch(_){}
   });
   try{const v=localStorage.getItem(VOLUME_KEY);if(v!==null&&isFinite(Number(v))){previewAudio.volume=Math.max(0,Math.min(1,Number(v)));$('volSlider').value=String(Math.round(previewAudio.volume*100));updateVolIcon(previewAudio.volume);}}catch(_){}
-  $('refresh').addEventListener('click',()=>refreshAll(false));
+  $('refresh').addEventListener('click',()=>{
+    if(document.body.dataset.view!=='home')setHomeView();
+    if($('refresh').dataset.state==='loading')return;
+    if(busy){searchQueued=true;setSearchState('loading');return;}
+    refreshAll(false);
+  });
   $('savedToggle').addEventListener('click',()=>setSavedView($('savedView').hidden));
   $('aboutToggle').addEventListener('click',()=>setAboutView($('aboutView').hidden));
   $('appToggle').addEventListener('click',()=>setAppView($('appView').hidden));
@@ -2060,6 +1758,7 @@ function bind(){
   $('decadeFilter').addEventListener('click',event=>{
     const btn=event.target.closest('.decade-btn');if(!btn)return;
     const decade=btn.dataset.decade?Number(btn.dataset.decade):null;
+    setHomeView();
     if(decade===activeDecade)return;
     activeDecade=decade;
     document.querySelectorAll('.decade-btn').forEach(b=>b.classList.toggle('is-active',b===btn));
@@ -2068,96 +1767,16 @@ function bind(){
     if(!pools[key]&&poolStatus[key]!=='loading'&&!busy)refreshAll(true);
   });
   $('featuredDismiss').addEventListener('click',()=>{$('featuredBand').hidden=true;});
-}
-
-/* ── Snake mini game ──
-   A four-block snake in the topbar's free space (wide desktops only; CSS
-   hides it elsewhere). Click it, then steer with the arrow keys: the keys
-   only act while the game has focus, so they never reach the player or the
-   TV remote navigation. Three squares wait on three different rows; eating
-   one brings a new one. The snake never grows (four blocks cannot bite
-   themselves), walls wrap around, and every fifth square speeds it up. It
-   pauses when it loses focus or the tab is hidden. */
-function initSnake(){
-  const canvas=$('gameCanvas');if(!canvas||!canvas.getContext)return;
-  const ctx=canvas.getContext('2d'),C=10,LENGTH=4,FOODS=3,HI_KEY='deep-cut-snake-hi';
-  const DIRS={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
-  let w=0,h=0,cols=0,rows=0,ox=0,oy=0,state='idle',timer=0,snake=[],dir=[1,0],queue=[],foods=[],eaten=0,hi=0;
-  try{hi=Number(localStorage.getItem(HI_KEY))||0;}catch(_){}
-  const css=name=>getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  const pad=n=>String(n).padStart(3,'0'),step=()=>Math.max(65,120-Math.floor(eaten/5)*8);
-  const on=(list,x,y)=>list.some(p=>p.x===x&&p.y===y);
-  // A new square goes on a row no other square is using, away from the snake
-  function addFood(){
-    const free=[];
-    for(let y=0;y<rows;y++){if(foods.some(f=>f.y===y))continue;for(let x=0;x<cols;x++)if(!on(snake,x,y))free.push({x,y});}
-    if(free.length)foods.push(free[Math.floor(Math.random()*free.length)]);
-  }
-  function reset(){
-    const y=Math.floor(rows/2);
-    snake=Array.from({length:LENGTH},(_,i)=>({x:LENGTH-1-i,y}));dir=[1,0];queue=[];foods=[];eaten=0;
-    for(let i=0;i<Math.min(FOODS,rows-1);i++)addFood();
-  }
-  function cell(p,fill,inset){ctx.fillStyle=fill;ctx.fillRect(ox+p.x*C+inset,oy+p.y*C+inset,C-inset*2,C-inset*2);}
-  function draw(){
-    ctx.clearRect(0,0,w,h);if(!cols||!rows)return;
-    ctx.fillStyle=css('--line');
-    for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)ctx.fillRect(ox+x*C+C/2-.5,oy+y*C+C/2-.5,1,1);
-    foods.forEach(f=>cell(f,css('--ink'),2));
-    const mint=css('--mint');snake.forEach((p,i)=>cell(p,mint,i?1:0));
-    ctx.font='11px GeistPixel, monospace';ctx.textBaseline='top';ctx.textAlign='right';ctx.fillStyle=css('--muted');
-    ctx.fillText('HI '+pad(hi)+'  '+pad(eaten),w-2,0);
-    const msg=state==='idle'?'▶ CLICK, THEN USE THE ARROWS':state==='paused'?'‖ PAUSED · CLICK TO RESUME':'';
-    if(msg){
-      ctx.textAlign='center';ctx.textBaseline='middle';const tw=ctx.measureText(msg).width+16;
-      ctx.fillStyle=css('--bg');ctx.fillRect(w/2-tw/2,h/2-9,tw,18);
-      ctx.fillStyle=css('--mint');ctx.fillText(msg,w/2,h/2);
-    }
-  }
-  function move(){
-    if(queue.length)dir=queue.shift();
-    const head=snake[0],x=(head.x+dir[0]+cols)%cols,y=(head.y+dir[1]+rows)%rows;
-    snake.unshift({x,y});snake.pop(); // same length every step: the snake never grows
-    const hit=foods.findIndex(f=>f.x===x&&f.y===y);
-    if(hit>=0){
-      foods.splice(hit,1);eaten++;addFood();
-      if(eaten>hi){hi=eaten;try{localStorage.setItem(HI_KEY,String(hi));}catch(_){}}
-    }
-    draw();
-    if(state==='running')timer=setTimeout(move,step());
-  }
-  function start(){
-    if(state==='running'||!cols)return;
-    if(state==='idle')reset();
-    state='running';clearTimeout(timer);timer=setTimeout(move,step());draw();
-  }
-  function pause(){if(state!=='running')return;state='paused';clearTimeout(timer);draw();}
-  function turn(next){
-    // Checked against the last queued turn, so two fast presses cannot reverse the snake into itself
-    const prev=queue.length?queue[queue.length-1]:dir;
-    if(next[0]===-prev[0]&&next[1]===-prev[1]||next[0]===prev[0]&&next[1]===prev[1])return;
-    if(queue.length<2)queue.push(next);
-  }
-  function resize(){
-    const r=canvas.getBoundingClientRect(),d=window.devicePixelRatio||1;
-    w=r.width;h=r.height;canvas.width=Math.round(w*d);canvas.height=Math.round(h*d);ctx.setTransform(d,0,0,d,0,0);
-    const c=Math.floor(w/C),rw=Math.floor((h-12)/C); // the top 12px hold the score
-    if(c!==cols||rw!==rows){cols=c;rows=rw;if(state!=='idle')state='paused';clearTimeout(timer);if(cols&&rows)reset();}
-    ox=Math.floor((w-cols*C)/2);oy=12;
-    if(!w)pause();draw();
-  }
-  canvas.addEventListener('pointerdown',event=>{event.preventDefault();canvas.focus();start();});
-  canvas.addEventListener('keydown',event=>{
-    const next=DIRS[event.key];
-    if(!next&&event.key!==' '&&event.key!=='Enter')return;
-    event.preventDefault();event.stopPropagation();
-    if(state!=='running'){start();return;}
-    if(next)turn(next);
-  });
-  canvas.addEventListener('blur',pause);
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});
-  if('ResizeObserver' in window)new ResizeObserver(resize).observe(canvas);else resize();
-  if(document.fonts)document.fonts.ready.then(draw);
+  $('homeToggle').addEventListener('click',setHomeView);
+  $('drawPrev').addEventListener('click',()=>stepDraw(-1));
+  $('drawNext').addEventListener('click',()=>stepDraw(1));
+  $('featShareBtn').addEventListener('click',shareViewed);
+  $('themeToggle').addEventListener('click',toggleTheme);
+  // Track rows are focusable: Enter or Space plays, like a click
+  ['tracklistBody','npPanelBody'].forEach(id=>$(id).addEventListener('keydown',event=>{
+    if((event.key==='Enter'||event.key===' ')&&event.target.classList.contains('track-row')){event.preventDefault();event.target.click();}
+  }));
+  bindHeroTilt();bindThemeFollow();
 }
 
 window.__deepCutsDiagnostics=()=>({edition,count:currentAlbums.filter(Boolean).length,activeIndex,activeDecade:activeKey(),
@@ -2165,7 +1784,7 @@ window.__deepCutsDiagnostics=()=>({edition,count:currentAlbums.filter(Boolean).l
   selection:currentAlbums.filter(Boolean).map(item=>({identifier:item.identifier,title:item.title,artist:item.creator,year:item.year,tracks:item.tracks&&item.tracks.length})),requestInProgress:busy});
 
 // Albums only change on REFRESH: reuse the stored pools and fetch just the ones that are missing
-initLoadingRows();bind();initSnake();renderSaved();syncLikes();restorePools();syncDecadeButtons();
+syncTheme();initLoadingRows();bind();renderSaved();syncLikes();restorePools();syncDecadeButtons();
 if(pools[activeKey()])showPool(activeKey());
 preloadAllPools();
 restoreNowPlaying();handleSharedAlbum();refreshAll(true);

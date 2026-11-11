@@ -416,9 +416,11 @@ export function distinctArtists(items){
   const seen=new Set();
   return items.filter(item=>{const k=artistKey(item);if(!k)return true;if(seen.has(k))return false;seen.add(k);return true;});
 }
-/* Up to six albums, one per artist and one per style (an album with no
+/* Albums per draw */
+export const DRAW_SIZE=5;
+/* Up to DRAW_SIZE albums, one per artist and one per style (an album with no
    recognisable style is never blocked). perStyle 2 is only the fallback when
-   the searches could not turn up six different styles. */
+   the searches could not turn up that many different styles. */
 /* ── Brazilian and Latin American quota ──
    Their sources are so rich that they took over the pools, so one Search More
    hands out at most REGIONAL_QUOTA of them across all the era filters
@@ -441,17 +443,17 @@ function pickDiverse(items,perStyle,quota){
     // At most one per pool, so the quota spreads over the eras instead of filling the first pool drawn
     if(quota&&isRegional(item)){if(regional>=Math.min(1,quota.left))continue;regional++;}
     if(a)artists.add(a);if(st)styles.set(st,(styles.get(st)||0)+1);
-    out.push(item);if(out.length===6)break;
+    out.push(item);if(out.length===DRAW_SIZE)break;
   }
   return out;
 }
-function chooseSix(eligible,quota){
+function chooseDraw(eligible,quota){
   const byId=new Map();eligible.forEach(item=>{if(!byId.has(item.identifier))byId.set(item.identifier,item);});
   // Unseen albums in styles not shown lately come first, then unseen albums in recent styles, then repeats
   const rank=item=>(recentIds.includes(item.identifier)?2:0)+(item.style&&recentStyles.includes(item.style)?1:0);
   const ordered=shuffle(Array.from(byId.values())).sort((a,b)=>rank(a)-rank(b));
   const strict=pickDiverse(ordered,1,quota);
-  const picked=strict.length===6?strict:pickDiverse(ordered,2,quota);
+  const picked=strict.length===DRAW_SIZE?strict:pickDiverse(ordered,2,quota);
   if(quota)quota.left-=picked.filter(isRegional).length;
   return {picked,rest:ordered.filter(item=>!picked.includes(item))};
 }
@@ -460,14 +462,14 @@ function chooseSix(eligible,quota){
    regional ones out later (the server's ready-made pools). */
 export async function findAlbums(decade,exclude,onProgress,options={}){
   const inspected=new Set(),eligible=[],quota=options.quota||null;
-  const enough=more=>pickDiverse(eligible.concat(more),1,quota).length>=6;
+  const enough=more=>pickDiverse(eligible.concat(more),1,quota).length>=DRAW_SIZE;
   for(let wave=0;wave<3&&!enough([]);wave++){
     const candidates=(await retrieveCandidates(wave,decade,quota&&quota.left<=0)).filter(c=>!exclude.has(c.identifier));
     const base=[0,.45,.75][wave],span=[.45,.3,.25][wave];
     const next=await inspectCandidates(candidates,inspected,wave===0?24:18,(done,total)=>onProgress(base+(total?done/total*span:span)),enough);
     eligible.push(...next.filter(item=>!exclude.has(item.identifier)&&inDecade(item.year,decade)));
   }
-  const {picked,rest}=chooseSix(eligible,quota);
+  const {picked,rest}=chooseDraw(eligible,quota);
   if(options.spares)options.spares.push(...distinctArtists(rest.filter(item=>!isRegional(item))).slice(0,6));
   return picked;
 }

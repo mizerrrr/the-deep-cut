@@ -1,6 +1,6 @@
 # The Deep Cut
 
-> The Deep Cut (https://thedeepcut.vercel.app) is a free, open-source music discovery website. Every search shows six random albums from the Internet Archive's music collections, each in a different style, with a built-in player. There is no feed, no account and no personalized recommendations: it is a tool for finding new music without algorithms.
+> The Deep Cut (https://thedeepcut.vercel.app) is a free, open-source music discovery website. Every search shows five random albums from the Internet Archive's music collections, each in a different style, with a built-in player. There is no feed, no account and no personalized recommendations: it is a tool for finding new music without algorithms.
 
 Key facts:
 
@@ -18,7 +18,7 @@ Key facts:
 
 ## Pages
 
-- [The Deep Cut (app)](https://thedeepcut.vercel.app/): six random albums from the Internet Archive.
+- [The Deep Cut (app)](https://thedeepcut.vercel.app/): five random albums from the Internet Archive.
 - [How The Deep Cut works (FAQ)](https://thedeepcut.vercel.app/about): how albums are picked and checked, privacy, installing the app.
 - [How to find new music without algorithms](https://thedeepcut.vercel.app/guides/how-to-find-new-music): practical ways to discover music outside streaming recommendations.
 - [Free, legal music on the Internet Archive](https://thedeepcut.vercel.app/guides/free-legal-music-internet-archive): where to start in the archive's music collections and how to read licenses.

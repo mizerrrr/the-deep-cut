@@ -2,11 +2,11 @@
 
 # The Deep Cut
 
-**Six random albums from the Internet Archive. No feed, no recommendations, just discovery.**
+**Five random albums from the Internet Archive. No feed, no recommendations, just discovery.**
 
 Live at **https://thedeepcut.vercel.app** · Source: **https://github.com/mizerrrr/the-deep-cut**
 
-The Internet Archive holds hundreds of thousands of freely licensed and historical music releases, most of them almost impossible to stumble upon. The Deep Cut picks six of them at random, each in a different style, and shows them as an editorial page: the cover, the tracklist and a player, with colors taken from each cover.
+The Internet Archive holds hundreds of thousands of freely licensed and historical music releases, most of them almost impossible to stumble upon. The Deep Cut picks five of them at random, each in a different style, and shows them as an editorial page: the cover, the tracklist and a player, with colors taken from each cover.
 
 ## What it does
 
@@ -40,7 +40,7 @@ The local server serves the page and the same two endpoints that run as Vercel F
 |---|---|
 | `index.html` | The whole page: layout, styles, player and views, in one file |
 | `albums.mjs` | Searches the archive, checks each item and builds the album list |
-| `api/pool.mjs` | `/api/pool`: a ready-made set of six albums per era filter, cached at the CDN so a first visit doesn't wait on the search |
+| `api/pool.mjs` | `/api/pool`: a ready-made set of five albums per era filter, cached at the CDN so a first visit doesn't wait on the search |
 | `api/thumb.mjs` | `/api/thumb`: a same-origin copy of a cover thumbnail, so the page can read its colors |
 | `server.mjs` | Local development server (`npm run dev`) |
 | `assets/` | Logo, app icons and the Geist Pixel font |

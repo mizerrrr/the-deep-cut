@@ -1,4 +1,4 @@
-/* Ready-made pool of six albums for one era filter, so a first visit does not
+/* Ready-made pool of five albums for one era filter, so a first visit does not
    have to search the archive itself. The CDN keeps each answer for a few
    minutes and serves the stale one while it rebuilds, so visitors almost never
    wait on the search. Runs as a Vercel Function at /api/pool and is reused by
