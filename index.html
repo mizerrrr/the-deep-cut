@@ -1534,12 +1534,12 @@ function nextSearchLine(delay){
   lineTimer=setTimeout(()=>{
     const list=searchNearEnd?SEARCH_ALMOST:SEARCH_LINES;
     setSearchLabel(searchLine(list[lineIndex++%list.length]));
-    nextSearchLine(2200);
+    nextSearchLine(5000+Math.random()*3000); // each line stays 5–8 s
   },delay);
 }
 function foundGem(){
   if($('refresh').dataset.state!=='loading')return;
-  setSearchLabel(searchLine(SEARCH_GEM));nextSearchLine(1500);
+  setSearchLabel(searchLine(SEARCH_GEM));nextSearchLine(3000);
 }
 function setSearchState(state){
   clearTimeout(searchTimer);
