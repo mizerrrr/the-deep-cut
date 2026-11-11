@@ -163,6 +163,11 @@ img{display:block}
 #refresh[data-state="done"] .sm-dots i{transform:rotate(calc(var(--i)*45deg)) translateY(-7.6px) scale(1)}
 #refresh[data-state="done"] .sm-check{opacity:1;transform:none;animation:pop .5s var(--ease) .15s}
 #refresh[data-state="done"] .sm-check path{stroke-dashoffset:0;transition:stroke-dashoffset .38s var(--ease) .08s}
+/* The label changes while it searches; each new line slides in */
+#refreshLabel{white-space:nowrap}
+#refreshLabel.is-swap{animation:smText .32s var(--ease)}
+@keyframes smText{from{opacity:0;transform:translateY(5px)}}
+@media (prefers-reduced-motion:reduce){#refreshLabel.is-swap{animation:none}}
 @media (min-width:861px){
   #refresh{
     justify-content:center;gap:var(--s2);height:42px;margin:var(--s2) 0 var(--s1);

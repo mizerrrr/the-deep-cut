@@ -97,7 +97,7 @@
         <svg class="ic sm-search"><use href="#i-search"/></svg>
         <span class="sm-dots"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i></span>
         <svg class="ic sm-check" viewBox="0 0 24 24"><path pathLength="1" d="m5 12.5 4.5 4.5L19 7.5"/></svg>
-      </span><span class="nav-text">Search more</span>
+      </span><span class="nav-text" id="refreshLabel">Search more</span>
     </button>
     <p class="side-label">Library</p>
     <button class="nav-item" id="savedToggle" type="button" aria-label="Saved albums" aria-pressed="false">
@@ -1507,17 +1507,51 @@ function withinQuota(items,spares,quota,exclude){
   return out;
 }
 function regionalCount(keys){return keys.reduce((n,k)=>n+(pools[k]||[]).filter(isRegional).length,0);}
-/* Search more button: magnifier → ring of spinning dots while the albums on screen are
-   being drawn → check when they land → magnifier again. The other eras keep loading in
-   the background; a click during that time is queued and runs as soon as they finish. */
-let searchTimer=0,searchQueued=false;
+/* Search more button: magnifier → ring of spinning dots until EVERY era has been drawn →
+   check + "DONE!" for a few seconds → magnifier again. While it spins the label cycles
+   through small jokes; each era that lands flashes "Found a gem!". Each line is
+   [sidebar text, short text for the mobile tab bar]. */
+const SEARCH_LINES=[
+  ['Finding new tunes…','Digging…'],
+  ['Digging the crates…','Crates…'],
+  ['Dusting off vinyl…','Dusting…'],
+  ['Flipping B-sides…','B-sides…'],
+  ['Asking the archive…','Asking…'],
+  ['Rewinding tapes…','Rewinding…'],
+  ['Skipping the hits…','No hits…'],
+  ['Tuning the dial…','Tuning…']
+];
+const SEARCH_ALMOST=[['Almost there…','Almost…'],['One last crate…','Last one…']];
+const SEARCH_GEM=['Found a gem!','A gem!'];
+let searchTimer=0,searchQueued=false,lineTimer=0,lineIndex=0,searchNearEnd=false;
+function searchLine(pair){return pair[matchMedia('(max-width:860px)').matches?1:0];}
+function setSearchLabel(text){
+  const el=$('refreshLabel');if(el.textContent===text)return;
+  el.textContent=text;el.classList.remove('is-swap');void el.offsetWidth;el.classList.add('is-swap');
+}
+function nextSearchLine(delay){
+  clearTimeout(lineTimer);
+  lineTimer=setTimeout(()=>{
+    const list=searchNearEnd?SEARCH_ALMOST:SEARCH_LINES;
+    setSearchLabel(searchLine(list[lineIndex++%list.length]));
+    nextSearchLine(2200);
+  },delay);
+}
+function foundGem(){
+  if($('refresh').dataset.state!=='loading')return;
+  setSearchLabel(searchLine(SEARCH_GEM));nextSearchLine(1500);
+}
 function setSearchState(state){
   clearTimeout(searchTimer);
-  const btn=$('refresh');btn.dataset.state=state;btn.setAttribute('aria-busy',String(state==='loading'));
-  if(state==='done')searchTimer=setTimeout(()=>setSearchState('idle'),1600);
+  const btn=$('refresh'),was=btn.dataset.state;
+  btn.dataset.state=state;btn.setAttribute('aria-busy',String(state==='loading'));
+  if(state==='loading'){if(was!=='loading')nextSearchLine(0);}
+  else{clearTimeout(lineTimer);setSearchLabel(state==='done'?'DONE!':'Search more');}
+  if(state==='done')searchTimer=setTimeout(()=>setSearchState('idle'),2800);
 }
 async function refreshAll(onlyMissing){
   if(busy)return;
+  searchNearEnd=false;
   const first=activeKey();
   const keys=[first].concat(DECADES.map(d=>d.key).filter(k=>k!==first)).filter(k=>!onlyMissing||!(pools[k]&&pools[k].length)&&poolStatus[k]!=='empty');
   if(!keys.length)return;
@@ -1553,7 +1587,9 @@ async function refreshAll(onlyMissing){
     progress[key]=1;done++;
     savePools();syncDecadeButtons();report();
     if(key===activeKey())showPool(key);
-    if(key===first&&searching&&!searchQueued)setSearchState(found?'done':'idle');
+    // The last two eras are in flight together, so from here the label says "almost"
+    searchNearEnd=keys.length>2&&keys.length-done<=2;
+    if(found&&done<keys.length)foundGem();
   }
   const queue=keys.slice();
   const worker=async()=>{while(queue.length)await load(queue.shift());};
@@ -1569,7 +1605,7 @@ async function refreshAll(onlyMissing){
     hideProgressAfter(succeeded?2400:5000);
     busy=false;
     if(searchQueued){searchQueued=false;refreshAll(false);}
-    else if($('refresh').dataset.state==='loading')setSearchState('idle');
+    else if($('refresh').dataset.state==='loading')setSearchState(succeeded?'done':'idle');
   }
 }
 
