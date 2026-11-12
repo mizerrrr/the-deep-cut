@@ -908,10 +908,113 @@ function loadTrack(idx,autoplay,startAt){
   const item=previewItem;if(!item)return;
   item.trackIndex=Math.max(0,Math.min(idx,(item.tracks&&item.tracks.length||1)-1));
   pendingSeek=startAt||0;
-  previewAudio.src=trackUrl(item,item.trackIndex);previewAudio.load();updateMediaMetadata();
-  if(autoplay)previewAudio.play().then(()=>{previewPlaying=true;syncPlayerUI();}).catch(()=>{previewPlaying=false;syncPlayerUI();});
+  // A track downloaded ahead of time plays from memory; anything else streams from the archive
+  let src=trackUrl(item,item.trackIndex);
+  const oldBlob=playingBlob;playingBlob='';
+  if(preload&&preload.key===preloadKey(item,item.trackIndex)){
+    if(preload.blobUrl){src=playingBlob=preload.blobUrl;preload=null;}
+    else dropPreload(); // still downloading: it would hold up the stream of the same file
+  }
+  previewAudio.src=src;previewAudio.load();updateMediaMetadata();
+  if(oldBlob)URL.revokeObjectURL(oldBlob);
+  rescues=0;stallSince=Date.now();stallTime=-1;
+  if(!playingBlob)preferDirect(item,item.trackIndex);
+  if(autoplay)previewAudio.play().then(()=>{previewPlaying=true;syncPlayerUI();}).catch(e=>{if(e&&e.name==='AbortError')return;previewPlaying=false;syncPlayerUI();});
   else previewPlaying=false;
   syncPlayerUI();persistNowPlaying();
+}
+/* ── Slow archive servers ──
+   archive.org/download/… redirects each request to a server of its choosing, and some
+   of those (the *.ca mirrors, measured 2026-11) send audio slower than it plays. The
+   item's own servers, listed by the metadata API, were fast in the same test. So:
+   · direct: playback is asked for at once through the redirect (inside the click, so
+     autoplay is allowed) and moves to the item's own server as soon as that is known,
+     unless audio has already arrived;
+   · rescue: playback that stops advancing for a few seconds is reloaded from another
+     of the item's servers, or through the redirect again, and resumes where it was;
+   · preload: once a track has played for a while, the next one (or the next album's
+     first) is downloaded whole from the item's server and starts from memory. */
+const ARCHIVE_DL='https://archive.org/download/';
+const STALL_MS=4000,START_MS=8000,MAX_RESCUES=3,PRELOAD_AFTER=10,PRELOAD_MAX=40e6;
+const serverInfo=new Map();
+let stallSince=0,stallTime=-1,rescues=0,rescuing=false,preload=null,playingBlob='';
+function itemServers(id){
+  if(!serverInfo.has(id)){
+    const get=k=>fetch('https://archive.org/metadata/'+encodeURIComponent(id)+'/'+k).then(r=>r.ok?r.json():null).then(j=>j&&j.result);
+    serverInfo.set(id,Promise.all([get('workable_servers'),get('dir')]).then(([hosts,dir])=>{
+      hosts=(Array.isArray(hosts)?hosts:[]).filter(h=>/^[a-z0-9.-]+\.archive\.org$/i.test(h));
+      if(!hosts.length||typeof dir!=='string'||dir[0]!=='/')throw new Error('No servers');
+      return {hosts,dir};
+    }).catch(()=>{serverInfo.delete(id);return null;}));
+  }
+  return serverInfo.get(id);
+}
+/* The same file on each of the item's own servers, skipping the redirect */
+async function directUrls(item,idx){
+  const url=trackUrl(item,idx),prefix=ARCHIVE_DL+encodeURIComponent(item.identifier)+'/';
+  if(!url||!url.startsWith(prefix))return [];
+  const info=await itemServers(item.identifier);
+  return info?info.hosts.map(h=>'https://'+h+info.dir+'/'+url.slice(prefix.length)):[];
+}
+function preferDirect(item,idx){
+  directUrls(item,idx).then(urls=>{
+    const a=previewAudio;
+    if(!urls.length||previewItem!==item||item.trackIndex!==idx)return;
+    if(a.getAttribute('src')!==trackUrl(item,idx)||a.readyState>0)return; // already answered, or moved on
+    const playing=!a.paused;
+    a.src=urls[0];a.load();stallSince=Date.now();stallTime=-1;
+    if(playing)a.play().catch(()=>{});
+  }).catch(()=>{});
+}
+async function rescueTrack(){
+  const item=previewItem,idx=item.trackIndex,at=previewAudio.currentTime||pendingSeek||0;
+  rescuing=true;rescues++;
+  let urls=[];
+  try{urls=await directUrls(item,idx);}catch(_){}
+  const base=trackUrl(item,idx);
+  urls.push(base+(base.includes('?')?'&':'?')+'r='+Date.now()); // last resort: ask the redirect again
+  rescuing=false;stallSince=Date.now();stallTime=-1;
+  if(previewItem!==item||item.trackIndex!==idx||previewAudio.paused)return;
+  const cur=previewAudio.getAttribute('src');
+  pendingSeek=at;previewAudio.src=urls.find(u=>u!==cur);previewAudio.load();
+  previewAudio.play().catch(()=>{});
+}
+function watchStall(){
+  const a=previewAudio,now=Date.now(),src=a.getAttribute('src')||'';
+  if(!previewItem||!src||a.paused||a.ended||rescuing||src.startsWith('blob:')||navigator.onLine===false){stallSince=now;stallTime=-1;return;}
+  if(a.currentTime!==stallTime){stallTime=a.currentTime;stallSince=now;return;}
+  if(rescues<MAX_RESCUES&&now-stallSince>(a.currentTime>0?STALL_MS:START_MS))rescueTrack();
+}
+function preloadKey(item,idx){return item.identifier+'|'+trackUrl(item,idx);}
+function nextUp(){
+  const item=previewItem;if(!item)return null;
+  if(item.tracks&&item.trackIndex<item.tracks.length-1)return {item,idx:item.trackIndex+1};
+  if(item.isSingle)return null;
+  const i=currentAlbums.findIndex(a=>sameAlbum(a,item));if(i<0)return null;
+  const next=currentAlbums.slice(i+1).find(a=>a&&a.previewUrl);
+  return next?{item:next,idx:0}:null;
+}
+function dropPreload(){
+  if(!preload)return;
+  preload.ctrl.abort();if(preload.blobUrl)URL.revokeObjectURL(preload.blobUrl);preload=null;
+}
+async function preloadNext(){
+  const a=previewAudio;
+  if(!previewItem||a.paused||!(a.currentTime>=PRELOAD_AFTER)||navigator.onLine===false)return;
+  if(navigator.connection&&navigator.connection.saveData)return;
+  const up=nextUp();if(!up)return;
+  const key=preloadKey(up.item,up.idx);
+  if(preload&&preload.key===key)return; // under way, ready, or already failed: one try per track
+  dropPreload();
+  const job=preload={key,ctrl:new AbortController(),blobUrl:''};
+  try{
+    const urls=await directUrls(up.item,up.idx);
+    if(!urls.length||preload!==job)return;
+    const r=await fetch(urls[0],{signal:job.ctrl.signal});
+    if(!r.ok||Number(r.headers.get('content-length'))>PRELOAD_MAX){job.ctrl.abort();return;}
+    const blob=await r.blob();
+    if(preload===job&&blob.size)job.blobUrl=URL.createObjectURL(blob);
+  }catch(_){}
 }
 /* ── Media Session: lock screen, notification and media keys ── */
 const mediaSession='mediaSession' in navigator?navigator.mediaSession:null;
@@ -954,7 +1057,7 @@ function togglePlayPause(){
   if(!previewItem)return;
   if(!previewAudio.paused){previewAudio.pause();return;}
   if(previewAudio.ended||!previewAudio.src){loadTrack(previewAudio.ended?0:previewItem.trackIndex||0,true);return;}
-  previewAudio.play().then(()=>{previewPlaying=true;syncPlayerUI();}).catch(()=>{previewPlaying=false;syncPlayerUI();});
+  previewAudio.play().then(()=>{previewPlaying=true;syncPlayerUI();}).catch(e=>{if(e&&e.name==='AbortError')return;previewPlaying=false;syncPlayerUI();});
 }
 function nextTrack(){
   const item=previewItem;if(!item)return;
@@ -991,6 +1094,7 @@ function prevTrack(){
 }
 function closePlayer(){
   previewAudio.pause();previewAudio.removeAttribute('src');previewAudio.load();
+  dropPreload();if(playingBlob){URL.revokeObjectURL(playingBlob);playingBlob='';}
   previewItem=null;previewPlaying=false;pendingSeek=0;updateMediaMetadata();
   $('npPanel').hidden=true;$('npListToggle').setAttribute('aria-expanded','false');
   syncPlayerUI();persistNowPlaying();
@@ -1020,7 +1124,7 @@ function restoreNowPlaying(){
     if(!data||!data.item||!data.item.identifier||Date.now()-Number(data.savedAt)>CURRENT_TTL)return;
     previewItem=dedupeTracks(data.item);renderNowPlayingPanel();
     loadTrack(Number(previewItem.trackIndex)||0,false,Number(data.time)||0);
-    if(data.playing)previewAudio.play().then(()=>{previewPlaying=true;syncPlayerUI();}).catch(()=>{previewPlaying=false;syncPlayerUI();showShareToast('Press play to resume');});
+    if(data.playing)previewAudio.play().then(()=>{previewPlaying=true;syncPlayerUI();}).catch(e=>{if(e&&e.name==='AbortError')return;previewPlaying=false;syncPlayerUI();showShareToast('Press play to resume');});
   }catch(_){}
 }
 function bindPreviewAudio(){
@@ -1041,7 +1145,13 @@ function bindPreviewAudio(){
     else if(item)playNextAlbum().then(started=>{if(!started&&previewItem===item)loadTrack(0,false);});
     else{previewPlaying=false;syncPlayerUI();persistNowPlaying();}
   });
-  previewAudio.addEventListener('error',()=>{if(!previewAudio.getAttribute('src'))return;previewPlaying=false;syncPlayerUI();});
+  previewAudio.addEventListener('error',()=>{
+    const src=previewAudio.getAttribute('src');if(!src)return;
+    // A preloaded copy that will not play: stream the same track instead
+    if(src.startsWith('blob:')&&previewItem){loadTrack(previewItem.trackIndex||0,true);return;}
+    previewPlaying=false;syncPlayerUI();
+  });
+  setInterval(()=>{watchStall();preloadNext();},1000);
   addEventListener('pagehide',persistNowPlaying);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')persistNowPlaying();});
 }
